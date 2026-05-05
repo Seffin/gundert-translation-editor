@@ -1,4 +1,32 @@
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
 .env
-ui/
+.env.*
+!.env.example
+!.env.test
+
+# Local resources (separate repos)
 en_obs/
 en_obs-twl/
+
+# Design artifacts
+ui/
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+# Playwright
+test-results

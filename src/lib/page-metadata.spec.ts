@@ -1,0 +1,28 @@
+import { describe, expect, it } from 'vitest';
+import {
+	buildPageTitle,
+	getPageMetadata,
+	PAGE_METADATA_BY_PATH,
+	validatePageTitle
+} from '$lib/page-metadata';
+
+describe('page metadata', () => {
+	it('provides metadata for known routes', () => {
+		expect(getPageMetadata('/').title).toBe('Workspace');
+		expect(getPageMetadata('/demo').title).toBe('Demo');
+	});
+
+	it('falls back to home metadata for unknown routes', () => {
+		expect(getPageMetadata('/unknown').title).toBe('Workspace');
+	});
+
+	it('builds titles with Gundert Editor prefix', () => {
+		expect(buildPageTitle('/')).toMatch(/^Gundert Editor \| /);
+	});
+
+	it('validates all configured routes against legacy brand strings', () => {
+		for (const path of Object.keys(PAGE_METADATA_BY_PATH)) {
+			expect(validatePageTitle(path)).toBe(true);
+		}
+	});
+});
