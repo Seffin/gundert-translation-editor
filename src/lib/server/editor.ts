@@ -8,8 +8,18 @@ export type EditorSegment = {
 	status: 'Draft' | 'Done';
 	draftedByGemini: boolean;
 	updatedAtLabel: string;
+	aiProvenance?: AIDraftProvenance;
 	lastSavedByActorId?: string;
 	lastSavedAtIso?: string;
+};
+
+export type AIDraftScope = 'whole-story' | 'selected-chunk';
+
+export type AIDraftProvenance = {
+	actor: string;
+	scope: AIDraftScope;
+	generatedAtIso: string;
+	generatedAtLabel: string;
 };
 
 export type StoryEditorModel = {
@@ -31,16 +41,32 @@ function deriveGeminiLabel(segmentIndex: number): string {
 	return 'Not generated';
 }
 
+function deriveGeminiIso(segmentIndex: number): string {
+	if (segmentIndex === 0) return '2026-05-05T09:58:00.000Z';
+	if (segmentIndex === 1) return '2026-05-05T09:55:00.000Z';
+	return '2026-05-05T09:50:00.000Z';
+}
+
 function mapSegment(segment: ObsSegment, index: number, targetLanguage: string): EditorSegment {
 	const status = deriveStatus(index);
+	const draftedByGemini = status === 'Done';
+	const updatedAtLabel = deriveGeminiLabel(index);
 	return {
 		id: segment.id,
 		sourceText: segment.text,
 		targetText: '',
 		targetLanguage,
 		status,
-		draftedByGemini: status === 'Done',
-		updatedAtLabel: deriveGeminiLabel(index),
+		draftedByGemini,
+		updatedAtLabel,
+		aiProvenance: draftedByGemini
+			? {
+				actor: 'Gemini',
+				scope: 'whole-story',
+				generatedAtIso: deriveGeminiIso(index),
+				generatedAtLabel: updatedAtLabel
+			}
+			: undefined,
 		lastSavedByActorId: undefined,
 		lastSavedAtIso: undefined
 	};

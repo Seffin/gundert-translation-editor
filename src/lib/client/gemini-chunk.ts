@@ -56,7 +56,13 @@ export function applyChunkDraftToSegments(
 			targetText: translation,
 			draftedByGemini: true,
 			status: 'Draft' as const,
-			updatedAtLabel: 'Just now'
+			updatedAtLabel: 'Just now',
+			aiProvenance: {
+				actor: 'Gemini',
+				scope: 'selected-chunk',
+				generatedAtIso: nowIso,
+				generatedAtLabel: 'Just now'
+			}
 		};
 	});
 }

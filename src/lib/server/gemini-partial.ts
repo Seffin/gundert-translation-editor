@@ -46,7 +46,13 @@ export function mergePartialDraftResult(
 			targetText: outcome.targetText,
 			draftedByGemini: true,
 			status: 'Draft' as const,
-			updatedAtLabel: 'Just now'
+			updatedAtLabel: 'Just now',
+			aiProvenance: {
+				actor: 'Gemini',
+				scope: 'selected-chunk',
+				generatedAtIso: nowIso,
+				generatedAtLabel: 'Just now'
+			}
 		};
 	});
 }

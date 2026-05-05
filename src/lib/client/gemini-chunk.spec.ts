@@ -105,6 +105,9 @@ describe('selective chunk draft', () => {
 		// Segment 01:02 updated with draft
 		expect(result[1].targetText).toBe('प्रकाश हो जाए');
 		expect(result[1].draftedByGemini).toBe(true);
+		expect(result[1].aiProvenance?.actor).toBe('Gemini');
+		expect(result[1].aiProvenance?.scope).toBe('selected-chunk');
+		expect(result[1].aiProvenance?.generatedAtIso).toBe('2026-05-05T10:00:00.000Z');
 		// Segment 01:03 unchanged
 		expect(result[2].targetText).toBe('');
 		expect(result[2].draftedByGemini).toBe(false);
@@ -155,6 +158,8 @@ describe('selective chunk draft', () => {
 		expect(result).toHaveLength(3);
 		// Verify selected segment got a new draft
 		expect(result[1].draftedByGemini).toBe(true);
+		expect(result[1].aiProvenance?.actor).toBe('Gemini');
+		expect(result[1].aiProvenance?.scope).toBe('selected-chunk');
 		// Verify unselected segment unchanged
 		expect(result[0].targetText).toBe('पहले से था');
 

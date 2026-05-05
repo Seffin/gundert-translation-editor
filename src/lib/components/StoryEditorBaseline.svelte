@@ -107,6 +107,12 @@
 		editorSegments = editorSegments.map((s) => ({ ...s, targetLanguage: lang }));
 	}
 
+	function formatProvenanceScope(scope: string): string {
+		if (scope === 'whole-story') return 'Whole story';
+		if (scope === 'selected-chunk') return 'Selected chunk';
+		return scope;
+	}
+
 	async function draftSelected(): Promise<void> {
 		if (selection.count === 0 || drafting) return;
 		drafting = true;
@@ -229,8 +235,12 @@
 							aria-label={`target-${segment.id}`}
 						></textarea>
 					{/if}
-					{#if segment.draftedByGemini}
-						<div class="provenance">DRAFTED BY GEMINI • {segment.updatedAtLabel}</div>
+					{#if segment.draftedByGemini && segment.aiProvenance}
+						<div class="provenance">
+							AI DRAFT • {segment.aiProvenance.actor} • {formatProvenanceScope(segment.aiProvenance.scope)} • {segment.aiProvenance.generatedAtLabel}
+						</div>
+					{:else if segment.draftedByGemini}
+						<div class="provenance">AI DRAFT • Gemini • Whole story • {segment.updatedAtLabel}</div>
 					{/if}
 					{#if segment.lastSavedByActorId}
 						<div class="save-meta">Saved by {segment.lastSavedByActorId} at {segment.lastSavedAtIso}</div>

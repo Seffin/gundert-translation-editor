@@ -103,7 +103,13 @@ export function parseGeminiWholeStoryResponse(
 			targetText: translation,
 			draftedByGemini: true,
 			status: 'Draft' as const,
-			updatedAtLabel: 'Just now'
+			updatedAtLabel: 'Just now',
+			aiProvenance: {
+				actor: 'Gemini',
+				scope: 'whole-story',
+				generatedAtIso: nowIso,
+				generatedAtLabel: 'Just now'
+			}
 		};
 	});
 }

@@ -18,7 +18,13 @@ const STORY: StoryEditorModel = {
 			targetLanguage: 'Hindi',
 			status: 'Done',
 			draftedByGemini: true,
-			updatedAtLabel: '2 mins ago'
+			updatedAtLabel: '2 mins ago',
+			aiProvenance: {
+				actor: 'Gemini',
+				scope: 'whole-story',
+				generatedAtIso: '2026-05-05T10:00:00.000Z',
+				generatedAtLabel: '2 mins ago'
+			}
 		},
 		{
 			id: '01:02',
@@ -41,7 +47,9 @@ describe('StoryEditorBaseline', () => {
 			.element(page.getByText('In the beginning, God created the heavens and the earth.'))
 			.toBeInTheDocument();
 		await expect.element(page.getByText('Hindi').nth(1)).toBeInTheDocument();
-		await expect.element(page.getByText('DRAFTED BY GEMINI • 2 mins ago')).toBeInTheDocument();
+		await expect
+			.element(page.getByText('AI DRAFT • Gemini • Whole story • 2 mins ago'))
+			.toBeInTheDocument();
 	});
 
 	it('shows skeleton placeholder on selected segments while drafting', async () => {

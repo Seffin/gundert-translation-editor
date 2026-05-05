@@ -74,8 +74,12 @@ describe('Gemini whole-story draft adapter', () => {
 		expect(drafted[0].id).toBe('01:01');
 		expect(drafted[0].targetText).toMatch(/beginning|God|created/i);
 		expect(drafted[0].draftedByGemini).toBe(true);
+		expect(drafted[0].aiProvenance?.actor).toBe('Gemini');
+		expect(drafted[0].aiProvenance?.scope).toBe('whole-story');
+		expect(drafted[0].aiProvenance?.generatedAtIso).toBe('2026-05-05T10:00:00.000Z');
 		expect(drafted[1].id).toBe('01:02');
 		expect(drafted[1].draftedByGemini).toBe(true);
+		expect(drafted[1].aiProvenance?.scope).toBe('whole-story');
 	});
 
 	it('handles Gemini API success with mocked fetch', async () => {
@@ -98,6 +102,8 @@ describe('Gemini whole-story draft adapter', () => {
 
 		expect(result).toHaveLength(2);
 		expect(result[0].draftedByGemini).toBe(true);
+		expect(result[0].aiProvenance?.actor).toBe('Gemini');
+		expect(result[0].aiProvenance?.scope).toBe('whole-story');
 		expect(mockFetch).toHaveBeenCalled();
 	});
 
