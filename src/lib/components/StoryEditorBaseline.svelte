@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 	import {
 		applyPersistedStoryDraft,
 		buildPersistedStoryDraft,
@@ -8,6 +9,7 @@
 		savePersistedStoryDraft,
 		type PersistedStoryDraft
 	} from '$lib/client/story-editor-draft';
+	import { confirmDiscardChanges } from '$lib/client/route-leave-guard';
 	import type { StoryEditorModel } from '$lib/server/editor';
 
 	const ACTOR_ID = 'translator.demo';
@@ -31,6 +33,31 @@
 		lastSavedDraft = persisted;
 		saveMessage = `Saved by ${persisted.savedByActorId} at ${persisted.savedAtIso}`;
 		isDirty = false;
+
+		// Set up beforeunload handler for browser tab/window close
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			if (isDirty && hasUnsavedChanges(editorSegments, lastSavedDraft)) {
+				e.preventDefault();
+				e.returnValue = '';
+			}
+		};
+
+		window.addEventListener('beforeunload', handleBeforeUnload);
+
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		};
+	});
+
+	beforeNavigate(async (navigation) => {
+		if (!isDirty || !hasUnsavedChanges(editorSegments, lastSavedDraft)) {
+			return;
+		}
+
+		const allowed = await confirmDiscardChanges(editorSegments, lastSavedDraft);
+		if (!allowed) {
+			navigation.cancel();
+		}
 	});
 
 	function markDirty(): void {
