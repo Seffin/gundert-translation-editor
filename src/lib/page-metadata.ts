@@ -17,6 +17,10 @@ export const PAGE_METADATA_BY_PATH: Record<string, PageMetadata> = {
 	'/demo/playwright': {
 		title: 'Playwright Demo',
 		description: 'End-to-end test demo route'
+	},
+	'/stories': {
+		title: 'Story List',
+		description: 'Open Bible Stories translation workflow list'
 	}
 };
 
