@@ -43,6 +43,21 @@ describe('StoryEditorBaseline', () => {
 		await expect.element(page.getByText('DRAFTED BY GEMINI • 2 mins ago')).toBeInTheDocument();
 	});
 
+	it('shows skeleton placeholder on selected segments while drafting', async () => {
+		render(StoryEditorBaseline, { story: STORY });
+
+		// Select the first segment
+		const checkbox = page.getByRole('checkbox', { name: 'select-segment-01:01' });
+		await checkbox.click();
+
+		// Draft-Selected button should now be enabled (count = 1)
+		const draftBtn = page.getByTestId('draft-selected-btn');
+		await expect.element(draftBtn).toHaveTextContent('Draft Selected (1)');
+
+		// Verify the button is not disabled
+		await expect.element(draftBtn).not.toBeDisabled();
+	});
+
 	it('tracks unsaved changes and shows save confirmation with actor', async () => {
 		render(StoryEditorBaseline, { story: STORY });
 

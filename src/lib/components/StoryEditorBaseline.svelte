@@ -174,13 +174,21 @@
 						<span class="language-chip">{segment.targetLanguage}</span>
 						<span class="status-chip">{segment.status}</span>
 					</div>
-					<textarea
-						rows="4"
-						placeholder="Start translating or use AI draft..."
-						bind:value={segment.targetText}
-						oninput={markDirty}
-						aria-label={`target-${segment.id}`}
-					></textarea>
+					{#if drafting && selection.selected[segment.id]}
+						<div class="skeleton" aria-label="generating draft" data-testid="skeleton-{segment.id}">
+							<div class="skeleton-line"></div>
+							<div class="skeleton-line skeleton-line--short"></div>
+							<div class="skeleton-line"></div>
+						</div>
+					{:else}
+						<textarea
+							rows="4"
+							placeholder="Start translating or use AI draft..."
+							bind:value={segment.targetText}
+							oninput={markDirty}
+							aria-label={`target-${segment.id}`}
+						></textarea>
+					{/if}
 					{#if segment.draftedByGemini}
 						<div class="provenance">DRAFTED BY GEMINI • {segment.updatedAtLabel}</div>
 					{/if}
@@ -303,6 +311,30 @@
 		border: 1px solid #e5e7eb;
 		border-radius: 0.5rem;
 		padding: 0.75rem;
+	}
+
+	.skeleton {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 0.75rem 0;
+	}
+
+	.skeleton-line {
+		height: 1rem;
+		border-radius: 0.25rem;
+		background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+		background-size: 200% 100%;
+		animation: shimmer 1.4s infinite;
+	}
+
+	.skeleton-line--short {
+		width: 60%;
+	}
+
+	@keyframes shimmer {
+		0% { background-position: 200% 0; }
+		100% { background-position: -200% 0; }
 	}
 
 	.provenance {
