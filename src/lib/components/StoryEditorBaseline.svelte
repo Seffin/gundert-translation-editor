@@ -85,6 +85,22 @@
 		selection = toggleSegmentSelection(selection, id);
 	}
 
+	function toggleAllSegments(): void {
+		if (editorSegments.length === 0) return;
+
+		const shouldSelectAll = selection.count !== editorSegments.length;
+		const selected: Record<string, boolean> = {};
+
+		for (const segment of editorSegments) {
+			selected[segment.id] = shouldSelectAll;
+		}
+
+		selection = {
+			selected,
+			count: shouldSelectAll ? editorSegments.length : 0
+		};
+	}
+
 	function handleLanguageChange(lang: string): void {
 		selectedLanguage = lang;
 		saveTargetLanguage(story.storyId, lang);
@@ -140,6 +156,17 @@
 		<p>{story.description}</p>
 		<div class="save-bar">
 			<LanguageSelector storyId={story.storyId} value={selectedLanguage} onchange={handleLanguageChange} />
+			<button
+				type="button"
+				class="bulk-select-btn"
+				onclick={toggleAllSegments}
+				disabled={editorSegments.length === 0}
+				data-testid="bulk-select-btn"
+			>
+				{selection.count === editorSegments.length && editorSegments.length > 0
+					? 'Deselect All'
+					: 'Select All'}
+			</button>
 			<button onclick={saveChanges} disabled={!isDirty || saving}>
 				{saving ? 'Saving...' : 'Save Changes'}
 			</button>
@@ -246,6 +273,11 @@
 	.draft-btn {
 		background: #1f4f3f;
 		border-color: #1f4f3f;
+	}
+
+	.bulk-select-btn {
+		background: #374151;
+		border-color: #374151;
 	}
 
 	.dirty-indicator {

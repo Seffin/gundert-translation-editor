@@ -59,6 +59,29 @@ describe('StoryEditorBaseline', () => {
 		await expect.element(draftBtn).not.toBeDisabled();
 	});
 
+	it('supports select all and deselect all for segment checkboxes', async () => {
+		render(StoryEditorBaseline, { story: STORY });
+
+		const bulkSelectBtn = page.getByTestId('bulk-select-btn');
+		const firstCheckbox = page.getByRole('checkbox', { name: 'select-segment-01:01' });
+		const secondCheckbox = page.getByRole('checkbox', { name: 'select-segment-01:02' });
+		const draftBtn = page.getByTestId('draft-selected-btn');
+
+		await expect.element(bulkSelectBtn).toHaveTextContent('Select All');
+
+		await bulkSelectBtn.click();
+		await expect.element(firstCheckbox).toBeChecked();
+		await expect.element(secondCheckbox).toBeChecked();
+		await expect.element(bulkSelectBtn).toHaveTextContent('Deselect All');
+		await expect.element(draftBtn).toHaveTextContent('Draft Selected (2)');
+
+		await bulkSelectBtn.click();
+		await expect.element(firstCheckbox).not.toBeChecked();
+		await expect.element(secondCheckbox).not.toBeChecked();
+		await expect.element(bulkSelectBtn).toHaveTextContent('Select All');
+		await expect.element(draftBtn).toHaveTextContent('Draft Selected (0)');
+	});
+
 	it('tracks unsaved changes and shows save confirmation with actor', async () => {
 		render(StoryEditorBaseline, { story: STORY });
 
