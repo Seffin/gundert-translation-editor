@@ -15,7 +15,7 @@
 		toggleSegmentSelection,
 		requestGeminiChunkDraft,
 		type SegmentSelectionModel
-	} from '$lib/server/gemini-chunk';
+	} from '$lib/client/gemini-chunk';
 	import type { StoryEditorModel } from '$lib/server/editor';
 
 	const ACTOR_ID = 'translator.demo';

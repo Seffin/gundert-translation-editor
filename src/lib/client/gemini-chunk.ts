@@ -1,14 +1,19 @@
-import type { EditorSegment } from './editor';
-import {
-	buildGeminiWholeStoryRequest,
-	parseGeminiWholeStoryResponse,
-	type GeminiDraftResponse,
-	type GeminiErrorResponse
-} from './gemini-adapter';
+import type { EditorSegment } from '$lib/server/editor';
 
 export type SegmentSelectionModel = {
 	selected: Record<string, boolean>;
 	count: number;
+};
+
+type GeminiDraftResponse = {
+	candidates: Array<{
+		content: { parts: Array<{ text: string }> };
+		finishReason: string;
+	}>;
+};
+
+type GeminiErrorResponse = {
+	error: { code: number; message: string; status: string };
 };
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
@@ -93,17 +98,8 @@ export async function requestGeminiChunkDraft(
 	const url = `${GEMINI_API_BASE}/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
 	const payload = {
-		contents: [
-			{
-				parts: [{ text: prompt }]
-			}
-		],
-		generationConfig: {
-			temperature: 0.7,
-			topK: 40,
-			topP: 0.95,
-			maxOutputTokens: 2048
-		},
+		contents: [{ parts: [{ text: prompt }] }],
+		generationConfig: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 2048 },
 		safetySettings: [
 			{ category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
 			{ category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },

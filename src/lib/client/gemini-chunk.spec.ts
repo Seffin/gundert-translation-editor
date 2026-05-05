@@ -7,7 +7,7 @@ import {
 	requestGeminiChunkDraft,
 	toggleSegmentSelection,
 	type SegmentSelectionModel
-} from '$lib/server/gemini-chunk';
+} from '$lib/client/gemini-chunk';
 
 const SEGMENTS: EditorSegment[] = [
 	{
