@@ -8,6 +8,8 @@ export type EditorSegment = {
 	status: 'Draft' | 'Done';
 	draftedByGemini: boolean;
 	updatedAtLabel: string;
+	lastSavedByActorId?: string;
+	lastSavedAtIso?: string;
 };
 
 export type StoryEditorModel = {
@@ -42,7 +44,9 @@ function mapSegment(storyNumber: number, segment: ObsSegment, index: number): Ed
 		targetLanguage,
 		status,
 		draftedByGemini: status === 'Done',
-		updatedAtLabel: deriveGeminiLabel(index)
+		updatedAtLabel: deriveGeminiLabel(index),
+		lastSavedByActorId: undefined,
+		lastSavedAtIso: undefined
 	};
 }
 

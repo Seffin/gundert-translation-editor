@@ -1,7 +1,57 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import {
+		applyPersistedStoryDraft,
+		buildPersistedStoryDraft,
+		hasUnsavedChanges,
+		loadPersistedStoryDraft,
+		savePersistedStoryDraft,
+		type PersistedStoryDraft
+	} from '$lib/client/story-editor-draft';
 	import type { StoryEditorModel } from '$lib/server/editor';
 
+	const ACTOR_ID = 'translator.demo';
+
 	let { story } = $props<{ story: StoryEditorModel }>();
+	const initialSegments = story.segments.map((segment) => ({ ...segment }));
+	let editorSegments = $state(initialSegments);
+	let isDirty = $state(false);
+	let saveMessage = $state('');
+	let saving = $state(false);
+	let lastSavedDraft = $state<PersistedStoryDraft | undefined>(undefined);
+
+	onMount(() => {
+		const persisted = loadPersistedStoryDraft(story.storyId);
+		if (!persisted) return;
+
+		editorSegments = applyPersistedStoryDraft(editorSegments, persisted);
+		lastSavedDraft = persisted;
+		saveMessage = `Saved by ${persisted.savedByActorId} at ${persisted.savedAtIso}`;
+		isDirty = false;
+	});
+
+	function markDirty(): void {
+		isDirty = hasUnsavedChanges(editorSegments, lastSavedDraft);
+		if (isDirty) saveMessage = '';
+	}
+
+	function saveChanges(): void {
+		saving = true;
+		const nowIso = new Date().toISOString();
+		const draft = buildPersistedStoryDraft(story.storyId, ACTOR_ID, editorSegments, nowIso);
+		savePersistedStoryDraft(draft);
+
+		editorSegments = editorSegments.map((segment) => ({
+			...segment,
+			lastSavedByActorId: ACTOR_ID,
+			lastSavedAtIso: nowIso
+		}));
+
+		lastSavedDraft = draft;
+		isDirty = false;
+		saveMessage = `Saved by ${ACTOR_ID} at ${nowIso}`;
+		saving = false;
+	}
 </script>
 
 <main class="editor">
@@ -9,10 +59,21 @@
 		<nav aria-label="breadcrumbs">Open Bible Stories / Story {story.storyId}</nav>
 		<h1>{story.storyId}: {story.title}</h1>
 		<p>{story.description}</p>
+		<div class="save-bar">
+			<button onclick={saveChanges} disabled={!isDirty || saving}>
+				{saving ? 'Saving...' : 'Save Changes'}
+			</button>
+			{#if isDirty}
+				<span class="dirty-indicator">Unsaved changes</span>
+			{/if}
+			{#if saveMessage}
+				<span class="save-message" data-testid="save-message">{saveMessage}</span>
+			{/if}
+		</div>
 	</header>
 
 	<section class="editor-grid" aria-label="source-target-editor">
-		{#each story.segments as segment, index}
+		{#each editorSegments as segment, index}
 			<div class="segment-row" data-segment={segment.id}>
 				<section class="source-column" aria-label={`source-${segment.id}`}>
 					<span class="segment-number">{String(index + 1).padStart(2, '0')}</span>
@@ -24,9 +85,18 @@
 						<span class="language-chip">{segment.targetLanguage}</span>
 						<span class="status-chip">{segment.status}</span>
 					</div>
-					<textarea rows="4" placeholder="Start translating or use AI draft..." value={segment.targetText}></textarea>
+					<textarea
+						rows="4"
+						placeholder="Start translating or use AI draft..."
+						bind:value={segment.targetText}
+						oninput={markDirty}
+						aria-label={`target-${segment.id}`}
+					></textarea>
 					{#if segment.draftedByGemini}
 						<div class="provenance">DRAFTED BY GEMINI • {segment.updatedAtLabel}</div>
+					{/if}
+					{#if segment.lastSavedByActorId}
+						<div class="save-meta">Saved by {segment.lastSavedByActorId} at {segment.lastSavedAtIso}</div>
 					{/if}
 				</section>
 			</div>
@@ -39,6 +109,40 @@
 		padding: 2rem;
 		max-width: 1100px;
 		margin: 0 auto;
+	}
+
+	.save-bar {
+		display: flex;
+		gap: 0.75rem;
+		align-items: center;
+		margin-top: 0.75rem;
+	}
+
+	button {
+		padding: 0.5rem 0.875rem;
+		border-radius: 0.5rem;
+		border: 1px solid #111827;
+		background: #111827;
+		color: #fff;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	button:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	.dirty-indicator {
+		font-size: 0.8rem;
+		font-weight: 700;
+		color: #7a1f1a;
+	}
+
+	.save-message {
+		font-size: 0.8rem;
+		font-weight: 700;
+		color: #1f4f3f;
 	}
 
 	.editor-grid {
@@ -89,6 +193,13 @@
 		font-size: 0.7rem;
 		color: #4b5563;
 		font-weight: 700;
+	}
+
+	.save-meta {
+		margin-top: 0.35rem;
+		font-size: 0.7rem;
+		color: #1f4f3f;
+		font-weight: 600;
 	}
 
 	@media (max-width: 900px) {

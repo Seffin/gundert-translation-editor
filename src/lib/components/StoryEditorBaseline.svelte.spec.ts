@@ -42,4 +42,18 @@ describe('StoryEditorBaseline', () => {
 		await expect.element(page.getByText('Hindi')).toBeInTheDocument();
 		await expect.element(page.getByText('DRAFTED BY GEMINI • 2 mins ago')).toBeInTheDocument();
 	});
+
+	it('tracks unsaved changes and shows save confirmation with actor', async () => {
+		render(StoryEditorBaseline, { story: STORY });
+
+		const firstTarget = page.getByRole('textbox').first();
+		await firstTarget.fill('नई अनुवादित पंक्ति');
+
+		await expect.element(page.getByText('Unsaved changes')).toBeInTheDocument();
+
+		await page.getByRole('button', { name: 'Save Changes' }).click();
+		await expect.element(page.getByTestId('save-message')).toHaveTextContent(
+			/Saved by translator\.demo at /
+		);
+	});
 });
