@@ -4,7 +4,7 @@ export type EditorSegment = {
 	id: string;
 	sourceText: string;
 	targetText: string;
-	targetLanguage: 'Hindi' | 'Malayalam';
+	targetLanguage: string;
 	status: 'Draft' | 'Done';
 	draftedByGemini: boolean;
 	updatedAtLabel: string;
@@ -17,12 +17,9 @@ export type StoryEditorModel = {
 	storyNumber: number;
 	title: string;
 	description: string;
+	targetLanguage: string;
 	segments: EditorSegment[];
 };
-
-function deriveLanguage(storyNumber: number, segmentIndex: number): 'Hindi' | 'Malayalam' {
-	return (storyNumber + segmentIndex) % 2 === 0 ? 'Hindi' : 'Malayalam';
-}
 
 function deriveStatus(segmentIndex: number): 'Draft' | 'Done' {
 	return segmentIndex < 2 ? 'Done' : 'Draft';
@@ -34,9 +31,8 @@ function deriveGeminiLabel(segmentIndex: number): string {
 	return 'Not generated';
 }
 
-function mapSegment(storyNumber: number, segment: ObsSegment, index: number): EditorSegment {
+function mapSegment(segment: ObsSegment, index: number, targetLanguage: string): EditorSegment {
 	const status = deriveStatus(index);
-	const targetLanguage = deriveLanguage(storyNumber, index);
 	return {
 		id: segment.id,
 		sourceText: segment.text,
@@ -50,12 +46,18 @@ function mapSegment(storyNumber: number, segment: ObsSegment, index: number): Ed
 	};
 }
 
-export function buildStoryEditorModel(story: ObsStory): StoryEditorModel {
+export const DEFAULT_STORY_LANGUAGE = 'Hindi';
+
+export function buildStoryEditorModel(
+	story: ObsStory,
+	targetLanguage: string = DEFAULT_STORY_LANGUAGE
+): StoryEditorModel {
 	return {
 		storyId: story.storyId,
 		storyNumber: story.storyNumber,
 		title: story.title,
 		description: `Story ${story.storyId} baseline editor view for source and target translation.`,
-		segments: story.segments.map((segment, index) => mapSegment(story.storyNumber, segment, index))
+		targetLanguage,
+		segments: story.segments.map((segment, index) => mapSegment(segment, index, targetLanguage))
 	};
 }

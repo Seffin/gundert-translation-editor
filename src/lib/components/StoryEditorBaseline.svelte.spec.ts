@@ -9,6 +9,7 @@ const STORY: StoryEditorModel = {
 	storyNumber: 1,
 	title: 'The Creation',
 	description: 'Editor baseline test story',
+	targetLanguage: 'Hindi',
 	segments: [
 		{
 			id: '01:01',
@@ -39,7 +40,7 @@ describe('StoryEditorBaseline', () => {
 		await expect
 			.element(page.getByText('In the beginning, God created the heavens and the earth.'))
 			.toBeInTheDocument();
-		await expect.element(page.getByText('Hindi')).toBeInTheDocument();
+		await expect.element(page.getByText('Hindi').nth(1)).toBeInTheDocument();
 		await expect.element(page.getByText('DRAFTED BY GEMINI • 2 mins ago')).toBeInTheDocument();
 	});
 

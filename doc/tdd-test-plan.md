@@ -144,6 +144,7 @@ E2E:
 ## Acceptance Evidence Checklist
 1. Test run outputs for unit/integration/e2e.
 2. UI screenshots for critical states:
+   - language selector open and language chosen
    - chunk selection
    - AI generating
    - partial success + retry
@@ -151,8 +152,29 @@ E2E:
    - blocked approval
 3. Brand/title consistency report.
 
+### Module G: Target Language Selection
+Unit:
+1. `SUPPORTED_LANGUAGES` list is non-empty and contains expected gateway languages.
+2. `loadTargetLanguage(storyId)` returns stored language or default when none stored.
+3. `saveTargetLanguage(storyId, language)` persists to localStorage and loads back correctly.
+4. `isValidLanguage(language)` returns true for supported, false for unsupported strings.
+
+Component:
+1. LanguageSelector renders a `<select>` with all supported languages as options.
+2. LanguageSelector reflects the current selection as the active option.
+3. Changing the selection fires an `onchange` callback with the new language name.
+4. Editor header displays the selected language at all times.
+
+Integration:
+1. Selecting a language and triggering a draft sends that language to the Gemini prompt.
+2. After page reload the previously selected language is restored from localStorage.
+
+E2E:
+1. Open a story, change language to Tamil, generate a draft — prompt contains "Tamil".
+2. Reload page and verify language selector still shows Tamil.
+
 ## Minimum Gate to Merge
-1. Critical path tests pass for modules A-D.
+1. Critical path tests pass for modules A-D and G.
 2. No failing tests in brand/title consistency checks.
 3. E2E happy-path workflow passes.
 4. Known non-critical failures documented with owner and ETA.

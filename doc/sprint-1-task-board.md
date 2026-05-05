@@ -32,6 +32,7 @@
 | T1 | P0 | Initialize Svelte + Bun app foundation and test harness | Dev 1 | 0.5d | None | Write failing smoke test for app boot route | Sprint 1 Story 1 | Ready |
 | T2 | P0 | Define domain models (Project, Story, Segment, Role, Status, AuditEvent) | Dev 1 | 0.5d | T1 | Write schema validation tests first | Sprint 1 Stories 1,4,5 | Ready |
 | T3 | P0 | Add route metadata system with brand/title constants | Dev 1 | 0.5d | T1 | Write failing tests for title format | Brand consistency gate | Ready |
+| T27 | P0 | Implement target language selector with persistence | Dev 1 | 0.5d | T7 | Failing tests for language load/save and selector rendering | FR-0 | Ready |
 
 ### P0 OBS Import and Story List
 

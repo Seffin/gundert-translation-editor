@@ -37,4 +37,18 @@ describe('story editor model', () => {
 		expect(model.segments[0].updatedAtLabel).toContain('mins ago');
 		expect(model.segments[2].status).toBe('Draft');
 	});
+
+	it('uses Hindi as the default story-level target language', () => {
+		const model = buildStoryEditorModel(makeStory());
+		expect(model.targetLanguage).toBe('Hindi');
+		expect(model.segments[0].targetLanguage).toBe('Hindi');
+		expect(model.segments[1].targetLanguage).toBe('Hindi');
+	});
+
+	it('propagates an explicit target language to all segments', () => {
+		const model = buildStoryEditorModel(makeStory(), 'Tamil');
+		expect(model.targetLanguage).toBe('Tamil');
+		expect(model.segments[0].targetLanguage).toBe('Tamil');
+		expect(model.segments[2].targetLanguage).toBe('Tamil');
+	});
 });

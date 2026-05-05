@@ -49,6 +49,13 @@ Current OBS workflows are manual and slow. Teams need AI acceleration for first 
 6. Project Lead approves only stories with no blockers.
 
 ## Functional Requirements
+### FR-0 Target Language Selection
+- User can select the target translation language from a supported list before generating a draft.
+- Selected language persists per story across browser sessions (localStorage).
+- All AI draft calls (whole-story and chunk) use the story-level selected language.
+- The editor header displays the current language selection at all times.
+- Supported languages for MVP: Hindi, Malayalam, Tamil, Telugu, Kannada, Bengali, Gujarati, Marathi, Punjabi, Urdu, Odia, Assamese, Nepali, Sinhala, Malay, Indonesian, Swahili, Amharic.
+
 ### FR-1 OBS Import
 - System imports OBS stories and renders them in canonical order.
 - System preserves source segmentation.

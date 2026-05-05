@@ -16,6 +16,11 @@
 		requestGeminiChunkDraft,
 		type SegmentSelectionModel
 	} from '$lib/client/gemini-chunk';
+	import {
+		loadTargetLanguage,
+		saveTargetLanguage
+	} from '$lib/client/target-language';
+	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
 	import type { StoryEditorModel } from '$lib/server/editor';
 
 	const ACTOR_ID = 'translator.demo';
@@ -33,8 +38,10 @@
 	let selection = $state<SegmentSelectionModel>(buildSegmentSelectionModel(createInitialSegments()));
 	let drafting = $state(false);
 	let draftError = $state('');
+	let selectedLanguage = $state((() => story.targetLanguage)());
 
 	onMount(() => {
+		selectedLanguage = loadTargetLanguage(story.storyId);
 		const persisted = loadPersistedStoryDraft(story.storyId);
 		if (!persisted) return;
 
@@ -78,17 +85,22 @@
 		selection = toggleSegmentSelection(selection, id);
 	}
 
+	function handleLanguageChange(lang: string): void {
+		selectedLanguage = lang;
+		saveTargetLanguage(story.storyId, lang);
+		editorSegments = editorSegments.map((s) => ({ ...s, targetLanguage: lang }));
+	}
+
 	async function draftSelected(): Promise<void> {
 		if (selection.count === 0 || drafting) return;
 		drafting = true;
 		draftError = '';
 		try {
-			const targetLanguage = editorSegments[0]?.targetLanguage ?? 'Hindi';
 			const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
 			editorSegments = await requestGeminiChunkDraft(
 				editorSegments,
 				selection,
-				targetLanguage,
+				selectedLanguage,
 				story.storyId,
 				apiKey
 			);
@@ -127,6 +139,7 @@
 		<h1>{story.storyId}: {story.title}</h1>
 		<p>{story.description}</p>
 		<div class="save-bar">
+			<LanguageSelector storyId={story.storyId} value={selectedLanguage} onchange={handleLanguageChange} />
 			<button onclick={saveChanges} disabled={!isDirty || saving}>
 				{saving ? 'Saving...' : 'Save Changes'}
 			</button>
