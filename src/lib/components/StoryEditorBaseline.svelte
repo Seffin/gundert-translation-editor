@@ -13,8 +13,11 @@
 	const ACTOR_ID = 'translator.demo';
 
 	let { story } = $props<{ story: StoryEditorModel }>();
-	const initialSegments = story.segments.map((segment) => ({ ...segment }));
-	let editorSegments = $state(initialSegments);
+	function createInitialSegments() {
+		return story.segments.map((segment) => ({ ...segment }));
+	}
+
+	let editorSegments = $state(createInitialSegments());
 	let isDirty = $state(false);
 	let saveMessage = $state('');
 	let saving = $state(false);
@@ -73,7 +76,7 @@
 	</header>
 
 	<section class="editor-grid" aria-label="source-target-editor">
-		{#each editorSegments as segment, index}
+		{#each editorSegments as segment, index (segment.id)}
 			<div class="segment-row" data-segment={segment.id}>
 				<section class="source-column" aria-label={`source-${segment.id}`}>
 					<span class="segment-number">{String(index + 1).padStart(2, '0')}</span>
