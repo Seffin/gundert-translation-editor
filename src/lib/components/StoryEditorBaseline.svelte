@@ -10,6 +10,12 @@
 		type PersistedStoryDraft
 	} from '$lib/client/story-editor-draft';
 	import { confirmDiscardChanges } from '$lib/client/route-leave-guard';
+	import {
+		buildSegmentSelectionModel,
+		toggleSegmentSelection,
+		requestGeminiChunkDraft,
+		type SegmentSelectionModel
+	} from '$lib/server/gemini-chunk';
 	import type { StoryEditorModel } from '$lib/server/editor';
 
 	const ACTOR_ID = 'translator.demo';
@@ -24,6 +30,9 @@
 	let saveMessage = $state('');
 	let saving = $state(false);
 	let lastSavedDraft = $state<PersistedStoryDraft | undefined>(undefined);
+	let selection = $state<SegmentSelectionModel>(buildSegmentSelectionModel(createInitialSegments()));
+	let drafting = $state(false);
+	let draftError = $state('');
 
 	onMount(() => {
 		const persisted = loadPersistedStoryDraft(story.storyId);
@@ -65,6 +74,34 @@
 		if (isDirty) saveMessage = '';
 	}
 
+	function toggleSegment(id: string): void {
+		selection = toggleSegmentSelection(selection, id);
+	}
+
+	async function draftSelected(): Promise<void> {
+		if (selection.count === 0 || drafting) return;
+		drafting = true;
+		draftError = '';
+		try {
+			const targetLanguage = editorSegments[0]?.targetLanguage ?? 'Hindi';
+			const apiKey = (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
+			editorSegments = await requestGeminiChunkDraft(
+				editorSegments,
+				selection,
+				targetLanguage,
+				story.storyId,
+				apiKey
+			);
+			isDirty = true;
+			saveMessage = '';
+			selection = buildSegmentSelectionModel(editorSegments);
+		} catch (err) {
+			draftError = err instanceof Error ? err.message : 'Draft failed';
+		} finally {
+			drafting = false;
+		}
+	}
+
 	function saveChanges(): void {
 		saving = true;
 		const nowIso = new Date().toISOString();
@@ -93,11 +130,22 @@
 			<button onclick={saveChanges} disabled={!isDirty || saving}>
 				{saving ? 'Saving...' : 'Save Changes'}
 			</button>
+			<button
+				class="draft-btn"
+				onclick={draftSelected}
+				disabled={selection.count === 0 || drafting}
+				data-testid="draft-selected-btn"
+			>
+				{drafting ? 'Drafting…' : `Draft Selected (${selection.count})`}
+			</button>
 			{#if isDirty}
 				<span class="dirty-indicator">Unsaved changes</span>
 			{/if}
 			{#if saveMessage}
 				<span class="save-message" data-testid="save-message">{saveMessage}</span>
+			{/if}
+			{#if draftError}
+				<span class="draft-error" data-testid="draft-error">{draftError}</span>
 			{/if}
 		</div>
 	</header>
@@ -106,7 +154,18 @@
 		{#each editorSegments as segment, index (segment.id)}
 			<div class="segment-row" data-segment={segment.id}>
 				<section class="source-column" aria-label={`source-${segment.id}`}>
-					<span class="segment-number">{String(index + 1).padStart(2, '0')}</span>
+					<div class="segment-header">
+						<span class="segment-number">{String(index + 1).padStart(2, '0')}</span>
+						<label class="select-label">
+							<input
+								type="checkbox"
+								checked={selection.selected[segment.id]}
+								onchange={() => toggleSegment(segment.id)}
+								aria-label={`select-segment-${segment.id}`}
+							/>
+							Select
+						</label>
+					</div>
 					<p>{segment.sourceText}</p>
 				</section>
 
@@ -163,6 +222,11 @@
 		cursor: not-allowed;
 	}
 
+	.draft-btn {
+		background: #1f4f3f;
+		border-color: #1f4f3f;
+	}
+
 	.dirty-indicator {
 		font-size: 0.8rem;
 		font-weight: 700;
@@ -173,6 +237,29 @@
 		font-size: 0.8rem;
 		font-weight: 700;
 		color: #1f4f3f;
+	}
+
+	.draft-error {
+		font-size: 0.8rem;
+		font-weight: 700;
+		color: #7a1f1a;
+	}
+
+	.segment-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.25rem;
+	}
+
+	.select-label {
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		cursor: pointer;
+		color: #4b5563;
 	}
 
 	.editor-grid {
