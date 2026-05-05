@@ -40,7 +40,7 @@
 				{#each stories as story}
 					<tr>
 						<td>{story.storyId}</td>
-						<td>{story.title}</td>
+						<td><a href={`/stories/${story.storyId}`}>{story.title}</a></td>
 						<td>
 							<span class={statusClass(story.status)}>{story.status}</span>
 						</td>

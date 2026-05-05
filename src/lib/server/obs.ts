@@ -107,3 +107,9 @@ export async function parseObsContentDirectory(contentDirPath: string): Promise<
 
 	return stories;
 }
+
+export async function parseObsStoryById(contentDirPath: string, storyId: string): Promise<ObsStory> {
+	const normalizedId = storyId.padStart(2, '0');
+	const filePath = join(contentDirPath, `${normalizedId}.md`);
+	return parseObsStoryFile(filePath);
+}

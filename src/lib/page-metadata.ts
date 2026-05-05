@@ -25,6 +25,13 @@ export const PAGE_METADATA_BY_PATH: Record<string, PageMetadata> = {
 };
 
 export function getPageMetadata(pathname: string): PageMetadata {
+	if (/^\/stories\/\d{2}$/.test(pathname)) {
+		return {
+			title: 'Story Editor',
+			description: 'Source and target editor for OBS story translation'
+		};
+	}
+
 	return PAGE_METADATA_BY_PATH[pathname] ?? PAGE_METADATA_BY_PATH['/'];
 }
 
