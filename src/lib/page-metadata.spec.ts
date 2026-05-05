@@ -10,6 +10,7 @@ describe('page metadata', () => {
 	it('provides metadata for known routes', () => {
 		expect(getPageMetadata('/').title).toBe('Workspace');
 		expect(getPageMetadata('/demo').title).toBe('Demo');
+		expect(getPageMetadata('/reviewer').title).toBe('Reviewer Queue');
 	});
 
 	it('falls back to home metadata for unknown routes', () => {

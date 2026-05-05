@@ -21,6 +21,10 @@ export const PAGE_METADATA_BY_PATH: Record<string, PageMetadata> = {
 	'/stories': {
 		title: 'Story List',
 		description: 'Open Bible Stories translation workflow list'
+	},
+	'/reviewer': {
+		title: 'Reviewer Queue',
+		description: 'Reviewer workflow queue for resolving in-review stories'
 	}
 };
 
