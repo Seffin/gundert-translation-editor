@@ -18,7 +18,7 @@ export interface LLMValidationResult {
 }
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 /**
  * Detects cross-segment consistency issues where the same glossary term
@@ -150,7 +150,7 @@ INCONSISTENCY: In Bible translation, "God" must always be the same word for clar
 
 	try {
 		const response = await fetch(
-			`${GEMINI_API_BASE}/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+			`${GEMINI_API_BASE}/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
 			{
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },

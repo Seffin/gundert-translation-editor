@@ -157,7 +157,7 @@ describe('LLM validation', () => {
 		expect(fetchMock).toHaveBeenCalledOnce();
 		const callArgs = fetchMock.mock.calls[0];
 		const url = callArgs?.[0];
-		expect(url).toContain('gemini-2.0-flash');
+		expect(url).toContain('gemini-2.5-flash');
 		expect(url).toContain('test-key');
 	});
 
