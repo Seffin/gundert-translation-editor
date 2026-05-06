@@ -21,7 +21,11 @@
 		saveTargetLanguage
 	} from '$lib/client/target-language';
 	import { buildTerminologyWarnings } from '$lib/client/terminology-warnings';
-	import { buildConsistencyIssues, validateConsistencyIssuesWithLLM } from '$lib/client/consistency-check';
+		import {
+			buildConsistencyIssues,
+			validateConsistencyIssuesWithLLM,
+			type ConsistencyIssue
+		} from '$lib/client/consistency-check';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
 	import CommentThread from '$lib/components/CommentThread.svelte';
 	import type { GlossaryTerm } from '$lib/glossary';
@@ -46,7 +50,7 @@
 	let terminologyWarnings = $derived(buildTerminologyWarnings(editorSegments, glossaryTerms));
 	let consistencyIssues = $derived(buildConsistencyIssues(editorSegments, glossaryTerms));
 	let llmValidating = $state(false);
-	let validatedConsistencyIssues = $state(consistencyIssues);
+	let validatedConsistencyIssues = $state<Array<ConsistencyIssue & { validated?: boolean }>>([]);
 
 	$effect(async () => {
 		// When consistency issues change and we have an API key, validate with LLM
@@ -66,6 +70,10 @@
 
 	onMount(() => {
 		selectedLanguage = loadTargetLanguage(story.storyId);
+		editorSegments = editorSegments.map((segment) => ({
+			...segment,
+			targetLanguage: selectedLanguage
+		}));
 		const persisted = loadPersistedStoryDraft(story.storyId);
 		if (!persisted) return;
 

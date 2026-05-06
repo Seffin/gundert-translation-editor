@@ -87,6 +87,10 @@ function extractAlternativeTranslation(
 	sourceTerm: string,
 	expectedTerm: string
 ): string | null {
+	void targetText;
+	void sourceTerm;
+	void expectedTerm;
+
 	// Very simple heuristic: look for words in targetText that might be the translation
 	// In a real system, this could use fuzzy matching or word tokenization
 	// For now, return null to indicate "not the expected term"
