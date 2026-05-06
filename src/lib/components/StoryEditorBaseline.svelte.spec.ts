@@ -2,6 +2,7 @@ import { page } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import StoryEditorBaseline from '$lib/components/StoryEditorBaseline.svelte';
+import type { GlossaryTerm } from '$lib/glossary';
 import type { StoryEditorModel } from '$lib/server/editor';
 
 const STORY: StoryEditorModel = {
@@ -37,6 +38,16 @@ const STORY: StoryEditorModel = {
 		}
 	]
 };
+
+const GLOSSARY_TERMS: GlossaryTerm[] = [
+	{
+		id: 'term-1',
+		sourceTerm: 'God',
+		targetTerm: 'Ishwar',
+		status: 'Approved',
+		rationale: 'Preferred rendering in this project'
+	}
+];
 
 describe('StoryEditorBaseline', () => {
 	it('renders story header and source/target columns', async () => {
@@ -91,7 +102,7 @@ describe('StoryEditorBaseline', () => {
 	});
 
 	it('tracks unsaved changes and shows save confirmation with actor', async () => {
-		render(StoryEditorBaseline, { story: STORY });
+		render(StoryEditorBaseline, { story: STORY, glossaryTerms: GLOSSARY_TERMS });
 
 		const firstTarget = page.getByRole('textbox').first();
 		await firstTarget.fill('नई अनुवादित पंक्ति');
@@ -102,5 +113,19 @@ describe('StoryEditorBaseline', () => {
 		await expect.element(page.getByTestId('save-message')).toHaveTextContent(
 			/Saved by translator\.demo at /
 		);
+	});
+
+	it('shows glossary terminology warnings and clears after compliant edits', async () => {
+		render(StoryEditorBaseline, { story: STORY, glossaryTerms: GLOSSARY_TERMS });
+
+		await expect.element(page.getByTestId('terminology-warnings')).toBeInTheDocument();
+		await expect.element(page.getByText('Use "Ishwar" for "God" in segment 01:01.')).toBeInTheDocument();
+
+		const firstTarget = page.getByRole('textbox').first();
+		const secondTarget = page.getByRole('textbox').nth(1);
+		await firstTarget.fill('Ishwar created the heavens and earth.');
+		await secondTarget.fill('And Ishwar said, let there be light.');
+
+		await expect.element(page.getByTestId('terminology-clear')).toBeInTheDocument();
 	});
 });

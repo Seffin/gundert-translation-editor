@@ -4,4 +4,4 @@
 	let { data } = $props();
 </script>
 
-<StoryEditorBaseline story={data.story} />
+<StoryEditorBaseline story={data.story} glossaryTerms={data.glossaryTerms} />

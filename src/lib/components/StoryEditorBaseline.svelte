@@ -20,12 +20,14 @@
 		loadTargetLanguage,
 		saveTargetLanguage
 	} from '$lib/client/target-language';
+	import { buildTerminologyWarnings } from '$lib/client/terminology-warnings';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
+	import type { GlossaryTerm } from '$lib/glossary';
 	import type { StoryEditorModel } from '$lib/server/editor';
 
 	const ACTOR_ID = 'translator.demo';
 
-	let { story } = $props<{ story: StoryEditorModel }>();
+	let { story, glossaryTerms = [] } = $props<{ story: StoryEditorModel; glossaryTerms?: GlossaryTerm[] }>();
 	function createInitialSegments() {
 		return story.segments.map((segment) => ({ ...segment }));
 	}
@@ -39,6 +41,7 @@
 	let drafting = $state(false);
 	let draftError = $state('');
 	let selectedLanguage = $state((() => story.targetLanguage)());
+	let terminologyWarnings = $derived(buildTerminologyWarnings(editorSegments, glossaryTerms));
 
 	onMount(() => {
 		selectedLanguage = loadTargetLanguage(story.storyId);
@@ -197,6 +200,21 @@
 	</header>
 
 	<section class="editor-grid" aria-label="source-target-editor">
+		<section class="warning-panel" aria-label="terminology-warning-panel">
+			<h2>Terminology Warnings</h2>
+			{#if terminologyWarnings.length > 0}
+				<ul data-testid="terminology-warnings">
+					{#each terminologyWarnings as warning (`${warning.segmentId}:${warning.sourceTerm}:${warning.expectedTargetTerm}`)}
+						<li>
+							Use "{warning.expectedTargetTerm}" for "{warning.sourceTerm}" in segment {warning.segmentId}.
+						</li>
+					{/each}
+				</ul>
+			{:else}
+				<p data-testid="terminology-clear">No terminology warnings.</p>
+			{/if}
+		</section>
+
 		{#each editorSegments as segment, index (segment.id)}
 			<div class="segment-row" data-segment={segment.id}>
 				<section class="source-column" aria-label={`source-${segment.id}`}>
@@ -328,6 +346,23 @@
 	.editor-grid {
 		display: grid;
 		gap: 2rem;
+	}
+
+	.warning-panel {
+		padding: 0.875rem 1rem;
+		border: 1px solid #f3d9d2;
+		border-radius: 0.75rem;
+		background: #fff7f5;
+	}
+
+	.warning-panel h2 {
+		margin: 0 0 0.5rem;
+		font-size: 0.95rem;
+	}
+
+	.warning-panel ul {
+		margin: 0;
+		padding-left: 1.2rem;
 	}
 
 	.segment-row {

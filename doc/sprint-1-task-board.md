@@ -68,21 +68,21 @@
 | T16 | P0 | Implement status transition engine (Draft -> In Review -> Approved) | Dev 1 | 0.5d | T15 | Failing valid/invalid transition tests | Sprint 1 Story 4 | Backlog |
 | T17 | P0 | Implement review blockers (unresolved comments/conflicts) | Dev 1 | 0.5d | T16 | Failing gate tests for blocked approval | Sprint 1 Story 4 | Backlog |
 | T18 | P1 | Build reviewer queue default interactions and resolve action | Dev 2 | 0.5d | T15, T16 | Failing E2E for resolve path | Sprint 1 Story 4 | Backlog |
-| T19 | P1 | Build project lead approval gating view and approve-ready action | Dev 2 | 0.5d | T17, T18 | Failing E2E for blocked vs ready approval | Sprint 1 Story 4 | Backlog |
+| T19 | P1 | Build project lead approval gating view and approve-ready action | Dev 2 | 0.5d | T17, T18 | Failing E2E for blocked vs ready approval | Sprint 1 Story 4 | Done |
 
 ### P1 Glossary and Consistency
 
 | ID | Priority | Task | Owner | Estimate | Depends On | TDD Entry | Acceptance Mapping | Initial Column |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| T20 | P1 | Implement glossary list and add/edit flow | Dev 2 | 0.5d | T2 | Failing create/update glossary tests | Sprint 2 prep + Story 4 support | Backlog |
-| T21 | P1 | Implement editor terminology warnings from glossary rules | Dev 2 | 0.5d | T20, T7 | Failing warning-generation tests | Sprint 2 prep + Story 4 support | Backlog |
+| T20 | P1 | Implement glossary list and add/edit flow | Dev 2 | 0.5d | T2 | Failing create/update glossary tests | Sprint 2 prep + Story 4 support | Done |
+| T21 | P1 | Implement editor terminology warnings from glossary rules | Dev 2 | 0.5d | T20, T7 | Failing warning-generation tests | Sprint 2 prep + Story 4 support | Done |
 
 ### P0 Audit Trail
 
 | ID | Priority | Task | Owner | Estimate | Depends On | TDD Entry | Acceptance Mapping | Initial Column |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| T22 | P0 | Implement audit event writer for draft/edit/review/approve actions | Dev 1 | 0.5d | T2, T10, T16 | Failing tests for event emission per action | Sprint 1 Story 5 | Backlog |
-| T23 | P1 | Implement activity log UI and filter states | Dev 2 | 0.5d | T22 | Failing component tests for filtering by actor/type/date | Sprint 1 Story 5 | Backlog |
+| T22 | P0 | Implement audit event writer for draft/edit/review/approve actions | Dev 1 | 0.5d | T2, T10, T16 | Failing tests for event emission per action | Sprint 1 Story 5 | Done |
+| T23 | P1 | Implement activity log UI and filter states | Dev 2 | 0.5d | T22 | Failing component tests for filtering by actor/type/date | Sprint 1 Story 5 | Done |
 
 ### P0 Brand and Title Consistency
 

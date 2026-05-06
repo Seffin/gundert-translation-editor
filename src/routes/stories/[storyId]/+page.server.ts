@@ -1,4 +1,5 @@
 import { buildStoryEditorModel } from '$lib/server/editor';
+import { listGlossaryTerms } from '$lib/server/glossary';
 import { parseObsStoryById } from '$lib/server/obs';
 import { join } from 'node:path';
 import { error } from '@sveltejs/kit';
@@ -16,7 +17,8 @@ export const load: PageServerLoad = async ({ params }) => {
 	try {
 		const story = await parseObsStoryById(DEFAULT_OBS_CONTENT_DIR, storyId);
 		return {
-			story: buildStoryEditorModel(story)
+			story: buildStoryEditorModel(story),
+			glossaryTerms: listGlossaryTerms()
 		};
 	} catch {
 		throw error(404, 'Story not found');

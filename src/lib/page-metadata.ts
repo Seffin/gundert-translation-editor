@@ -25,6 +25,18 @@ export const PAGE_METADATA_BY_PATH: Record<string, PageMetadata> = {
 	'/reviewer': {
 		title: 'Reviewer Queue',
 		description: 'Reviewer workflow queue for resolving in-review stories'
+	},
+	'/lead': {
+		title: 'Lead Approval',
+		description: 'Project lead approval queue with review blocker gating'
+	},
+	'/glossary': {
+		title: 'Glossary',
+		description: 'Glossary management for adding and editing translation terms'
+	},
+	'/activity': {
+		title: 'Activity Log',
+		description: 'Audit feed with actor, action, and date filters'
 	}
 };
 

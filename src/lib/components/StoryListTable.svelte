@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { BRAND_NAME } from '$lib/brand';
 	import type { StoryListItem } from '$lib/server/story-list';
 
 	let { stories } = $props<{ stories: StoryListItem[] }>();
@@ -20,7 +21,7 @@
 
 <section aria-label="story-list">
 	<h1>Open Bible Stories</h1>
-	<p>Manage story progress, status, and assignees for Gundert Editor.</p>
+	<p>Manage story progress, status, and assignees for {BRAND_NAME}.</p>
 
 	{#if stories.length === 0}
 		<p>No stories found. Ensure OBS content is available.</p>

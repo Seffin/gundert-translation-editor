@@ -11,6 +11,9 @@ describe('page metadata', () => {
 		expect(getPageMetadata('/').title).toBe('Workspace');
 		expect(getPageMetadata('/demo').title).toBe('Demo');
 		expect(getPageMetadata('/reviewer').title).toBe('Reviewer Queue');
+		expect(getPageMetadata('/lead').title).toBe('Lead Approval');
+		expect(getPageMetadata('/glossary').title).toBe('Glossary');
+		expect(getPageMetadata('/activity').title).toBe('Activity Log');
 	});
 
 	it('falls back to home metadata for unknown routes', () => {
