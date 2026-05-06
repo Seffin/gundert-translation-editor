@@ -9,14 +9,30 @@
 
 	let queueItems = $state(createInitialItems());
 	let message = $state('');
+	let errorMessage = $state('');
 
-	function resolveItem(storyId: string): void {
+	async function resolveItem(storyId: string): Promise<void> {
 		const item = queueItems.find((entry) => entry.storyId === storyId);
 		if (!item) return;
 
-		resolveReviewerQueueItem(item);
-		queueItems = queueItems.filter((entry) => entry.storyId !== storyId);
-		message = `Resolved review for story ${storyId}`;
+		try {
+			await fetch('/api/reviewer-comments/resolve', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ storyId })
+			});
+
+			resolveReviewerQueueItem(item);
+			queueItems = queueItems.filter((entry) => entry.storyId !== storyId);
+			errorMessage = '';
+			message = `Resolved review for story ${storyId}`;
+		} catch (error) {
+			message = '';
+			errorMessage =
+				error instanceof Error
+					? error.message
+					: `Failed to resolve reviewer comments for story ${storyId}`;
+		}
 	}
 
 	function commentLabel(count: number): string {
@@ -30,6 +46,10 @@
 
 	{#if message}
 		<p class="message" data-testid="resolve-message">{message}</p>
+	{/if}
+
+	{#if errorMessage}
+		<p class="error" data-testid="resolve-error">{errorMessage}</p>
 	{/if}
 
 	{#if queueItems.length === 0}
@@ -106,5 +126,11 @@
 		margin-top: 0.75rem;
 		font-weight: 700;
 		color: #1f4f3f;
+	}
+
+	.error {
+		margin-top: 0.75rem;
+		font-weight: 700;
+		color: #8a1f1f;
 	}
 </style>

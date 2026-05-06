@@ -62,4 +62,15 @@ describe('lead approval queue', () => {
 
 		expect(() => approveLeadApprovalItem(blockedItem)).toThrow(/blocked approval/i);
 	});
+
+	it('supports externally supplied blocker state from reviewer comments', () => {
+		const items = buildLeadApprovalItems(STORIES, (story) => ({
+			unresolvedCommentCount: story.storyId === '06' ? 2 : 0,
+			hasBlockingConflicts: false
+		}));
+
+		const gated = items.find((item) => item.storyId === '06');
+		expect(gated?.canApprove).toBe(false);
+		expect(gated?.blockers).toContain('2 unresolved comments');
+	});
 });

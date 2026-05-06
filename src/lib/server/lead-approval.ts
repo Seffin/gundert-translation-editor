@@ -1,21 +1,26 @@
 import type { LeadApprovalItem, LeadApprovalSourceStory } from '$lib/lead-approval';
 import { checkApprovalGate } from '$lib/server/review-blockers';
 
-function deriveReviewBlockerState(storyNumber: number): {
+type ReviewBlockerState = {
 	unresolvedCommentCount: number;
 	hasBlockingConflicts: boolean;
-} {
+};
+
+function deriveReviewBlockerState(storyNumber: number): ReviewBlockerState {
 	return {
 		unresolvedCommentCount: storyNumber % 2 === 0 ? 0 : 1,
 		hasBlockingConflicts: storyNumber % 5 === 0
 	};
 }
 
-export function buildLeadApprovalItems(stories: LeadApprovalSourceStory[]): LeadApprovalItem[] {
+export function buildLeadApprovalItems(
+	stories: LeadApprovalSourceStory[],
+	getReviewBlockerState?: (story: LeadApprovalSourceStory) => ReviewBlockerState
+): LeadApprovalItem[] {
 	return stories
 		.filter((story) => story.status === 'In Review')
 		.map((story) => {
-			const blockerState = deriveReviewBlockerState(story.storyNumber);
+			const blockerState = getReviewBlockerState?.(story) ?? deriveReviewBlockerState(story.storyNumber);
 			const gate = checkApprovalGate('In Review', 'Lead', blockerState);
 
 			return {

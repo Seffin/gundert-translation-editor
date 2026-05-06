@@ -21,7 +21,10 @@ function derivePendingComments(storyNumber: number): number {
 	return (storyNumber % 4) + 1;
 }
 
-export function buildReviewerQueueItems(stories: ReviewerQueueSourceStory[]): ReviewerQueueItem[] {
+export function buildReviewerQueueItems(
+	stories: ReviewerQueueSourceStory[],
+	getPendingComments?: (story: ReviewerQueueSourceStory) => number
+): ReviewerQueueItem[] {
 	return stories
 		.filter((story) => story.status === 'In Review')
 		.map((story) => ({
@@ -31,7 +34,7 @@ export function buildReviewerQueueItems(stories: ReviewerQueueSourceStory[]): Re
 			status: 'In Review',
 			assignee: story.assignee,
 			segmentCount: story.segmentCount,
-			pendingComments: derivePendingComments(story.storyNumber)
+			pendingComments: getPendingComments?.(story) ?? derivePendingComments(story.storyNumber)
 		}));
 }
 

@@ -1,5 +1,5 @@
 import { page } from 'vitest/browser';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import ReviewerQueue from '$lib/components/ReviewerQueue.svelte';
 import type { ReviewerQueueItem } from '$lib/reviewer-queue';
@@ -26,6 +26,16 @@ const ITEMS: ReviewerQueueItem[] = [
 ];
 
 describe('ReviewerQueue', () => {
+	beforeEach(() => {
+		vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+			new Response(JSON.stringify({ success: true, resolvedCount: 1 }), { status: 200 })
+		);
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
 	it('renders reviewer queue items with resolve actions', async () => {
 		render(ReviewerQueue, { items: ITEMS });
 
