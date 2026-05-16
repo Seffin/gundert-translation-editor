@@ -11,6 +11,24 @@
 	<title>{data.pageTitle}</title>
 	<meta name="description" content={data.description} />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<script>
+		(function() {
+			const theme = localStorage.getItem('gundert-editor:theme') || 'system';
+			const root = document.documentElement;
+			if (theme === 'dark') {
+				root.classList.add('dark');
+			} else if (theme === 'light') {
+				root.classList.remove('dark');
+			} else {
+				const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+				if (prefersDark) {
+					root.classList.add('dark');
+				} else {
+					root.classList.remove('dark');
+				}
+			}
+		})();
+	</script>
 </svelte:head>
 
 <div class="app-container">

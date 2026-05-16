@@ -59,6 +59,43 @@
 	--shadow-medium: 0 24px 56px rgba(20, 63, 126, 0.14);
 }
 
+:root.dark {
+	--color-background: #0b1320;
+	--color-on-background: #e6f1ff;
+	
+	--color-surface: #111a2e;
+	--color-surface-dim: #0a0f1d;
+	--color-surface-container-lowest: #0d1526;
+	--color-surface-container-low: #15223b;
+	--color-surface-container: #1b2a47;
+	--color-surface-container-high: #243553;
+	--color-on-surface: #e6f1ff;
+	--color-on-surface-variant: #8fa5c4;
+	
+	--color-outline: #4a5d78;
+	--color-outline-variant: #2f3e56;
+	
+	--color-panel: rgba(17, 26, 46, 0.86);
+	--color-panel-strong: rgba(17, 26, 46, 0.96);
+	
+	--color-primary: #5fa4ff;
+	--color-on-primary: #002d70;
+	--color-primary-container: #0043a4;
+	--color-on-primary-container: #d7e7ff;
+	
+	--color-secondary: #7fb4f5;
+	--color-on-secondary: #002e64;
+	
+	--color-accent: #5fa4ff;
+	--color-accent-soft: rgba(95, 164, 255, 0.24);
+}
+
+:root.dark body {
+	background:
+		radial-gradient(circle at top left, rgba(95, 164, 255, 0.15), transparent 28%),
+		linear-gradient(180deg, #0b1320 0%, #080d1a 100%);
+}
+
 /* Reset & Base Styles */
 * {
 	margin: 0;

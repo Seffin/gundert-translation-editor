@@ -33,6 +33,10 @@ export function loadTargetLanguage(storyId: string): string {
 	try {
 		const stored = globalThis.localStorage?.getItem(storageKey(storyId));
 		if (stored && isValidLanguage(stored)) return stored;
+		
+		// Fallback to global user setting
+		const globalStored = globalThis.localStorage?.getItem('gundert-editor:user-target-language');
+		if (globalStored && isValidLanguage(globalStored)) return globalStored;
 	} catch {
 		// localStorage unavailable (SSR, private mode)
 	}

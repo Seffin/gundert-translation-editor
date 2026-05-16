@@ -43,6 +43,13 @@
 				</li>
 			{/each}
 		</ul>
+
+		<div class="nav-settings">
+			<a href="/settings" class="nav-link settings-btn" title="Settings">
+				<span class="icon">⚙️</span>
+				<span class="label">Settings</span>
+			</a>
+		</div>
 	</div>
 </nav>
 
@@ -135,6 +142,17 @@
 
 	.label {
 		display: inline;
+	}
+
+	.nav-settings {
+		position: relative;
+	}
+
+	.settings-btn {
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: white;
 	}
 
 	@media (max-width: 768px) {
