@@ -131,7 +131,7 @@ describe('selective chunk draft', () => {
 		expect(result[2].targetText).toBe('और परमेश्वर ने देखा कि प्रकाश अच्छा है');
 	});
 
-	it('calls Gemini API only with selected segments', async () => {
+	it('calls Gemini API with whole-story context and selected segment ids', async () => {
 		const mockFetch = vi.fn(() =>
 			Promise.resolve(
 				new Response(JSON.stringify(MOCK_RESPONSE), {
@@ -165,8 +165,257 @@ describe('selective chunk draft', () => {
 
 		const fetchCall = mockFetch.mock.calls[0];
 		const body = JSON.parse(fetchCall[1].body as string);
-		// Prompt should only include the selected segment source text
+		// Prompt should include whole story context and selected IDs for deterministic mapping
 		expect(body.contents[0].parts[0].text).toContain('Let there be light');
-		expect(body.contents[0].parts[0].text).not.toContain('In the beginning');
+		expect(body.contents[0].parts[0].text).toContain('In the beginning');
+		expect(body.contents[0].parts[0].text).toContain('Selected segment IDs');
+		expect(body.contents[0].parts[0].text).toContain('01:02');
+	});
+
+	it('preserves internal blank lines when drafting a single selected segment', async () => {
+		const multiParagraphTranslation =
+			'ദൈവം ആകാശവും ഭൂമിയും സൃഷ്ടിച്ചു.\n\nഅവൻ സൃഷ്ടിച്ചതെല്ലാം നല്ലതായിരുന്നു.';
+
+		const mockFetch = vi.fn(() =>
+			Promise.resolve(
+				new Response(
+					JSON.stringify({
+						candidates: [
+							{
+								content: {
+									parts: [{ text: multiParagraphTranslation }]
+								},
+								finishReason: 'STOP'
+							}
+						]
+					}),
+					{
+						status: 200,
+						headers: { 'content-type': 'application/json' }
+					}
+				)
+			)
+		);
+		vi.stubGlobal('fetch', mockFetch);
+
+		const selection: SegmentSelectionModel = {
+			selected: { '01:01': false, '01:02': true, '01:03': false },
+			count: 1
+		};
+
+		const result = await requestGeminiChunkDraft(
+			SEGMENTS,
+			selection,
+			'Malayalam',
+			'story-01',
+			'fake-api-key'
+		);
+
+		expect(result[1].targetText).toBe(multiParagraphTranslation);
+	});
+
+	it('supports multi-segment drafts with paragraph breaks using explicit separators', async () => {
+		const firstTranslation =
+			'അപ്പോൾ ദൈവം അരുളിച്ചെയ്തു: വെളിച്ചമുണ്ടാകട്ടെ.\n\nവെളിച്ചം ഉണ്ടായി.';
+		const secondTranslation =
+			'ദൈവം വെളിച്ചം നല്ലതാണെന്ന് കണ്ടു.\n\nഅവൻ വെളിച്ചത്തെയും ഇരുളിനെയും വേർതിരിച്ചു.';
+
+		const mockFetch = vi.fn(() =>
+			Promise.resolve(
+				new Response(
+					JSON.stringify({
+						candidates: [
+							{
+								content: {
+									parts: [{ text: `${firstTranslation}\n---\n${secondTranslation}` }]
+								},
+								finishReason: 'STOP'
+							}
+						]
+					}),
+					{
+						status: 200,
+						headers: { 'content-type': 'application/json' }
+					}
+				)
+			)
+		);
+		vi.stubGlobal('fetch', mockFetch);
+
+		const selection: SegmentSelectionModel = {
+			selected: { '01:01': false, '01:02': true, '01:03': true },
+			count: 2
+		};
+
+		const result = await requestGeminiChunkDraft(
+			SEGMENTS,
+			selection,
+			'Malayalam',
+			'story-01',
+			'fake-api-key'
+		);
+
+		expect(result[1].targetText).toBe(firstTranslation);
+		expect(result[2].targetText).toBe(secondTranslation);
+	});
+
+	it('maps JSON translations by segment id to prevent split bleed across selected segments', async () => {
+		const firstTranslation =
+			'ദൈവം എല്ലാം സൃഷ്ടിച്ചു.\n\nഅവന്റെ ആത്മാവ് ജലത്തിനുമീതെ ഉണ്ടായിരുന്നു.';
+		const secondTranslation = 'ദൈവം അരുളിച്ചെയ്തു: വെളിച്ചമുണ്ടാകട്ടെ.';
+
+		const mockFetch = vi.fn(() =>
+			Promise.resolve(
+				new Response(
+					JSON.stringify({
+						candidates: [
+							{
+								content: {
+									parts: [
+										{
+											text: JSON.stringify({
+												translations: [
+													{ id: '01:01', text: firstTranslation },
+													{ id: '01:02', text: secondTranslation }
+												]
+											})
+										}
+									]
+								},
+								finishReason: 'STOP'
+							}
+						]
+					}),
+					{
+						status: 200,
+						headers: { 'content-type': 'application/json' }
+					}
+				)
+			)
+		);
+		vi.stubGlobal('fetch', mockFetch);
+
+		const selection: SegmentSelectionModel = {
+			selected: { '01:01': true, '01:02': true, '01:03': false },
+			count: 2
+		};
+
+		const result = await requestGeminiChunkDraft(
+			SEGMENTS,
+			selection,
+			'Malayalam',
+			'story-01',
+			'fake-api-key'
+		);
+
+		expect(result[0].targetText).toBe(firstTranslation);
+		expect(result[1].targetText).toBe(secondTranslation);
+		expect(result[2].targetText).toBe('');
+	});
+
+	it('parses JSON wrapped in markdown code fences as Gemini typically returns', async () => {
+		const firstTranslation =
+			'ആദിയിൽ ദൈവം സകലവും സൃഷ്ടിച്ചത് ഇങ്ങനെയാണ്. അവൻ ആകാശവും ഭൂമിയും അതിലുള്ള സകലതും ആറ് ദിവസങ്ങൾകൊണ്ട് സൃഷ്ടിച്ചു.';
+		const secondTranslation =
+			'അപ്പോൾ ദൈവം അരുളിച്ചെയ്തു: "വെളിച്ചം ഉണ്ടാകട്ടെ!" വെളിച്ചം ഉണ്ടായി.';
+
+		const fencedJson = '```json\n' + JSON.stringify({
+			translations: [
+				{ id: '01:01', text: firstTranslation },
+				{ id: '01:02', text: secondTranslation }
+			]
+		}, null, 2) + '\n```';
+
+		const mockFetch = vi.fn(() =>
+			Promise.resolve(
+				new Response(
+					JSON.stringify({
+						candidates: [
+							{
+								content: {
+									parts: [{ text: fencedJson }]
+								},
+								finishReason: 'STOP'
+							}
+						]
+					}),
+					{
+						status: 200,
+						headers: { 'content-type': 'application/json' }
+					}
+				)
+			)
+		);
+		vi.stubGlobal('fetch', mockFetch);
+
+		const selection: SegmentSelectionModel = {
+			selected: { '01:01': true, '01:02': true, '01:03': false },
+			count: 2
+		};
+
+		const result = await requestGeminiChunkDraft(
+			SEGMENTS,
+			selection,
+			'Malayalam',
+			'story-01',
+			'fake-api-key'
+		);
+
+		expect(result[0].targetText).toBe(firstTranslation);
+		expect(result[1].targetText).toBe(secondTranslation);
+		expect(result[2].targetText).toBe('');
+	});
+
+	it('handles fenced JSON with extra commentary text before/after fence', async () => {
+		const firstTranslation = 'ആദിയിൽ ദൈവം സകലവും സൃഷ്ടിച്ചു.';
+		const secondTranslation = 'ദൈവം വെളിച്ചമുണ്ടാകട്ടെ എന്ന് അരുളിച്ചെയ്തു.';
+
+		const responseWithCommentary =
+			'Here is the translation:\n\n```json\n' +
+			JSON.stringify({
+				translations: [
+					{ id: '01:01', text: firstTranslation },
+					{ id: '01:02', text: secondTranslation }
+				]
+			}, null, 2) +
+			'\n```\n\nLet me know if you need any changes.';
+
+		const mockFetch = vi.fn(() =>
+			Promise.resolve(
+				new Response(
+					JSON.stringify({
+						candidates: [
+							{
+								content: {
+									parts: [{ text: responseWithCommentary }]
+								},
+								finishReason: 'STOP'
+							}
+						]
+					}),
+					{
+						status: 200,
+						headers: { 'content-type': 'application/json' }
+					}
+				)
+			)
+		);
+		vi.stubGlobal('fetch', mockFetch);
+
+		const selection: SegmentSelectionModel = {
+			selected: { '01:01': true, '01:02': true, '01:03': false },
+			count: 2
+		};
+
+		const result = await requestGeminiChunkDraft(
+			SEGMENTS,
+			selection,
+			'Malayalam',
+			'story-01',
+			'fake-api-key'
+		);
+
+		expect(result[0].targetText).toBe(firstTranslation);
+		expect(result[1].targetText).toBe(secondTranslation);
 	});
 });
