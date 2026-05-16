@@ -1,14 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { loadSourceLanguage, loadGlobalTargetLanguage, saveGlobalTargetLanguage, loadTheme, saveTheme, type Theme } from '$lib/client/settings';
+	import { loadGlobalTargetLanguage, saveGlobalTargetLanguage, loadTheme, saveTheme, type Theme } from '$lib/client/settings';
 	import { SUPPORTED_LANGUAGES } from '$lib/client/target-language';
 
-	let sourceLanguage = $state('English');
 	let targetLanguage = $state('Hindi');
 	let theme = $state<Theme>('system');
 
 	onMount(() => {
-		sourceLanguage = loadSourceLanguage();
 		targetLanguage = loadGlobalTargetLanguage();
 		theme = loadTheme();
 	});
@@ -58,7 +56,7 @@
 			<div class="settings-item">
 				<label for="target-lang" class="item-label">Default Target Language</label>
 				<select id="target-lang" value={targetLanguage} onchange={(e) => updateTarget((e.target as HTMLSelectElement).value)}>
-					{#each SUPPORTED_LANGUAGES as lang}
+					{#each SUPPORTED_LANGUAGES as lang (lang)}
 						<option value={lang}>{lang}</option>
 					{/each}
 				</select>
