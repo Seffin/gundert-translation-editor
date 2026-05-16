@@ -110,7 +110,7 @@ function parseJsonDraftResponse(responseText: string): ParsedJsonDraft | undefin
 	const normalized = responseText.trim();
 	if (normalized.length === 0) return undefined;
 
-	let jsonText = extractJsonFromResponse(normalized);
+	const jsonText = extractJsonFromResponse(normalized);
 	if (!jsonText) return undefined;
 
 	try {
