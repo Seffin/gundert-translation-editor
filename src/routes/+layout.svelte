@@ -30,14 +30,20 @@
 		display: flex;
 		flex-direction: column;
 		min-height: 100vh;
-		background-color: var(--color-background, #fbf8fe);
+		background: transparent;
 	}
 
 	.app-main {
 		flex: 1;
-		padding: 1rem 2rem;
-		max-width: 1400px;
-		margin: 0 auto;
+		padding: 0;
+		max-width: none;
+		margin: 0;
 		width: 100%;
+	}
+
+	@media (max-width: 768px) {
+		.app-main {
+			padding: 0;
+		}
 	}
 </style>

@@ -24,6 +24,7 @@
 <nav class="gundert-nav" style:--primary-color={COLORS.primary} style:--surface-color={COLORS.surface}>
 	<div class="nav-container">
 		<div class="nav-brand">
+			<span class="brand-kicker">Translation Workspace</span>
 			<h1>{BRAND_NAME}</h1>
 		</div>
 
@@ -47,11 +48,15 @@
 
 <style>
 	.gundert-nav {
-		background-color: var(--primary-color);
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		background: linear-gradient(180deg, rgba(10, 36, 84, 0.94), rgba(20, 86, 217, 0.88));
 		color: white;
 		padding: 0;
 		margin: 0;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+		box-shadow: 0 16px 36px rgba(10, 36, 84, 0.18);
+		backdrop-filter: blur(16px);
 	}
 
 	.nav-container {
@@ -59,19 +64,29 @@
 		align-items: center;
 		max-width: 1400px;
 		margin: 0 auto;
-		padding: 1rem 2rem;
+		padding: 1rem 1.5rem;
 		gap: 3rem;
 	}
 
 	.nav-brand {
 		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.brand-kicker {
+		font-size: 0.68rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		opacity: 0.72;
 	}
 
 	.nav-brand h1 {
 		margin: 0;
-		font-size: 1.5rem;
+		font-size: 1.35rem;
 		font-weight: 700;
-		letter-spacing: -0.5px;
+		letter-spacing: -0.03em;
 		font-family: Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
 
@@ -89,30 +104,32 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.75rem 1rem;
+		padding: 0.8rem 1rem;
 		text-decoration: none;
 		color: white;
 		font-size: 0.875rem;
-		font-weight: 500;
+		font-weight: 600;
 		font-family: Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-		border-radius: 0.375rem;
-		transition: background-color 0.2s ease;
-		opacity: 0.85;
+		border-radius: 999px;
+		transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+		opacity: 0.82;
 	}
 
 	.nav-link:hover {
 		opacity: 1;
-		background-color: rgba(255, 255, 255, 0.1);
+		background-color: rgba(255, 255, 255, 0.14);
+		transform: translateY(-1px);
 	}
 
 	.nav-link.active {
 		opacity: 1;
-		background-color: rgba(255, 255, 255, 0.2);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.18));
 		font-weight: 600;
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
 	}
 
 	.icon {
-		font-size: 1.1rem;
+		font-size: 1rem;
 		display: inline-block;
 	}
 

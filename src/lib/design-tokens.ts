@@ -6,43 +6,43 @@
 /* Colors */
 export const COLORS = {
 	// Primary
-	primary: '#161c54',
+	primary: '#1456d9',
 	onPrimary: '#ffffff',
-	primaryContainer: '#2d336b',
-	onPrimaryContainer: '#979ddd',
+	primaryContainer: '#0d3f9e',
+	onPrimaryContainer: '#d7e7ff',
 
 	// Secondary
-	secondary: '#316763',
+	secondary: '#2f6fb4',
 	onSecondary: '#ffffff',
-	secondaryContainer: '#b5ede7',
-	onSecondaryContainer: '#376d69',
+	secondaryContainer: '#d9ebff',
+	onSecondaryContainer: '#1f4f86',
 
 	// Error
 	error: '#ba1a1a',
 	onError: '#ffffff',
-	errorContainer: '#ffdad6',
+	errorContainer: '#ffe0dd',
 
-	// Surface (cream background - warm, editorial feel)
-	surface: '#fbf8fe',
-	surfaceDim: '#dcd9de',
-	surfaceBright: '#fbf8fe',
+	// Surface
+	surface: '#f7faff',
+	surfaceDim: '#d8e3f2',
+	surfaceBright: '#f7faff',
 	surfaceContainerLowest: '#ffffff',
-	surfaceContainerLow: '#f6f2f8',
-	surfaceContainer: '#f0edf2',
-	surfaceContainerHigh: '#eae7ed',
-	surfaceContainerHighest: '#e4e1e7',
+	surfaceContainerLow: '#eef4fb',
+	surfaceContainer: '#e5eef8',
+	surfaceContainerHigh: '#dce8f5',
+	surfaceContainerHighest: '#d3e1f1',
 
 	// On Surface
-	onSurface: '#1b1b1f',
-	onSurfaceVariant: '#46464f',
+	onSurface: '#182538',
+	onSurfaceVariant: '#53647a',
 
 	// Outline
-	outline: '#777681',
-	outlineVariant: '#c7c5d1',
+	outline: '#8ea3bf',
+	outlineVariant: '#cfdaea',
 
 	// Background
-	background: '#fbf8fe',
-	onBackground: '#1b1b1f'
+	background: '#edf4fb',
+	onBackground: '#132033'
 };
 
 /* Typography */
