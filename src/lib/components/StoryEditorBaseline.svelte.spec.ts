@@ -1,9 +1,10 @@
 import { page } from 'vitest/browser';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import StoryEditorBaseline from '$lib/components/StoryEditorBaseline.svelte';
 import type { GlossaryTerm } from '$lib/glossary';
 import type { StoryEditorModel } from '$lib/server/editor';
+import type { ReviewerComment } from '$lib/server/reviewer-comments';
 
 const STORY: StoryEditorModel = {
 	storyId: '01',
@@ -20,6 +21,8 @@ const STORY: StoryEditorModel = {
 			status: 'Done',
 			draftedByGemini: true,
 			updatedAtLabel: '2 mins ago',
+			lastSavedByActorId: 'reviewer.demo',
+			lastSavedAtIso: '2026-05-05T10:06:00.000Z',
 			aiProvenance: {
 				actor: 'Gemini',
 				scope: 'whole-story',
@@ -49,7 +52,39 @@ const GLOSSARY_TERMS: GlossaryTerm[] = [
 	}
 ];
 
+function mockReviewerCommentsResponse(comments: ReviewerComment[] = []) {
+	const fetchMock = vi.fn((input: RequestInfo | URL) => {
+		const url = String(input);
+		if (url.includes('/api/reviewer-comments?storyId=')) {
+			return Promise.resolve(
+				new Response(JSON.stringify({ comments }), {
+					status: 200,
+					headers: { 'content-type': 'application/json' }
+				})
+			);
+		}
+
+		return Promise.resolve(
+			new Response(JSON.stringify({ comments: [] }), {
+				status: 200,
+				headers: { 'content-type': 'application/json' }
+			})
+		);
+	});
+
+	vi.stubGlobal('fetch', fetchMock);
+	return fetchMock;
+}
+
 describe('StoryEditorBaseline', () => {
+	beforeEach(() => {
+		mockReviewerCommentsResponse();
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
 	it('renders story header and source/target columns', async () => {
 		render(StoryEditorBaseline, { story: STORY });
 
@@ -61,6 +96,70 @@ describe('StoryEditorBaseline', () => {
 		await expect
 			.element(page.getByText('AI DRAFT • Gemini • Whole story • 2 mins ago'))
 			.toBeInTheDocument();
+	});
+
+	it('renders a separate editor toolbar and drafting pane with grouped segment cards', async () => {
+		render(StoryEditorBaseline, { story: STORY });
+
+		await expect.element(page.getByTestId('editor-toolbar')).toBeInTheDocument();
+		await expect.element(page.getByTestId('drafting-area')).toBeInTheDocument();
+		await expect.element(page.getByTestId('segment-card-01:01')).toBeInTheDocument();
+		await expect
+			.element(page.getByTestId('segment-card-01:01').getByText(STORY.segments[0].sourceText))
+			.toBeInTheDocument();
+		await expect
+			.element(page.getByTestId('segment-card-01:01').getByRole('textbox'))
+			.toBeInTheDocument();
+	});
+
+	it('shows per-segment toolbox metadata, actions, and inline terminology warnings', async () => {
+		render(StoryEditorBaseline, { story: STORY, glossaryTerms: GLOSSARY_TERMS });
+
+		const firstToolbox = page.getByTestId('segment-toolbox-01:01');
+
+		await expect.element(firstToolbox).toBeInTheDocument();
+		await expect.element(page.getByText('Last edited by reviewer.demo')).toBeInTheDocument();
+		await expect.element(firstToolbox.getByText('Regenerate draft')).toBeInTheDocument();
+		await expect.element(firstToolbox.getByText('Comments')).toBeInTheDocument();
+		await expect.element(page.getByTestId('segment-warning-01:01')).toHaveTextContent(
+			'Use "Ishwar" for "God" in this segment.'
+		);
+		await expect.element(page.getByTestId('segment-status-01:01')).toBeInTheDocument();
+		await expect.element(page.getByTestId('terminology-warning-panel')).not.toBeInTheDocument();
+	});
+
+	it('marks a selected segment as active', async () => {
+		render(StoryEditorBaseline, { story: STORY });
+
+		await page.getByRole('checkbox', { name: 'select-segment-01:01' }).click();
+
+		await expect.element(page.getByTestId('segment-card-01:01')).toHaveAttribute('data-active', 'true');
+		await expect.element(page.getByTestId('segment-card-01:02')).toHaveAttribute('data-active', 'false');
+	});
+
+	it('opens segment comments inline without relying on a sidebar', async () => {
+		mockReviewerCommentsResponse([
+			{
+				id: 'comment-1',
+				storyId: '01',
+				segmentId: '01:01',
+				authorId: 'reviewer.seed',
+				message: 'Please verify the key term before approval.',
+				resolved: false,
+				createdAt: '2026-05-05T10:08:00.000Z',
+				resolvedAt: null
+			}
+		]);
+
+		render(StoryEditorBaseline, { story: STORY });
+
+		await expect.element(page.getByTestId('segment-toolbox-01:01').getByText('1 comment')).toBeInTheDocument();
+		await page.getByTestId('segment-comments-toggle-01:01').click();
+		await expect.element(page.getByTestId('segment-comments-01:01')).toBeInTheDocument();
+		await expect
+			.element(page.getByTestId('segment-comments-01:01').getByText('Please verify the key term before approval.'))
+			.toBeInTheDocument();
+		await expect.element(page.getByText('Reviewer Comments')).not.toBeInTheDocument();
 	});
 
 	it('shows skeleton placeholder on selected segments while drafting', async () => {
@@ -115,17 +214,16 @@ describe('StoryEditorBaseline', () => {
 		);
 	});
 
-	it('shows glossary terminology warnings and clears after compliant edits', async () => {
+	it('shows inline terminology warnings and clears after compliant edits', async () => {
 		render(StoryEditorBaseline, { story: STORY, glossaryTerms: GLOSSARY_TERMS });
 
-		await expect.element(page.getByTestId('terminology-warnings')).toBeInTheDocument();
-		await expect.element(page.getByText('Use "Ishwar" for "God" in segment 01:01.')).toBeInTheDocument();
+		await expect.element(page.getByTestId('segment-warning-01:01')).toBeInTheDocument();
 
 		const firstTarget = page.getByRole('textbox').first();
 		const secondTarget = page.getByRole('textbox').nth(1);
 		await firstTarget.fill('Ishwar created the heavens and earth.');
 		await secondTarget.fill('And Ishwar said, let there be light.');
 
-		await expect.element(page.getByTestId('terminology-clear')).toBeInTheDocument();
+		await expect.element(page.getByTestId('segment-card-01:01').getByTestId('segment-warning-01:01')).not.toBeInTheDocument();
 	});
 });
