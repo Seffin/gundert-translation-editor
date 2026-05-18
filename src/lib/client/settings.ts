@@ -27,6 +27,7 @@ export function saveGlobalTargetLanguage(language: string): void {
 }
 
 const THEME_STORAGE_KEY = 'gundert-editor:theme';
+export const API_KEY_STORAGE_KEY = 'gundert-editor:api-key';
 
 export type Theme = 'system' | 'light' | 'dark';
 
@@ -43,6 +44,30 @@ export function loadTheme(): Theme {
 export function saveTheme(theme: Theme): void {
 	try {
 		globalThis.localStorage?.setItem(THEME_STORAGE_KEY, theme);
+	} catch {
+		// Ignore storage failures
+	}
+}
+
+export function loadApiKey(): string {
+	try {
+		return globalThis.localStorage?.getItem(API_KEY_STORAGE_KEY) ?? '';
+	} catch {
+		return '';
+	}
+}
+
+export function saveApiKey(key: string): void {
+	try {
+		globalThis.localStorage?.setItem(API_KEY_STORAGE_KEY, key);
+	} catch {
+		// Ignore storage failures
+	}
+}
+
+export function clearApiKey(): void {
+	try {
+		globalThis.localStorage?.removeItem(API_KEY_STORAGE_KEY);
 	} catch {
 		// Ignore storage failures
 	}

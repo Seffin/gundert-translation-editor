@@ -1,44 +1,60 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { loadGlobalTargetLanguage, saveGlobalTargetLanguage, loadTheme, saveTheme, type Theme } from '$lib/client/settings';
-	import { SUPPORTED_LANGUAGES } from '$lib/client/target-language';
+import { loadGlobalTargetLanguage, saveGlobalTargetLanguage, loadTheme, saveTheme, loadApiKey, saveApiKey, clearApiKey, type Theme } from '$lib/client/settings';
+import { SUPPORTED_LANGUAGES } from '$lib/client/target-language';
 
-	let targetLanguage = $state('Hindi');
-	let theme = $state<Theme>('system');
+let targetLanguage = $state('Hindi');
+let theme = $state<Theme>('system');
+let apiKey = $state('');
+let apiKeySaved = $state(false);
 
-	onMount(() => {
-		targetLanguage = loadGlobalTargetLanguage();
-		theme = loadTheme();
-	});
+onMount(() => {
+	targetLanguage = loadGlobalTargetLanguage();
+	theme = loadTheme();
+	apiKey = loadApiKey();
+	apiKeySaved = apiKey.length > 0;
+});
 
-	function updateTarget(lang: string) {
-		targetLanguage = lang;
-		saveGlobalTargetLanguage(lang);
-	}
+function updateTarget(lang: string) {
+	targetLanguage = lang;
+	saveGlobalTargetLanguage(lang);
+}
 
-	function updateTheme(newTheme: Theme) {
-		theme = newTheme;
-		saveTheme(newTheme);
-		applyTheme(newTheme);
-	}
+function updateTheme(newTheme: Theme) {
+	theme = newTheme;
+	saveTheme(newTheme);
+	applyTheme(newTheme);
+}
 
-	function applyTheme(t: Theme) {
-		if (typeof document === 'undefined') return;
-		const root = document.documentElement;
-		if (t === 'dark') {
+function updateApiKey(value: string) {
+	apiKey = value;
+	saveApiKey(value);
+	apiKeySaved = value.length > 0;
+}
+
+function removeApiKey() {
+	apiKey = '';
+	apiKeySaved = false;
+	clearApiKey();
+}
+
+function applyTheme(t: Theme) {
+	if (typeof document === 'undefined') return;
+	const root = document.documentElement;
+	if (t === 'dark') {
+		root.classList.add('dark');
+	} else if (t === 'light') {
+		root.classList.remove('dark');
+	} else {
+		// System
+		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		if (prefersDark) {
 			root.classList.add('dark');
-		} else if (t === 'light') {
-			root.classList.remove('dark');
 		} else {
-			// System
-			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-			if (prefersDark) {
-				root.classList.add('dark');
-			} else {
-				root.classList.remove('dark');
-			}
+			root.classList.remove('dark');
 		}
 	}
+}
 </script>
 
 <div class="section">
@@ -84,6 +100,24 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="settings-group">
+			<h2>Personal Preferences</h2>
+			<div class="settings-item">
+				<label for="api-key" class="item-label">API Key</label>
+				<input
+					type="password"
+					id="api-key"
+					value={apiKey}
+					oninput={(e) => updateApiKey((e.target as HTMLInputElement).value)}
+					placeholder="Enter your Gemini API key"
+				/>
+				<p class="text-muted">This key is stored locally on your device only.</p>
+				{#if apiKeySaved}
+					<button type="button" class="secondary-btn" onclick={removeApiKey}>Clear API Key</button>
+				{/if}
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -105,6 +139,30 @@
 		font-weight: 600;
 		color: var(--color-on-background);
 		display: inline-block;
+	}
+
+	.settings-item input[type='password'] {
+		padding: 0.65rem 0.75rem;
+		border-radius: 0.5rem;
+		border: 1px solid var(--color-outline-variant);
+		background: var(--color-surface);
+		color: var(--color-on-background);
+		width: 100%;
+		max-width: 100%;
+	}
+
+	.secondary-btn {
+		margin-top: 0.5rem;
+		padding: 0.55rem 0.85rem;
+		border-radius: 0.5rem;
+		border: 1px solid var(--color-outline-variant);
+		background: transparent;
+		color: var(--color-on-background);
+		cursor: pointer;
+	}
+
+	.secondary-btn:hover {
+		background: rgba(255,255,255,0.06);
 	}
 
 	.locked-lang {
