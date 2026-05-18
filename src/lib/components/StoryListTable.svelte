@@ -26,7 +26,8 @@
 	{#if stories.length === 0}
 		<p>No stories found. Ensure OBS content is available.</p>
 	{:else}
-		<table>
+		<div class="table-responsive">
+			<table class="responsive">
 			<thead>
 				<tr>
 					<th>#</th>
@@ -37,21 +38,22 @@
 					<th>Segments</th>
 				</tr>
 			</thead>
-			<tbody>
-				{#each stories as story}
-					<tr>
-						<td>{story.storyId}</td>
-						<td><a href={`/stories/${story.storyId}`}>{story.title}</a></td>
-						<td>
-							<span class={statusClass(story.status)}>{story.status}</span>
-						</td>
-						<td>{story.assignee}</td>
-						<td>{story.completionPercent}%</td>
-						<td>{story.segmentCount}</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
+				<tbody>
+					{#each stories as story}
+						<tr>
+							<td data-label="#">{story.storyId}</td>
+							<td data-label="Title"><a href={`/stories/${story.storyId}`}>{story.title}</a></td>
+							<td data-label="Status">
+								<span class={statusClass(story.status)}>{story.status}</span>
+							</td>
+							<td data-label="Assignee">{story.assignee}</td>
+							<td data-label="Completion">{story.completionPercent}%</td>
+							<td data-label="Segments">{story.segmentCount}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	{/if}
 </section>
 

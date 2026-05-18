@@ -370,6 +370,48 @@ li {
 	margin-bottom: var(--spacing-md);
 }
 
+/* Responsive helpers */
+:root {
+	--breakpoint-sm: 480px;
+	--breakpoint-md: 768px;
+	--breakpoint-lg: 1024px;
+}
+
+img,
+picture,
+video,
+svg {
+	max-width: 100%;
+	height: auto;
+}
+
+.table-responsive {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	width: 100%;
+}
+
+/* Small-screen adjustments */
+@media (max-width: 900px) {
+	html { font-size: 15px; }
+	.section { padding: var(--spacing-lg); }
+	.grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+
+	/* Make toolbar-like pills and summary pills wrap to full width on very small screens */
+	.meta-pill, .summary-pill, button, .chip { width: 100%; box-sizing: border-box; }
+}
+
+@media (max-width: 600px) {
+	html { font-size: 14px; }
+	.section { padding: var(--spacing-md); }
+	.table-responsive table thead { display: none; }
+	.table-responsive table, .table-responsive thead, .table-responsive tbody, .table-responsive th, .table-responsive td, .table-responsive tr { display: block; }
+	.table-responsive tr { margin-bottom: var(--spacing-md); border-bottom: 1px solid var(--color-outline-variant); }
+	.table-responsive td { padding: 0.5rem 0; display: flex; justify-content: space-between; }
+	.table-responsive td::before { content: attr(data-label); font-weight: 700; color: var(--color-on-surface-variant); margin-right: 0.75rem; }
+}
+
+
 .mt-lg {
 	margin-top: var(--spacing-lg);
 }
