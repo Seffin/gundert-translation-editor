@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { COLORS, SPACING } from '$lib/design-tokens';
+	import { COLORS } from '$lib/design-tokens';
 	import { BRAND_NAME } from '$lib/brand';
 
 	let mobileMenuOpen = $state(false);
@@ -45,7 +45,7 @@
 		</button>
 
 		<ul id="main-nav" class="nav-menu" class:open={mobileMenuOpen}>
-			{#each navigationItems as item}
+			{#each navigationItems as item (item.path)}
 				<li>
 					<a
 						href={item.path}
