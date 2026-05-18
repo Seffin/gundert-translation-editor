@@ -61,7 +61,8 @@
 
 	@media (max-width: 768px) {
 		.app-main {
-			padding: 0;
+			padding: 0 0 70px 0;
+			overflow-y: auto;
 		}
 	}
 </style>
