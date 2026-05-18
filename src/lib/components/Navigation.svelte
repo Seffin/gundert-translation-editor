@@ -58,6 +58,12 @@
 					</a>
 				</li>
 			{/each}
+			<li class="mobile-settings">
+				<a href="/settings" class="nav-link" title="Settings">
+					<span class="icon">⚙️</span>
+					<span class="label">Settings</span>
+				</a>
+			</li>
 		</ul>
 
 		<div class="nav-settings">
@@ -212,11 +218,15 @@
 			position: fixed;
 			bottom: 0;
 			top: auto;
+			left: 0;
+			right: 0;
 			z-index: 50;
 			background: linear-gradient(180deg, rgba(10, 36, 84, 0.98), rgba(20, 86, 217, 0.98));
 			box-shadow: 0 -12px 30px rgba(10,36,84,0.18);
 			backdrop-filter: blur(8px);
 			padding: 0.25rem 0;
+			width: 100%;
+			max-width: 100vw;
 		}
 
 		.nav-container {
@@ -226,9 +236,10 @@
 			margin: 0 auto;
 			align-items: center;
 			justify-content: space-between;
+			box-sizing: border-box;
 		}
 
-		/* hide large brand & settings on mobile bottom bar */
+		/* hide large brand & desktop settings on mobile bottom bar */
 		.nav-brand { display: none; }
 		.nav-settings { display: none; }
 
@@ -243,10 +254,16 @@
 			flex-direction: row;
 			padding: 0.25rem 0.25rem;
 			gap: 0.25rem;
-			justify-content: space-around;
+			justify-content: space-between;
 			align-items: center;
 			width: 100%;
+			max-width: 100vw;
 			overflow-x: auto;
+		}
+
+		.nav-menu li {
+			flex: 1 1 auto;
+			min-width: 0;
 		}
 
 		.nav-link {
@@ -254,20 +271,26 @@
 			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			padding: 0.35rem 0.5rem;
-			font-size: 0.675rem;
+			gap: 0.2rem;
+			padding: 0.45rem 0.35rem;
+			font-size: 0.7rem;
 			min-width: 44px;
 			border-radius: 0.5rem;
 			opacity: 0.95;
+			width: 100%;
+			box-sizing: border-box;
+			text-align: center;
 		}
 
-		.icon { font-size: 1.15rem; }
-		.label { font-size: 0.6rem; margin-top: 3px; }
+		.icon { font-size: 1.2rem; }
+		.label { font-size: 0.65rem; margin: 0; }
+
+		.mobile-settings { display: list-item; }
 
 		/* active state emphasis on mobile */
 		.nav-link.active {
-			background: rgba(255,255,255,0.12);
-			box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+			background: rgba(255,255,255,0.14);
+			box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
 		}
 
 		/* hide hamburger on bottom nav */
