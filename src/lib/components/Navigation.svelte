@@ -3,7 +3,7 @@
 	import { COLORS, SPACING } from '$lib/design-tokens';
 	import { BRAND_NAME } from '$lib/brand';
 
-	let mobileMenuOpen = false;
+	let mobileMenuOpen = $state(false);
 
 	const navigationItems = [
 		{ path: '/', label: 'Workspace', icon: '🏠' },
@@ -36,7 +36,7 @@
 			aria-label="Toggle navigation"
 			aria-controls="main-nav"
 			aria-expanded={mobileMenuOpen}
-			on:click={() => (mobileMenuOpen = !mobileMenuOpen)}
+			onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
 			type="button"
 		>
 			<span class="hamburger-box">
@@ -286,11 +286,6 @@
 
 		.mobile-settings { display: list-item; }
 
-		@media (max-width: 540px) {
-			.nav-link { font-size: 0.65rem; padding: 0.3rem 0.2rem; }
-			.label { font-size: 0.55rem; }
-		}
-
 		.icon { font-size: 1.2rem; }
 		.label { font-size: 0.65rem; margin: 0; }
 
@@ -304,6 +299,11 @@
 
 		/* hide hamburger on bottom nav */
 		.hamburger { display: none; }
+	}
+
+	@media (max-width: 540px) {
+		.nav-link { font-size: 0.65rem; padding: 0.3rem 0.2rem; }
+		.label { font-size: 0.55rem; }
 	}
 
 	/* Tablet improvements: slightly denser layout and visible labels */
