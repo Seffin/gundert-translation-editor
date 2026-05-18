@@ -243,7 +243,7 @@
 		.nav-brand { display: none; }
 		.nav-settings { display: none; }
 
-		/* show nav as a horizontal icon bar */
+		/* show nav as a bottom full-width icon bar */
 		.nav-menu {
 			display: flex;
 			position: relative;
@@ -254,21 +254,16 @@
 			flex-direction: row;
 			flex-wrap: nowrap;
 			padding: 0.25rem 0.25rem;
-			gap: 0.25rem;
-			justify-content: flex-start;
+			gap: 0.125rem;
+			justify-content: space-between;
 			align-items: center;
 			width: 100%;
 			max-width: 100vw;
-			overflow-x: auto;
-			scrollbar-width: none;
-		}
-
-		.nav-menu::-webkit-scrollbar {
-			display: none;
+			overflow-x: hidden;
 		}
 
 		.nav-menu li {
-			flex: 0 0 auto;
+			flex: 1 1 0;
 			min-width: 0;
 		}
 
@@ -278,15 +273,22 @@
 			align-items: center;
 			justify-content: center;
 			gap: 0.2rem;
-			padding: 0.35rem 0.45rem;
+			padding: 0.35rem 0.25rem;
 			font-size: 0.7rem;
-			min-width: 44px;
+			min-width: 0;
 			border-radius: 0.5rem;
 			opacity: 0.95;
-			width: auto;
+			width: 100%;
 			box-sizing: border-box;
 			text-align: center;
 			white-space: nowrap;
+		}
+
+		.mobile-settings { display: list-item; }
+
+		@media (max-width: 540px) {
+			.nav-link { font-size: 0.65rem; padding: 0.3rem 0.2rem; }
+			.label { display: none; }
 		}
 
 		.icon { font-size: 1.2rem; }
