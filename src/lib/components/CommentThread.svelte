@@ -185,12 +185,15 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		padding: 1.5rem;
-		background: #f9f9f9;
-		border-left: 1px solid #e0e0e0;
+		padding: 1rem;
+		background: var(--color-surface);
+		border-left: 1px solid var(--color-outline-variant);
 		overflow-y: auto;
 		max-height: 100vh;
-		min-width: 320px;
+		min-width: 0;
+		width: 100%;
+		max-width: 420px;
+		box-sizing: border-box;
 	}
 
 	.header {
@@ -416,4 +419,21 @@
 		background: #d1d5db;
 		cursor: not-allowed;
 	}
+
+@media (max-width: 900px) {
+	.comment-thread {
+		border-left: none;
+		max-width: 100%;
+		padding: 0.75rem;
+	}
+
+	.comments-list {
+		max-height: 40vh;
+	}
+
+	.resolve-all-btn {
+		position: sticky;
+		bottom: 0;
+	}
+}
 </style>

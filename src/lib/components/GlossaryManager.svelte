@@ -88,6 +88,7 @@
 		<button type="submit">{editingId ? 'Save Changes' : 'Add Term'}</button>
 	</form>
 
+	<div class="table-responsive">
 	<table>
 		<thead>
 			<tr>
@@ -112,6 +113,7 @@
 			{/each}
 		</tbody>
 	</table>
+	</div>
 </section>
 
 <style>
@@ -133,6 +135,12 @@
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 0.75rem;
 		margin-bottom: 0.75rem;
+	}
+
+	@media (max-width: 700px) {
+		.fields { grid-template-columns: 1fr; }
+		section { padding: 1rem; }
+		button { width: 100%; }
 	}
 
 	label {
