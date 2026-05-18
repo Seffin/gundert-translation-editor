@@ -1112,6 +1112,7 @@
 		font-family: var(--font-serif);
 		font-size: 1.04rem;
 		line-height: 1.7;
+		color: #22354c;
 	}
 
 	.segment-comments {
