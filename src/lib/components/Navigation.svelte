@@ -207,45 +207,80 @@
 	}
 
 	@media (max-width: 768px) {
+		/* Bottom fixed navigation for mobile */
+		.gundert-nav {
+			position: fixed;
+			bottom: 0;
+			top: auto;
+			z-index: 50;
+			background: linear-gradient(180deg, rgba(10, 36, 84, 0.98), rgba(20, 86, 217, 0.98));
+			box-shadow: 0 -12px 30px rgba(10,36,84,0.18);
+			backdrop-filter: blur(8px);
+			padding: 0.25rem 0;
+		}
+
 		.nav-container {
-			padding: 0.75rem 1rem;
-			gap: 1rem;
+			padding: 0 0.5rem;
+			gap: 0.5rem;
+			max-width: 100%;
+			margin: 0 auto;
+			align-items: center;
+			justify-content: space-between;
 		}
 
-		.nav-brand h1 {
-			font-size: 1.25rem;
-		}
+		/* hide large brand & settings on mobile bottom bar */
+		.nav-brand { display: none; }
+		.nav-settings { display: none; }
 
+		/* show nav as a horizontal icon bar */
 		.nav-menu {
+			display: flex;
+			position: relative;
+			top: auto;
+			left: auto;
+			right: auto;
+			background: transparent;
+			flex-direction: row;
+			padding: 0.25rem 0.25rem;
 			gap: 0.25rem;
-			display: none; /* hidden by default on small screens */
-			position: absolute;
-			top: 100%;
-			left: 0;
-			right: 0;
-			background: linear-gradient(180deg, rgba(10, 36, 84, 0.94), rgba(20, 86, 217, 0.88));
-			flex-direction: column;
-			padding: 0.5rem 1rem 1rem 1rem;
-			border-bottom: 1px solid rgba(255,255,255,0.06);
-			z-index: 30;
+			justify-content: space-around;
+			align-items: center;
+			width: 100%;
+			overflow-x: auto;
 		}
 
 		.nav-link {
-			padding: 0.5rem 0.75rem;
-			font-size: 0.75rem;
-			width: 100%;
-			box-sizing: border-box;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 0.35rem 0.5rem;
+			font-size: 0.675rem;
+			min-width: 44px;
 			border-radius: 0.5rem;
+			opacity: 0.95;
 		}
 
-		.label {
-			display: inline-block;
+		.icon { font-size: 1.15rem; }
+		.label { font-size: 0.6rem; margin-top: 3px; }
+
+		/* active state emphasis on mobile */
+		.nav-link.active {
+			background: rgba(255,255,255,0.12);
+			box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
 		}
 
-		.nav-link.active .label {
-			display: inline;
-		}
+		/* hide hamburger on bottom nav */
+		.hamburger { display: none; }
+	}
 
+	/* Tablet improvements: slightly denser layout and visible labels */
+	@media (min-width: 769px) and (max-width: 1024px) {
+		.nav-container { padding: 0.75rem 1rem; gap: 1rem; }
+		.nav-brand h1 { font-size: 1.15rem; }
+		.nav-menu { gap: 0.5rem; }
+		.nav-link { padding: 0.6rem 0.8rem; font-size: 0.8rem; }
 		.hamburger { display: inline-flex; }
+		.nav-settings { display: block; }
 	}
 </style>
