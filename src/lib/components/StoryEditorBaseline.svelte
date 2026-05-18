@@ -1286,10 +1286,30 @@
 
 		.toolbar-heading-row {
 			flex-direction: column;
+			gap: 0.75rem;
 		}
 
 		.story-meta-pills {
+			display: flex;
+			flex-wrap: nowrap;
 			justify-content: flex-start;
+			gap: 0.5rem;
+			overflow-x: auto;
+			padding-bottom: 0.25rem;
+			margin-bottom: -0.25rem;
+		}
+
+		.story-meta-pills::-webkit-scrollbar {
+			display: none;
+		}
+
+		.story-meta-pills {
+			-ms-overflow-style: none;
+			scrollbar-width: none;
+		}
+
+		.meta-pill {
+			flex: 0 0 auto;
 		}
 
 		.segment-card-header,
