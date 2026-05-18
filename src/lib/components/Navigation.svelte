@@ -252,17 +252,23 @@
 			right: auto;
 			background: transparent;
 			flex-direction: row;
+			flex-wrap: nowrap;
 			padding: 0.25rem 0.25rem;
 			gap: 0.25rem;
-			justify-content: space-between;
+			justify-content: flex-start;
 			align-items: center;
 			width: 100%;
 			max-width: 100vw;
 			overflow-x: auto;
+			scrollbar-width: none;
+		}
+
+		.nav-menu::-webkit-scrollbar {
+			display: none;
 		}
 
 		.nav-menu li {
-			flex: 1 1 auto;
+			flex: 0 0 auto;
 			min-width: 0;
 		}
 
@@ -272,14 +278,15 @@
 			align-items: center;
 			justify-content: center;
 			gap: 0.2rem;
-			padding: 0.45rem 0.35rem;
+			padding: 0.35rem 0.45rem;
 			font-size: 0.7rem;
 			min-width: 44px;
 			border-radius: 0.5rem;
 			opacity: 0.95;
-			width: 100%;
+			width: auto;
 			box-sizing: border-box;
 			text-align: center;
+			white-space: nowrap;
 		}
 
 		.icon { font-size: 1.2rem; }
