@@ -170,6 +170,10 @@
 		position: relative;
 	}
 
+	.mobile-settings {
+		display: none;
+	}
+
 	/* Hamburger button */
 	.hamburger {
 		display: none;
