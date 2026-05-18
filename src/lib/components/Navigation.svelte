@@ -288,7 +288,7 @@
 
 		@media (max-width: 540px) {
 			.nav-link { font-size: 0.65rem; padding: 0.3rem 0.2rem; }
-			.label { display: none; }
+			.label { font-size: 0.55rem; }
 		}
 
 		.icon { font-size: 1.2rem; }
