@@ -3,6 +3,8 @@
 	import { COLORS, SPACING } from '$lib/design-tokens';
 	import { BRAND_NAME } from '$lib/brand';
 
+	let mobileMenuOpen = false;
+
 	const navigationItems = [
 		{ path: '/', label: 'Workspace', icon: '🏠' },
 		{ path: '/stories', label: 'Stories', icon: '📖' },
@@ -28,7 +30,21 @@
 			<h1>{BRAND_NAME}</h1>
 		</div>
 
-		<ul class="nav-menu">
+		<!-- Mobile hamburger toggle -->
+		<button
+			class="hamburger"
+			aria-label="Toggle navigation"
+			aria-controls="main-nav"
+			aria-expanded={mobileMenuOpen}
+			on:click={() => (mobileMenuOpen = !mobileMenuOpen)}
+			type="button"
+		>
+			<span class="hamburger-box">
+				<span class="hamburger-inner"></span>
+			</span>
+		</button>
+
+		<ul id="main-nav" class="nav-menu" class:open={mobileMenuOpen}>
 			{#each navigationItems as item}
 				<li>
 					<a
@@ -148,6 +164,41 @@
 		position: relative;
 	}
 
+	/* Hamburger button */
+	.hamburger {
+		display: none;
+		background: transparent;
+		border: none;
+		padding: 0.5rem;
+		margin-left: 0.5rem;
+		cursor: pointer;
+		color: inherit;
+	}
+
+	.hamburger-box {
+		width: 24px;
+		height: 16px;
+		display: inline-block;
+		position: relative;
+	}
+
+	.hamburger-inner,
+	.hamburger-inner::before,
+	.hamburger-inner::after {
+		width: 24px;
+		height: 2px;
+		background-color: currentColor;
+		position: absolute;
+		left: 0;
+		transition: transform 0.2s ease, opacity 0.2s ease;
+	}
+
+	.hamburger-inner { top: 50%; transform: translateY(-50%); }
+	.hamburger-inner::before { content: ''; top: -8px; }
+	.hamburger-inner::after { content: ''; top: 8px; }
+
+	.nav-menu.open { display: flex; }
+
 	.settings-btn {
 		background: none;
 		border: none;
@@ -167,19 +218,34 @@
 
 		.nav-menu {
 			gap: 0.25rem;
+			display: none; /* hidden by default on small screens */
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			background: linear-gradient(180deg, rgba(10, 36, 84, 0.94), rgba(20, 86, 217, 0.88));
+			flex-direction: column;
+			padding: 0.5rem 1rem 1rem 1rem;
+			border-bottom: 1px solid rgba(255,255,255,0.06);
+			z-index: 30;
 		}
 
 		.nav-link {
 			padding: 0.5rem 0.75rem;
 			font-size: 0.75rem;
+			width: 100%;
+			box-sizing: border-box;
+			border-radius: 0.5rem;
 		}
 
 		.label {
-			display: none;
+			display: inline-block;
 		}
 
 		.nav-link.active .label {
 			display: inline;
 		}
+
+		.hamburger { display: inline-flex; }
 	}
 </style>
