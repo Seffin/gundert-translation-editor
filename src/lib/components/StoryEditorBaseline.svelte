@@ -734,9 +734,10 @@
 	.editor-toolbar {
 		flex-shrink: 0;
 		padding: 1.2rem 1.5rem 1rem;
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(243, 248, 255, 0.95));
-		border-bottom: 1px solid rgba(207, 218, 234, 0.95);
-		box-shadow: 0 10px 32px rgba(20, 63, 126, 0.08);
+		background: var(--color-surface);
+		color: var(--color-on-surface);
+		border-bottom: 1px solid var(--color-outline-variant);
+		box-shadow: var(--shadow-subtle);
 		backdrop-filter: blur(16px);
 	}
 
@@ -750,12 +751,12 @@
 	}
 
 	.breadcrumbs {
-		margin-bottom: 0.8rem;
+		margin-bottom: 0.4rem;
 		font-size: 0.72rem;
 		font-weight: 800;
 		letter-spacing: 0.16em;
 		text-transform: uppercase;
-		color: #56708f;
+		color: var(--color-on-surface-variant);
 	}
 
 	.toolbar-heading-row {
@@ -763,17 +764,18 @@
 		justify-content: space-between;
 		gap: 1rem;
 		align-items: flex-start;
-		margin-bottom: 1rem;
+		margin-bottom: 0.5rem;
 	}
 
 	.toolbar-heading-row h1 {
-		margin-bottom: 0.45rem;
+		margin-bottom: 0.25rem;
+		color: var(--color-on-surface);
 	}
 
 	.editor-description {
 		max-width: 58ch;
 		margin-bottom: 0;
-		color: #53647a;
+		color: var(--color-on-surface-variant);
 	}
 
 	.story-meta-pills {
@@ -789,9 +791,9 @@
 		min-height: 2rem;
 		padding: 0.35rem 0.8rem;
 		border-radius: 999px;
-		background: rgba(20, 86, 217, 0.08);
-		border: 1px solid rgba(20, 86, 217, 0.14);
-		color: #255187;
+		background: var(--color-surface-container-low);
+		border: 1px solid var(--color-outline-variant);
+		color: var(--color-on-surface);
 		font-size: 0.78rem;
 		font-weight: 800;
 		letter-spacing: 0.04em;
@@ -799,8 +801,8 @@
 	}
 
 	.meta-pill--accent {
-		background: linear-gradient(180deg, rgba(20, 86, 217, 0.15), rgba(95, 164, 255, 0.14));
-		color: #0d3f9e;
+		background: var(--color-primary-container);
+		color: var(--color-on-primary-container);
 	}
 
 	.toolbar-actions {
@@ -816,8 +818,8 @@
 		align-items: center;
 		padding: 0.95rem;
 		margin-top: 0.75rem;
-		background: rgba(239, 245, 252, 0.86);
-		border: 1px solid rgba(207, 218, 234, 0.9);
+		background: var(--color-surface-container-low);
+		border: 1px solid var(--color-outline-variant);
 		border-radius: 1.1rem;
 	}
 
@@ -832,17 +834,17 @@
 		align-items: center;
 		padding: 0.35rem 0.75rem;
 		border-radius: 999px;
-		background: rgba(20, 86, 217, 0.08);
-		border: 1px solid rgba(20, 86, 217, 0.12);
-		color: #35537a;
+		background: var(--color-surface-container-low);
+		border: 1px solid var(--color-outline-variant);
+		color: var(--color-on-surface-variant);
 		font-size: 0.76rem;
 		font-weight: 700;
 	}
 
 	.summary-pill--accent {
-		background: rgba(255, 236, 173, 0.7);
-		border-color: rgba(227, 160, 8, 0.18);
-		color: #8f5e0b;
+		background: var(--color-surface-container-low);
+		border-color: var(--color-outline-variant);
+		color: var(--color-on-surface);
 	}
 
 	button {
@@ -856,54 +858,57 @@
 	}
 
 	.draft-btn {
-		background: linear-gradient(180deg, #2d7cff 0%, #1456d9 100%);
-		border-color: #1456d9;
+		background: linear-gradient(180deg, var(--color-primary-container) 0%, var(--color-primary) 100%);
+		border-color: var(--color-primary);
+		color: var(--color-on-primary);
 	}
 
 	.bulk-select-btn {
-		background: rgba(20, 86, 217, 0.08);
-		border-color: rgba(20, 86, 217, 0.18);
-		color: #1456d9;
+		background: var(--color-surface);
+		border-color: var(--color-outline-variant);
+		color: var(--color-primary);
 		box-shadow: none;
 	}
 
 	.dirty-indicator {
 		font-size: 0.8rem;
 		font-weight: 700;
-		color: #9a3412;
+		color: var(--color-error);
 	}
 
 	.save-message {
 		font-size: 0.8rem;
 		font-weight: 700;
-		color: #1456d9;
+		color: var(--color-primary);
 	}
 
 	.draft-error {
 		font-size: 0.8rem;
 		font-weight: 700;
-		color: #b42318;
+		color: var(--color-error);
 	}
 
 	.segment-card {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem 1rem;
 		padding: 1.25rem;
 		border-radius: 1.35rem;
-		border: 1px solid rgba(207, 218, 234, 0.92);
-		background: rgba(255, 255, 255, 0.92);
-		box-shadow: 0 14px 28px rgba(20, 63, 126, 0.06);
+		border: 1px solid var(--color-outline-variant);
+		background: var(--color-surface-container);
+		color: var(--color-on-surface);
+		box-shadow: var(--shadow-subtle);
 		transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 	}
 
 	.segment-card--active {
-		border-color: rgba(20, 86, 217, 0.42);
-		box-shadow: 0 22px 40px rgba(20, 86, 217, 0.12);
-		background: linear-gradient(180deg, rgba(247, 251, 255, 0.98), rgba(255, 255, 255, 0.98));
+		border-color: var(--color-primary);
+		box-shadow: var(--shadow-medium);
+		background: var(--color-surface-container-high);
 	}
 
 	.segment-card-header {
+		grid-column: 1 / -1;
 		display: flex;
 		justify-content: space-between;
 		gap: 1rem;
@@ -926,7 +931,7 @@
 	.segment-id {
 		font-family: var(--font-mono);
 		font-size: 0.74rem;
-		color: #69829e;
+		color: var(--color-on-surface-variant);
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
 	}
@@ -936,9 +941,9 @@
 		align-items: center;
 		padding: 0.35rem 0.7rem;
 		border-radius: 999px;
-		background: rgba(20, 86, 217, 0.08);
-		border: 1px solid rgba(20, 86, 217, 0.12);
-		color: #1456d9;
+		background: var(--color-surface-container-low);
+		border: 1px solid var(--color-outline-variant);
+		color: var(--color-primary);
 		font-size: 0.72rem;
 		font-weight: 800;
 		letter-spacing: 0.08em;
@@ -956,7 +961,7 @@
 	.segment-meta-item {
 		font-size: 0.78rem;
 		font-weight: 700;
-		color: #5a7390;
+		color: var(--color-on-surface-variant);
 	}
 
 	.select-label {
@@ -966,35 +971,38 @@
 		font-size: 0.75rem;
 		font-weight: 700;
 		cursor: pointer;
-		color: #53647a;
+		color: var(--color-on-surface-variant);
 	}
 
 	.source-column,
 	.target-column {
-		padding: 1.15rem;
-		border: 1px solid rgba(207, 218, 234, 0.92);
+		padding: 0.85rem;
+		border: 1px solid var(--color-outline-variant);
 		border-radius: 1.15rem;
-		background: rgba(255, 255, 255, 0.88);
-		box-shadow: 0 10px 24px rgba(20, 63, 126, 0.05);
+		background: var(--color-surface-container-lowest);
+		box-shadow: var(--shadow-subtle);
 	}
 
 	.source-column {
-		background: linear-gradient(180deg, rgba(246, 250, 255, 0.96), rgba(255, 255, 255, 0.98));
+		background: var(--color-surface-container-lowest);
 	}
 
 	.target-column {
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 255, 0.96));
+		background: var(--color-surface-container-lowest);
 	}
 
 	.segment-toolbox {
 		display: flex;
-		flex-direction: column;
-		gap: 0.8rem;
-		padding: 0.9rem 1rem;
-		margin-bottom: 0.9rem;
-		border-radius: 1rem;
-		background: rgba(239, 245, 252, 0.86);
-		border: 1px solid rgba(207, 218, 234, 0.95);
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		padding: 0.35rem 0.75rem;
+		margin-bottom: 0.5rem;
+		border-radius: 0.5rem;
+		background: var(--color-surface-container-low);
+		border: 1px solid var(--color-outline-variant);
 	}
 
 	.toolbox-meta-row {
@@ -1009,8 +1017,8 @@
 		align-items: center;
 		padding: 0.28rem 0.65rem;
 		border-radius: 999px;
-		background: rgba(20, 86, 217, 0.1);
-		color: #255187;
+		background: var(--color-surface-container);
+		color: var(--color-primary);
 		font-size: 0.73rem;
 		font-weight: 700;
 	}
@@ -1024,11 +1032,11 @@
 	.segment-warning {
 		padding: 0.7rem 0.8rem;
 		border-radius: 0.85rem;
-		background: linear-gradient(180deg, rgba(255, 246, 243, 1), rgba(255, 251, 249, 1));
-		border: 1px solid rgba(255, 186, 166, 0.76);
+		background: var(--color-error-container);
+		border: 1px solid var(--color-error);
 		font-size: 0.84rem;
 		font-weight: 700;
-		color: #a0381b;
+		color: var(--color-on-error);
 	}
 
 	.segment-actions {
@@ -1038,26 +1046,29 @@
 	}
 
 	.segment-action {
-		min-height: 2.25rem;
+		min-height: 1.75rem;
+		font-size: 0.75rem;
+		padding: 0.25rem 0.6rem;
 	}
 
 	.segment-action--primary {
-		background: linear-gradient(180deg, #2d7cff 0%, #1456d9 100%);
-		border-color: #1456d9;
+		background: linear-gradient(180deg, var(--color-primary-container) 0%, var(--color-primary) 100%);
+		border-color: var(--color-primary);
+		color: var(--color-on-primary);
 	}
 
 	.segment-action--secondary {
-		background: rgba(255, 255, 255, 0.82);
-		border-color: rgba(20, 86, 217, 0.18);
-		color: #1456d9;
+		background: var(--color-surface);
+		border-color: var(--color-outline-variant);
+		color: var(--color-on-surface);
 		box-shadow: none;
 	}
 
 	.comment-preview {
 		padding: 0.8rem 0.85rem;
 		border-radius: 0.9rem;
-		background: rgba(255, 255, 255, 0.84);
-		border: 1px solid rgba(207, 218, 234, 0.95);
+		background: var(--color-surface);
+		border: 1px solid var(--color-outline-variant);
 	}
 
 	.comment-preview-kicker {
@@ -1067,19 +1078,19 @@
 		font-weight: 800;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		color: #5a7390;
+		color: var(--color-on-surface-variant);
 	}
 
 	.comment-preview p {
 		margin-bottom: 0;
 		font-size: 0.92rem;
-		color: #31455f;
+		color: var(--color-on-surface);
 	}
 
 	.segment-number {
 		font-size: 0.75rem;
 		font-weight: 700;
-		color: #5a7390;
+		color: var(--color-on-surface-variant);
 		letter-spacing: 0.12em;
 	}
 
@@ -1088,7 +1099,7 @@
 		font-family: var(--font-serif);
 		font-size: 1.08rem;
 		line-height: 1.75;
-		color: #22354c;
+		color: var(--color-on-surface);
 	}
 
 	.language-chip {
@@ -1099,26 +1110,26 @@
 	}
 
 	.language-chip {
-		color: #1456d9;
+		color: var(--color-primary);
 	}
 
 	textarea {
 		width: 100%;
-		min-height: 11rem;
-		border: 1px solid rgba(199, 214, 235, 0.95);
+		min-height: 6rem;
+		border: 1px solid var(--color-outline-variant);
 		border-radius: 1rem;
 		padding: 0.95rem 1rem;
-		background: #fbfdff;
+		background: var(--color-surface-container-lowest);
 		font-family: var(--font-serif);
 		font-size: 1.04rem;
 		line-height: 1.7;
-		color: #22354c;
+		color: var(--color-on-surface);
 	}
 
 	.segment-comments {
 		margin-top: 1rem;
 		padding-top: 1rem;
-		border-top: 1px solid rgba(207, 218, 234, 0.92);
+		border-top: 1px solid var(--color-outline-variant);
 		display: flex;
 		flex-direction: column;
 		gap: 0.9rem;
@@ -1139,12 +1150,12 @@
 	.segment-comments-header span {
 		font-size: 0.78rem;
 		font-weight: 700;
-		color: #5a7390;
+		color: var(--color-on-surface-variant);
 	}
 
 	.comments-empty {
 		margin-bottom: 0;
-		color: #5a7390;
+		color: var(--color-on-surface-variant);
 	}
 
 	.segment-comment-list {
@@ -1156,8 +1167,8 @@
 	.segment-comment {
 		padding: 0.85rem 0.95rem;
 		border-radius: 1rem;
-		background: rgba(255, 255, 255, 0.88);
-		border: 1px solid rgba(207, 218, 234, 0.95);
+		background: var(--color-surface);
+		border: 1px solid var(--color-outline-variant);
 	}
 
 	.segment-comment--resolved {
@@ -1178,20 +1189,20 @@
 
 	.segment-comment-meta span {
 		font-size: 0.76rem;
-		color: #69829e;
+		color: var(--color-on-surface-variant);
 	}
 
 	.segment-comment p {
 		margin-bottom: 0;
 		font-size: 0.92rem;
-		color: #22354c;
+		color: var(--color-on-surface);
 	}
 
 	.comment-resolved-tag {
 		padding: 0.25rem 0.55rem;
 		border-radius: 999px;
 		background: rgba(95, 164, 255, 0.16);
-		color: #1456d9;
+		color: var(--color-primary);
 		font-size: 0.7rem;
 		font-weight: 800;
 		letter-spacing: 0.06em;
@@ -1202,9 +1213,9 @@
 		margin-left: auto;
 		padding: 0.45rem 0.8rem;
 		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.82);
-		border: 1px solid rgba(20, 86, 217, 0.18);
-		color: #1456d9;
+		background: var(--color-surface);
+		border: 1px solid var(--color-outline-variant);
+		color: var(--color-primary);
 		box-shadow: none;
 	}
 
@@ -1217,7 +1228,7 @@
 	.comment-label {
 		font-size: 0.8rem;
 		font-weight: 700;
-		color: #35537a;
+		color: var(--color-on-surface-variant);
 	}
 
 	.skeleton {
@@ -1247,13 +1258,17 @@
 	.provenance {
 		margin-top: 0.5rem;
 		font-size: 0.7rem;
-		color: #5a7390;
+		color: var(--color-on-surface-variant);
 		font-weight: 700;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 	}
 
 	@media (max-width: 900px) {
+		.segment-card {
+			grid-template-columns: 1fr;
+		}
+
 		.editor {
 			height: auto;
 			min-height: calc(100vh - 4.75rem);
