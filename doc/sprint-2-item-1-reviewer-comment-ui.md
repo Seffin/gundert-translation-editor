@@ -1,14 +1,17 @@
 # Sprint 2, Item 1 - Reviewer Comment UI Implementation
 
 ## Summary
+
 Added a visual comment thread panel to the story editor that allows reviewers to view, add, and resolve comments inline while translating. This enhances the reviewer workflow by making comments directly visible in the context where they're needed.
 
 ## Implemented Components
 
 ### 1. CommentThread.svelte (New)
+
 **Location:** `src/lib/components/CommentThread.svelte`
 
 A reusable comment thread panel component with:
+
 - **Display**: Shows all comments (resolved and unresolved) for a story
 - **Badges**: Displays counts of unresolved and resolved comments
 - **Interactions**:
@@ -22,9 +25,11 @@ A reusable comment thread panel component with:
 - **Styling**: Clean sidebar design with status badges, resolved comment fade-out, and error handling
 
 ### 2. Updated StoryEditorBaseline.svelte
+
 **Location:** `src/lib/components/StoryEditorBaseline.svelte`
 
 Integrated CommentThread as a right sidebar:
+
 - Restructured layout to support 2-pane design (editor + comments)
 - Added `CommentThread` import and component usage
 - Wraps editor content in `editor-wrapper` flex container
@@ -32,6 +37,7 @@ Integrated CommentThread as a right sidebar:
 - Maintains all existing functionality (terminology warnings, save, draft)
 
 **Layout Structure:**
+
 ```
 <main class="editor"> (flex container)
   ├─ <div class="editor-wrapper"> (flex: 1 + sidebar)
@@ -42,9 +48,11 @@ Integrated CommentThread as a right sidebar:
 ```
 
 ### 3. CommentThread.svelte.spec.ts (New)
+
 **Location:** `src/lib/components/CommentThread.svelte.spec.ts`
 
 Test suite for component rendering and basic functionality:
+
 - Verifies empty state UI
 - Confirms header and textarea rendering
 - Validates add button disabled state
@@ -54,11 +62,11 @@ Test suite for component rendering and basic functionality:
 
 Leverages existing reviewer comments API:
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/reviewer-comments?storyId={id}` | GET | Fetch all comments for a story |
-| `/api/reviewer-comments` | POST | Add new comment (`{ storyId, authorId, message, segmentId? }`) |
-| `/api/reviewer-comments/resolve` | POST | Resolve comment(s) (`{ storyId, commentId? }`) |
+| Endpoint                              | Method | Purpose                                                        |
+| ------------------------------------- | ------ | -------------------------------------------------------------- |
+| `/api/reviewer-comments?storyId={id}` | GET    | Fetch all comments for a story                                 |
+| `/api/reviewer-comments`              | POST   | Add new comment (`{ storyId, authorId, message, segmentId? }`) |
+| `/api/reviewer-comments/resolve`      | POST   | Resolve comment(s) (`{ storyId, commentId? }`)                 |
 
 ## Workflow
 

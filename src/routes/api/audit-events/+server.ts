@@ -13,10 +13,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const { action, actorId, storyId, segmentId, draftScope, decision } = body;
 
 		if (!action || !actorId || !storyId) {
-			return json(
-				{ error: 'Missing required fields: action, actorId, storyId' },
-				{ status: 400 }
-			);
+			return json({ error: 'Missing required fields: action, actorId, storyId' }, { status: 400 });
 		}
 
 		switch (action) {
@@ -30,10 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 			case 'edit':
 				if (!segmentId) {
-					return json(
-						{ error: 'Missing required field for edit: segmentId' },
-						{ status: 400 }
-					);
+					return json({ error: 'Missing required field for edit: segmentId' }, { status: 400 });
 				}
 				emitStoryEditEvent({
 					actorId,
@@ -58,10 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				break;
 
 			default:
-				return json(
-					{ error: `Unknown action: ${action}` },
-					{ status: 400 }
-				);
+				return json({ error: `Unknown action: ${action}` }, { status: 400 });
 		}
 
 		return json({ success: true, action, storyId });

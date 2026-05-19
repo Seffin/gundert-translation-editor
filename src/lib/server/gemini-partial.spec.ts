@@ -4,7 +4,6 @@ import {
 	buildPartialDraftResult,
 	mergePartialDraftResult,
 	retryFailedSegments,
-	type PartialDraftResult,
 	type SegmentDraftOutcome
 } from '$lib/server/gemini-partial';
 

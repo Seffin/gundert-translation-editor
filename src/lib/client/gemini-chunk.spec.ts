@@ -215,8 +215,7 @@ describe('selective chunk draft', () => {
 	});
 
 	it('supports multi-segment drafts with paragraph breaks using explicit separators', async () => {
-		const firstTranslation =
-			'അപ്പോൾ ദൈവം അരുളിച്ചെയ്തു: വെളിച്ചമുണ്ടാകട്ടെ.\n\nവെളിച്ചം ഉണ്ടായി.';
+		const firstTranslation = 'അപ്പോൾ ദൈവം അരുളിച്ചെയ്തു: വെളിച്ചമുണ്ടാകട്ടെ.\n\nവെളിച്ചം ഉണ്ടായി.';
 		const secondTranslation =
 			'ദൈവം വെളിച്ചം നല്ലതാണെന്ന് കണ്ടു.\n\nഅവൻ വെളിച്ചത്തെയും ഇരുളിനെയും വേർതിരിച്ചു.';
 
@@ -316,15 +315,21 @@ describe('selective chunk draft', () => {
 	it('parses JSON wrapped in markdown code fences as Gemini typically returns', async () => {
 		const firstTranslation =
 			'ആദിയിൽ ദൈവം സകലവും സൃഷ്ടിച്ചത് ഇങ്ങനെയാണ്. അവൻ ആകാശവും ഭൂമിയും അതിലുള്ള സകലതും ആറ് ദിവസങ്ങൾകൊണ്ട് സൃഷ്ടിച്ചു.';
-		const secondTranslation =
-			'അപ്പോൾ ദൈവം അരുളിച്ചെയ്തു: "വെളിച്ചം ഉണ്ടാകട്ടെ!" വെളിച്ചം ഉണ്ടായി.';
+		const secondTranslation = 'അപ്പോൾ ദൈവം അരുളിച്ചെയ്തു: "വെളിച്ചം ഉണ്ടാകട്ടെ!" വെളിച്ചം ഉണ്ടായി.';
 
-		const fencedJson = '```json\n' + JSON.stringify({
-			translations: [
-				{ id: '01:01', text: firstTranslation },
-				{ id: '01:02', text: secondTranslation }
-			]
-		}, null, 2) + '\n```';
+		const fencedJson =
+			'```json\n' +
+			JSON.stringify(
+				{
+					translations: [
+						{ id: '01:01', text: firstTranslation },
+						{ id: '01:02', text: secondTranslation }
+					]
+				},
+				null,
+				2
+			) +
+			'\n```';
 
 		const mockFetch = vi.fn(() =>
 			Promise.resolve(
@@ -372,12 +377,16 @@ describe('selective chunk draft', () => {
 
 		const responseWithCommentary =
 			'Here is the translation:\n\n```json\n' +
-			JSON.stringify({
-				translations: [
-					{ id: '01:01', text: firstTranslation },
-					{ id: '01:02', text: secondTranslation }
-				]
-			}, null, 2) +
+			JSON.stringify(
+				{
+					translations: [
+						{ id: '01:01', text: firstTranslation },
+						{ id: '01:02', text: secondTranslation }
+					]
+				},
+				null,
+				2
+			) +
 			'\n```\n\nLet me know if you need any changes.';
 
 		const mockFetch = vi.fn(() =>

@@ -16,10 +16,7 @@
 		requestGeminiChunkDraft,
 		type SegmentSelectionModel
 	} from '$lib/client/gemini-chunk';
-	import {
-		loadTargetLanguage,
-		saveTargetLanguage
-	} from '$lib/client/target-language';
+	import { loadTargetLanguage, saveTargetLanguage } from '$lib/client/target-language';
 	import { buildTerminologyWarnings } from '$lib/client/terminology-warnings';
 	import {
 		buildConsistencyIssues,
@@ -49,7 +46,9 @@
 		}, {});
 	}
 
-	function groupReviewerCommentsBySegment(comments: ReviewerComment[]): Record<string, ReviewerComment[]> {
+	function groupReviewerCommentsBySegment(
+		comments: ReviewerComment[]
+	): Record<string, ReviewerComment[]> {
 		return comments.reduce<Record<string, ReviewerComment[]>>((groups, comment) => {
 			const key = comment.segmentId ?? STORY_COMMENTS_KEY;
 			groups[key] = [...(groups[key] ?? []), comment];
@@ -57,7 +56,11 @@
 		}, {});
 	}
 
-	let { story, glossaryTerms = [], apiKey = null } = $props<{ story: StoryEditorModel; glossaryTerms?: GlossaryTerm[]; apiKey?: string | null }>();
+	let {
+		story,
+		glossaryTerms = [],
+		apiKey = null
+	} = $props<{ story: StoryEditorModel; glossaryTerms?: GlossaryTerm[]; apiKey?: string | null }>();
 
 	function createInitialSegments() {
 		return story.segments.map((segment) => ({ ...segment }));
@@ -213,7 +216,8 @@
 
 	function getLastEditedAt(segment: EditorSegment): string {
 		if (segment.lastSavedAtIso) return formatTimestamp(segment.lastSavedAtIso);
-		if (segment.aiProvenance?.generatedAtIso) return formatTimestamp(segment.aiProvenance.generatedAtIso);
+		if (segment.aiProvenance?.generatedAtIso)
+			return formatTimestamp(segment.aiProvenance.generatedAtIso);
 		return 'Not yet edited';
 	}
 
@@ -324,7 +328,7 @@
 		activeSegmentId = selectedIds[0] ?? activeSegmentId;
 
 		try {
-			const resolvedApiKey = apiKey ?? ((import.meta.env.VITE_GEMINI_API_KEY as string) ?? '');
+			const resolvedApiKey = apiKey ?? (import.meta.env.VITE_GEMINI_API_KEY as string) ?? '';
 			editorSegments = await requestGeminiChunkDraft(
 				editorSegments,
 				selectionModel,
@@ -452,7 +456,9 @@
 	<section class="editor-shell">
 		<header class="editor-toolbar" data-testid="editor-toolbar">
 			<div class="toolbar-copy">
-				<nav aria-label="breadcrumbs" class="breadcrumbs">Open Bible Stories / Story {story.storyId}</nav>
+				<nav aria-label="breadcrumbs" class="breadcrumbs">
+					Open Bible Stories / Story {story.storyId}
+				</nav>
 				<div class="toolbar-heading-row">
 					<div>
 						<h1>{story.storyId}: {story.title}</h1>
@@ -468,7 +474,11 @@
 
 			<div class="toolbar-actions" data-testid="save-bar">
 				<div class="save-bar">
-					<LanguageSelector storyId={story.storyId} value={selectedLanguage} onchange={handleLanguageChange} />
+					<LanguageSelector
+						storyId={story.storyId}
+						value={selectedLanguage}
+						onchange={handleLanguageChange}
+					/>
 					<button
 						type="button"
 						class="bulk-select-btn"
@@ -509,7 +519,9 @@
 					{#if commentsLoading}
 						<span class="summary-pill">Loading comments...</span>
 					{:else if unresolvedCommentCount > 0}
-						<span class="summary-pill summary-pill--accent">{unresolvedCommentCount} open comments</span>
+						<span class="summary-pill summary-pill--accent"
+							>{unresolvedCommentCount} open comments</span
+						>
 					{/if}
 					{#if llmValidating}
 						<span class="summary-pill">Validating consistency...</span>
@@ -619,7 +631,11 @@
 						</div>
 
 						{#if draftingSegmentIds.includes(segment.id)}
-							<div class="skeleton" aria-label="generating draft" data-testid="skeleton-{segment.id}">
+							<div
+								class="skeleton"
+								aria-label="generating draft"
+								data-testid="skeleton-{segment.id}"
+							>
 								<div class="skeleton-line"></div>
 								<div class="skeleton-line skeleton-line--short"></div>
 								<div class="skeleton-line"></div>
@@ -637,17 +653,25 @@
 
 						{#if segment.draftedByGemini && segment.aiProvenance}
 							<div class="provenance">
-								AI DRAFT • {segment.aiProvenance.actor} • {formatProvenanceScope(segment.aiProvenance.scope)} • {segment.aiProvenance.generatedAtLabel}
+								AI DRAFT • {segment.aiProvenance.actor} • {formatProvenanceScope(
+									segment.aiProvenance.scope
+								)} • {segment.aiProvenance.generatedAtLabel}
 							</div>
 						{:else if segment.draftedByGemini}
-							<div class="provenance">AI DRAFT • Gemini • Whole story • {segment.updatedAtLabel}</div>
+							<div class="provenance">
+								AI DRAFT • Gemini • Whole story • {segment.updatedAtLabel}
+							</div>
 						{/if}
 
 						{#if commentsExpanded}
 							<div class="segment-comments" data-testid={`segment-comments-${segment.id}`}>
 								<div class="segment-comments-header">
 									<h2>Comments on this segment</h2>
-									<span>{segmentComments.length > 0 ? getSegmentCommentCountLabel(segment.id) : 'No comments yet'}</span>
+									<span
+										>{segmentComments.length > 0
+											? getSegmentCommentCountLabel(segment.id)
+											: 'No comments yet'}</span
+									>
 								</div>
 
 								{#if segmentComments.length === 0}
@@ -655,7 +679,10 @@
 								{:else}
 									<div class="segment-comment-list">
 										{#each segmentComments as comment (comment.id)}
-											<article class="segment-comment" class:segment-comment--resolved={comment.resolved}>
+											<article
+												class="segment-comment"
+												class:segment-comment--resolved={comment.resolved}
+											>
 												<div class="segment-comment-meta">
 													<strong>{comment.authorId}</strong>
 													<span>{formatTimestamp(comment.createdAt)}</span>
@@ -690,12 +717,16 @@
 										value={commentDrafts[segment.id] ?? ''}
 										onclick={(event) => event.stopPropagation()}
 										oninput={(event) =>
-											updateCommentDraft(segment.id, (event.currentTarget as HTMLTextAreaElement).value)}
+											updateCommentDraft(
+												segment.id,
+												(event.currentTarget as HTMLTextAreaElement).value
+											)}
 									></textarea>
 									<button
 										type="button"
 										class="segment-action segment-action--secondary"
-										disabled={commentMutationSegmentId === segment.id || !(commentDrafts[segment.id] ?? '').trim()}
+										disabled={commentMutationSegmentId === segment.id ||
+											!(commentDrafts[segment.id] ?? '').trim()}
 										onclick={(event) => {
 											event.stopPropagation();
 											void addSegmentComment(segment.id);
@@ -858,7 +889,11 @@
 	}
 
 	.draft-btn {
-		background: linear-gradient(180deg, var(--color-primary-container) 0%, var(--color-primary) 100%);
+		background: linear-gradient(
+			180deg,
+			var(--color-primary-container) 0%,
+			var(--color-primary) 100%
+		);
 		border-color: var(--color-primary);
 		color: var(--color-on-primary);
 	}
@@ -898,7 +933,10 @@
 		background: var(--color-surface-container);
 		color: var(--color-on-surface);
 		box-shadow: var(--shadow-subtle);
-		transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease,
+			background-color 0.2s ease;
 	}
 
 	.segment-card--active {
@@ -1052,7 +1090,11 @@
 	}
 
 	.segment-action--primary {
-		background: linear-gradient(180deg, var(--color-primary-container) 0%, var(--color-primary) 100%);
+		background: linear-gradient(
+			180deg,
+			var(--color-primary-container) 0%,
+			var(--color-primary) 100%
+		);
 		border-color: var(--color-primary);
 		color: var(--color-on-primary);
 	}
@@ -1251,8 +1293,12 @@
 	}
 
 	@keyframes shimmer {
-		0% { background-position: 200% 0; }
-		100% { background-position: -200% 0; }
+		0% {
+			background-position: 200% 0;
+		}
+		100% {
+			background-position: -200% 0;
+		}
 	}
 
 	.provenance {

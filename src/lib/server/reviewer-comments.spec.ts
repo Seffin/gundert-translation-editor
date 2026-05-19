@@ -42,7 +42,11 @@ describe('reviewer comments store', () => {
 
 	it('resolves all unresolved comments for a story', () => {
 		addReviewerComment({ storyId: '09', authorId: 'reviewer.a', message: 'Fix punctuation' });
-		addReviewerComment({ storyId: '09', authorId: 'reviewer.b', message: 'Check tense consistency' });
+		addReviewerComment({
+			storyId: '09',
+			authorId: 'reviewer.b',
+			message: 'Check tense consistency'
+		});
 
 		const resolvedCount = resolveAllReviewerComments('09');
 		expect(resolvedCount).toBe(2);

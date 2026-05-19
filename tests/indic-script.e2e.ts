@@ -57,7 +57,9 @@ test('uses Tamil in Gemini chunk prompt and preserves selection after reload', a
 	await expect(page.locator('.language-chip').first()).toContainText('Tamil');
 });
 
-test('renders Hindi, Malayalam, and Tamil text without replacement glyphs or horizontal overflow', async ({ page }) => {
+test('renders Hindi, Malayalam, and Tamil text without replacement glyphs or horizontal overflow', async ({
+	page
+}) => {
 	await openStoryEditor(page);
 
 	const textareas = page.locator('textarea');

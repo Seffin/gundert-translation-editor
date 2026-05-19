@@ -17,9 +17,8 @@ export const load: PageServerLoad = async () => {
 		seedReviewerCommentsForStories(listItems);
 
 		return {
-			items: buildReviewerQueueItems(
-				listItems,
-				(story) => countUnresolvedReviewerComments(story.storyId)
+			items: buildReviewerQueueItems(listItems, (story) =>
+				countUnresolvedReviewerComments(story.storyId)
 			),
 			sourceAvailable: true
 		};

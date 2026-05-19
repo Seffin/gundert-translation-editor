@@ -31,7 +31,10 @@ export function createAuditEventWriter(seed: AuditEvent[] = []): AuditEventWrite
 	let events = seed.map((event) => ({ ...event, context: { ...event.context } }));
 	let sequence = events.length;
 
-	function write(input: AuditEventInput, createdAtIso: string = new Date().toISOString()): AuditEvent {
+	function write(
+		input: AuditEventInput,
+		createdAtIso: string = new Date().toISOString()
+	): AuditEvent {
 		sequence += 1;
 		const event: AuditEvent = {
 			eventId: buildEventId(sequence),

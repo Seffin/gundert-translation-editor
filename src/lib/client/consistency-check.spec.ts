@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { buildConsistencyIssues, validateConsistencyWithLLM, validateConsistencyIssuesWithLLM } from './consistency-check';
+import {
+	buildConsistencyIssues,
+	validateConsistencyWithLLM,
+	validateConsistencyIssuesWithLLM
+} from './consistency-check';
 import type { GlossaryTerm } from '$lib/glossary';
 import type { EditorSegment } from '$lib/server/editor';
 
@@ -14,7 +18,11 @@ describe('consistency check', () => {
 		updatedAtLabel: '2026-05-06'
 	});
 
-	const createTerm = (sourceTerm: string, targetTerm: string, status: 'Approved' | 'Proposed' = 'Approved'): GlossaryTerm => ({
+	const createTerm = (
+		sourceTerm: string,
+		targetTerm: string,
+		status: 'Approved' | 'Proposed' = 'Approved'
+	): GlossaryTerm => ({
 		id: `term-${sourceTerm}`,
 		sourceTerm,
 		targetTerm,
@@ -126,7 +134,13 @@ describe('LLM validation', () => {
 	});
 
 	it('returns false when no API key provided', async () => {
-		const result = await validateConsistencyWithLLM('God', ['Ishwar', 'Devta'], 'Hindi', 'Ishwar', '');
+		const result = await validateConsistencyWithLLM(
+			'God',
+			['Ishwar', 'Devta'],
+			'Hindi',
+			'Ishwar',
+			''
+		);
 
 		expect(result.isInconsistency).toBe(true);
 		expect(result.explanation).toContain('no API key');
@@ -175,7 +189,13 @@ describe('LLM validation', () => {
 			})
 		});
 
-		const result = await validateConsistencyWithLLM('God', ['Ishwar', 'Devta'], 'Hindi', 'Ishwar', 'test-key');
+		const result = await validateConsistencyWithLLM(
+			'God',
+			['Ishwar', 'Devta'],
+			'Hindi',
+			'Ishwar',
+			'test-key'
+		);
 
 		expect(result.isInconsistency).toBe(true);
 	});
@@ -194,7 +214,13 @@ describe('LLM validation', () => {
 			})
 		});
 
-		const result = await validateConsistencyWithLLM('God', ['Ishwar', 'Bhagwan'], 'Hindi', 'Ishwar', 'test-key');
+		const result = await validateConsistencyWithLLM(
+			'God',
+			['Ishwar', 'Bhagwan'],
+			'Hindi',
+			'Ishwar',
+			'test-key'
+		);
 
 		expect(result.isInconsistency).toBe(false);
 	});
@@ -202,7 +228,13 @@ describe('LLM validation', () => {
 	it('handles API errors gracefully', async () => {
 		fetchMock.mockRejectedValueOnce(new Error('Network error'));
 
-		const result = await validateConsistencyWithLLM('God', ['Ishwar', 'Devta'], 'Hindi', 'Ishwar', 'test-key');
+		const result = await validateConsistencyWithLLM(
+			'God',
+			['Ishwar', 'Devta'],
+			'Hindi',
+			'Ishwar',
+			'test-key'
+		);
 
 		expect(result.isInconsistency).toBe(true); // Fallback to flagging
 		expect(result.explanation).toContain('LLM validation error');

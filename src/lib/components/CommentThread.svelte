@@ -152,7 +152,9 @@
 		</div>
 
 		{#if unresolvedCount > 0}
-			<button class="resolve-all-btn" onclick={resolveAll}> Resolve All ({unresolvedCount}) </button>
+			<button class="resolve-all-btn" onclick={resolveAll}>
+				Resolve All ({unresolvedCount})
+			</button>
 		{/if}
 	{/if}
 
@@ -168,11 +170,7 @@
 				</select>
 			</div>
 		{/if}
-		<textarea
-			bind:value={newMessage}
-			placeholder="Add a comment..."
-			disabled={isAdding}
-			rows="3"
+		<textarea bind:value={newMessage} placeholder="Add a comment..." disabled={isAdding} rows="3"
 		></textarea>
 		<button onclick={addComment} disabled={isAdding || !newMessage.trim()}>
 			{isAdding ? 'Adding...' : 'Add Comment'}
@@ -420,20 +418,20 @@
 		cursor: not-allowed;
 	}
 
-@media (max-width: 900px) {
-	.comment-thread {
-		border-left: none;
-		max-width: 100%;
-		padding: 0.75rem;
-	}
+	@media (max-width: 900px) {
+		.comment-thread {
+			border-left: none;
+			max-width: 100%;
+			padding: 0.75rem;
+		}
 
-	.comments-list {
-		max-height: 40vh;
-	}
+		.comments-list {
+			max-height: 40vh;
+		}
 
-	.resolve-all-btn {
-		position: sticky;
-		bottom: 0;
+		.resolve-all-btn {
+			position: sticky;
+			bottom: 0;
+		}
 	}
-}
 </style>

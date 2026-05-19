@@ -88,7 +88,9 @@ describe('StoryEditorBaseline', () => {
 	it('renders story header and source/target columns', async () => {
 		render(StoryEditorBaseline, { story: STORY });
 
-		await expect.element(page.getByRole('heading', { level: 1 })).toHaveTextContent('01: The Creation');
+		await expect
+			.element(page.getByRole('heading', { level: 1 }))
+			.toHaveTextContent('01: The Creation');
 		await expect
 			.element(page.getByText('In the beginning, God created the heavens and the earth.'))
 			.toBeInTheDocument();
@@ -121,9 +123,9 @@ describe('StoryEditorBaseline', () => {
 		await expect.element(page.getByText('Last edited by reviewer.demo')).toBeInTheDocument();
 		await expect.element(firstToolbox.getByText('Regenerate draft')).toBeInTheDocument();
 		await expect.element(firstToolbox.getByText('Comments')).toBeInTheDocument();
-		await expect.element(page.getByTestId('segment-warning-01:01')).toHaveTextContent(
-			'Use "Ishwar" for "God" in this segment.'
-		);
+		await expect
+			.element(page.getByTestId('segment-warning-01:01'))
+			.toHaveTextContent('Use "Ishwar" for "God" in this segment.');
 		await expect.element(page.getByTestId('segment-status-01:01')).toBeInTheDocument();
 		await expect.element(page.getByTestId('terminology-warning-panel')).not.toBeInTheDocument();
 	});
@@ -133,8 +135,12 @@ describe('StoryEditorBaseline', () => {
 
 		await page.getByRole('checkbox', { name: 'select-segment-01:01' }).click();
 
-		await expect.element(page.getByTestId('segment-card-01:01')).toHaveAttribute('data-active', 'true');
-		await expect.element(page.getByTestId('segment-card-01:02')).toHaveAttribute('data-active', 'false');
+		await expect
+			.element(page.getByTestId('segment-card-01:01'))
+			.toHaveAttribute('data-active', 'true');
+		await expect
+			.element(page.getByTestId('segment-card-01:02'))
+			.toHaveAttribute('data-active', 'false');
 	});
 
 	it('opens segment comments inline without relying on a sidebar', async () => {
@@ -153,11 +159,17 @@ describe('StoryEditorBaseline', () => {
 
 		render(StoryEditorBaseline, { story: STORY });
 
-		await expect.element(page.getByTestId('segment-toolbox-01:01').getByText('1 comment')).toBeInTheDocument();
+		await expect
+			.element(page.getByTestId('segment-toolbox-01:01').getByText('1 comment'))
+			.toBeInTheDocument();
 		await page.getByTestId('segment-comments-toggle-01:01').click();
 		await expect.element(page.getByTestId('segment-comments-01:01')).toBeInTheDocument();
 		await expect
-			.element(page.getByTestId('segment-comments-01:01').getByText('Please verify the key term before approval.'))
+			.element(
+				page
+					.getByTestId('segment-comments-01:01')
+					.getByText('Please verify the key term before approval.')
+			)
 			.toBeInTheDocument();
 		await expect.element(page.getByText('Reviewer Comments')).not.toBeInTheDocument();
 	});
@@ -209,9 +221,9 @@ describe('StoryEditorBaseline', () => {
 		await expect.element(page.getByText('Unsaved changes')).toBeInTheDocument();
 
 		await page.getByRole('button', { name: 'Save Changes' }).click();
-		await expect.element(page.getByTestId('save-message')).toHaveTextContent(
-			/Saved by translator\.demo at /
-		);
+		await expect
+			.element(page.getByTestId('save-message'))
+			.toHaveTextContent(/Saved by translator\.demo at /);
 	});
 
 	it('shows inline terminology warnings and clears after compliant edits', async () => {
@@ -224,6 +236,8 @@ describe('StoryEditorBaseline', () => {
 		await firstTarget.fill('Ishwar created the heavens and earth.');
 		await secondTarget.fill('And Ishwar said, let there be light.');
 
-		await expect.element(page.getByTestId('segment-card-01:01').getByTestId('segment-warning-01:01')).not.toBeInTheDocument();
+		await expect
+			.element(page.getByTestId('segment-card-01:01').getByTestId('segment-warning-01:01'))
+			.not.toBeInTheDocument();
 	});
 });

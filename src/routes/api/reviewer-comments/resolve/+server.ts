@@ -1,7 +1,4 @@
-import {
-	resolveAllReviewerComments,
-	resolveReviewerComment
-} from '$lib/server/reviewer-comments';
+import { resolveAllReviewerComments, resolveReviewerComment } from '$lib/server/reviewer-comments';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

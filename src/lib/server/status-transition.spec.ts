@@ -70,21 +70,27 @@ const INVALID_CASES: InvalidCase[] = [
 ];
 
 describe('status transition engine', () => {
-	it.each(VALID_CASES)('allows $role to $action from $currentStatus to $nextStatus', ({ role, currentStatus, action, nextStatus }) => {
-		const allowed = canTransitionStatus(currentStatus, action, role);
+	it.each(VALID_CASES)(
+		'allows $role to $action from $currentStatus to $nextStatus',
+		({ role, currentStatus, action, nextStatus }) => {
+			const allowed = canTransitionStatus(currentStatus, action, role);
 
-		expect(allowed.allowed).toBe(true);
-		expect(allowed.nextStatus).toBe(nextStatus);
-		expect(allowed.reason).toBeUndefined();
-	});
+			expect(allowed.allowed).toBe(true);
+			expect(allowed.nextStatus).toBe(nextStatus);
+			expect(allowed.reason).toBeUndefined();
+		}
+	);
 
-	it.each(INVALID_CASES)('rejects $role trying to $action from $currentStatus', ({ role, currentStatus, action, reason }) => {
-		const result = canTransitionStatus(currentStatus, action, role);
+	it.each(INVALID_CASES)(
+		'rejects $role trying to $action from $currentStatus',
+		({ role, currentStatus, action, reason }) => {
+			const result = canTransitionStatus(currentStatus, action, role);
 
-		expect(result.allowed).toBe(false);
-		expect(result.nextStatus).toBeUndefined();
-		expect(result.reason).toMatch(reason);
-	});
+			expect(result.allowed).toBe(false);
+			expect(result.nextStatus).toBeUndefined();
+			expect(result.reason).toMatch(reason);
+		}
+	);
 
 	it('returns the transitioned status for valid transitions', () => {
 		expect(transitionStoryStatus('Draft', 'submitForReview', 'Translator')).toBe('In Review');

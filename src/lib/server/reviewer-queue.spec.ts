@@ -65,9 +65,7 @@ describe('reviewer queue model', () => {
 	});
 
 	it('uses supplied unresolved comment counts when provided', () => {
-		const items = buildReviewerQueueItems(STORIES, (story) =>
-			story.storyId === '03' ? 4 : 0
-		);
+		const items = buildReviewerQueueItems(STORIES, (story) => (story.storyId === '03' ? 4 : 0));
 
 		expect(items[0].pendingComments).toBe(4);
 		expect(items[1].pendingComments).toBe(0);

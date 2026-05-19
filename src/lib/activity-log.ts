@@ -28,7 +28,11 @@ function daysBetween(laterIso: string, earlierIso: string): number {
 	return (later - earlier) / (1000 * 60 * 60 * 24);
 }
 
-function matchesDateRange(event: ActivityEvent, range: ActivityLogFilter['dateRange'], nowIso: string): boolean {
+function matchesDateRange(
+	event: ActivityEvent,
+	range: ActivityLogFilter['dateRange'],
+	nowIso: string
+): boolean {
 	if (range === 'all') return true;
 	const ageDays = daysBetween(nowIso, event.createdAtIso);
 	if (range === 'last-7-days') return ageDays <= 7;

@@ -13,7 +13,7 @@
 	let message = $state('');
 
 	async function approveStory(storyId: string): Promise<void> {
-		const index = approvalItems.findIndex((item) => item.storyId === storyId);
+		const index = approvalItems.findIndex((item: LeadApprovalItem) => item.storyId === storyId);
 		if (index === -1) return;
 
 		const approved = approveLeadApprovalItem(approvalItems[index]);

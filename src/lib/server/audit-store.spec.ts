@@ -8,9 +8,7 @@ import {
 import {
 	createAuditEventWriter,
 	emitDraftAuditEvent,
-	emitEditAuditEvent,
-	emitReviewAuditEvent,
-	emitApproveAuditEvent
+	emitEditAuditEvent
 } from '$lib/server/audit-events';
 
 describe('audit event store', () => {

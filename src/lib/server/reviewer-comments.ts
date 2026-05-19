@@ -98,7 +98,10 @@ export function addReviewerComment(input: AddReviewerCommentInput): ReviewerComm
 	return comment;
 }
 
-export function resolveReviewerComment(storyId: string, commentIdToResolve: string): ReviewerComment | null {
+export function resolveReviewerComment(
+	storyId: string,
+	commentIdToResolve: string
+): ReviewerComment | null {
 	const existing = commentsByStory.get(storyId) ?? [];
 	let updatedComment: ReviewerComment | null = null;
 

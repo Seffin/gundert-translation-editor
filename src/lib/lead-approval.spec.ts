@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-	approveLeadApprovalItem,
-	type LeadApprovalSourceStory
-} from '$lib/lead-approval';
+import { approveLeadApprovalItem, type LeadApprovalSourceStory } from '$lib/lead-approval';
 import { buildLeadApprovalItems } from '$lib/server/lead-approval';
 
 const STORIES: LeadApprovalSourceStory[] = [

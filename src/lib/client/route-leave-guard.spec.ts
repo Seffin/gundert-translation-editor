@@ -50,7 +50,10 @@ describe('route leave guard', () => {
 
 	it('blocks route leave when unsaved changes exist and user cancels', async () => {
 		const edited = [{ ...SEGMENTS[0], targetText: 'Changed' }, SEGMENTS[1]];
-		vi.stubGlobal('confirm', vi.fn(() => false));
+		vi.stubGlobal(
+			'confirm',
+			vi.fn(() => false)
+		);
 
 		const result = await confirmDiscardChanges(edited, SAVED_DRAFT);
 		expect(result).toBe(false);
@@ -59,7 +62,10 @@ describe('route leave guard', () => {
 
 	it('allows route leave when unsaved changes exist and user confirms', async () => {
 		const edited = [{ ...SEGMENTS[0], targetText: 'Changed' }, SEGMENTS[1]];
-		vi.stubGlobal('confirm', vi.fn(() => true));
+		vi.stubGlobal(
+			'confirm',
+			vi.fn(() => true)
+		);
 
 		const result = await confirmDiscardChanges(edited, SAVED_DRAFT);
 		expect(result).toBe(true);
@@ -67,14 +73,20 @@ describe('route leave guard', () => {
 	});
 
 	it('allows route leave when no prior saved draft exists and user confirms', async () => {
-		vi.stubGlobal('confirm', vi.fn(() => true));
+		vi.stubGlobal(
+			'confirm',
+			vi.fn(() => true)
+		);
 
 		const result = await confirmDiscardChanges(SEGMENTS, undefined);
 		expect(result).toBe(true);
 	});
 
 	it('blocks route leave when no prior saved draft and unsaved content exists and user cancels', async () => {
-		vi.stubGlobal('confirm', vi.fn(() => false));
+		vi.stubGlobal(
+			'confirm',
+			vi.fn(() => false)
+		);
 
 		const result = await confirmDiscardChanges(SEGMENTS, undefined);
 		expect(result).toBe(false);

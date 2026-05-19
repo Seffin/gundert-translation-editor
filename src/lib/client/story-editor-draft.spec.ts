@@ -30,7 +30,12 @@ const SEGMENTS: EditorSegment[] = [
 
 describe('story editor draft persistence', () => {
 	it('builds persisted draft with actor and timestamp metadata', () => {
-		const draft = buildPersistedStoryDraft('01', 'translator.demo', SEGMENTS, '2026-05-05T10:00:00.000Z');
+		const draft = buildPersistedStoryDraft(
+			'01',
+			'translator.demo',
+			SEGMENTS,
+			'2026-05-05T10:00:00.000Z'
+		);
 
 		expect(draft.storyId).toBe('01');
 		expect(draft.savedByActorId).toBe('translator.demo');
@@ -38,7 +43,12 @@ describe('story editor draft persistence', () => {
 	});
 
 	it('applies persisted draft to editor segments', () => {
-		const draft = buildPersistedStoryDraft('01', 'translator.demo', SEGMENTS, '2026-05-05T10:00:00.000Z');
+		const draft = buildPersistedStoryDraft(
+			'01',
+			'translator.demo',
+			SEGMENTS,
+			'2026-05-05T10:00:00.000Z'
+		);
 		const applied = applyPersistedStoryDraft(
 			[
 				{
@@ -58,7 +68,12 @@ describe('story editor draft persistence', () => {
 	});
 
 	it('detects unsaved changes relative to last saved draft', () => {
-		const draft = buildPersistedStoryDraft('01', 'translator.demo', SEGMENTS, '2026-05-05T10:00:00.000Z');
+		const draft = buildPersistedStoryDraft(
+			'01',
+			'translator.demo',
+			SEGMENTS,
+			'2026-05-05T10:00:00.000Z'
+		);
 		expect(hasUnsavedChanges(SEGMENTS, draft)).toBe(false);
 
 		const edited = [{ ...SEGMENTS[0], targetText: 'Changed target' }, SEGMENTS[1]];

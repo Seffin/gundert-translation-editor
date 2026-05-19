@@ -25,9 +25,9 @@ describe('GlossaryManager', () => {
 	it('renders glossary terms in the table', async () => {
 		render(GlossaryManager, { initialTerms: TERMS });
 
-		await expect.element(page.getByRole('heading', { level: 1 })).toHaveTextContent(
-			'Glossary Management'
-		);
+		await expect
+			.element(page.getByRole('heading', { level: 1 }))
+			.toHaveTextContent('Glossary Management');
 		await expect.element(page.getByText('Grace')).toBeInTheDocument();
 		await expect.element(page.getByText('Anugrah')).toBeInTheDocument();
 	});

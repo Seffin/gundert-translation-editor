@@ -51,17 +51,22 @@ export function buildConsistencyIssues(
 		if (matchingSegments.length < 2) continue;
 
 		// Collect target translations used for this term
-		const targetTranslations = matchingSegments
-			.map((m) => {
-				const hasExpectedTarget = m.segment.targetText
-					.toLowerCase()
-					.includes(glossaryTerm.targetTerm.toLowerCase());
-				return {
-					segmentId: m.segment.id,
-					segmentIndex: m.index,
-					targetTerm: hasExpectedTarget ? glossaryTerm.targetTerm : extractAlternativeTranslation(m.segment.targetText, glossaryTerm.sourceTerm, glossaryTerm.targetTerm)
-				};
-			});
+		const targetTranslations = matchingSegments.map((m) => {
+			const hasExpectedTarget = m.segment.targetText
+				.toLowerCase()
+				.includes(glossaryTerm.targetTerm.toLowerCase());
+			return {
+				segmentId: m.segment.id,
+				segmentIndex: m.index,
+				targetTerm: hasExpectedTarget
+					? glossaryTerm.targetTerm
+					: extractAlternativeTranslation(
+							m.segment.targetText,
+							glossaryTerm.sourceTerm,
+							glossaryTerm.targetTerm
+						)
+			};
+		});
 
 		// Check if all use the approved target term
 		const allMatch = targetTranslations.every((t) => t.targetTerm === glossaryTerm.targetTerm);
@@ -185,8 +190,7 @@ INCONSISTENCY: In Bible translation, "God" must always be the same word for clar
 			}>;
 		};
 
-		const responseText =
-			data.candidates?.[0]?.content?.parts?.[0]?.text ?? 'INCONSISTENCY';
+		const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text ?? 'INCONSISTENCY';
 		const isInconsistency = responseText.includes('INCONSISTENCY');
 
 		return {
@@ -217,7 +221,9 @@ export async function validateConsistencyIssuesWithLLM(
 	const updatedIssues: Array<ConsistencyIssue & { validated?: boolean }> = [];
 
 	for (const issue of issues) {
-		const variations = issue.segmentVariations.map((v) => v.targetTerm).filter((t) => t !== null) as string[];
+		const variations = issue.segmentVariations
+			.map((v) => v.targetTerm)
+			.filter((t) => t !== null) as string[];
 
 		const validation = await validateConsistencyWithLLM(
 			issue.sourceTerm,

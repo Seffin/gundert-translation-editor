@@ -13,12 +13,13 @@ Implemented hybrid consistency checking that combines fast deterministic detecti
 ### Core Components
 
 **src/lib/client/consistency-check.ts**
+
 - `buildConsistencyIssues(segments, glossaryTerms)`: Deterministic detection
   - Scans all approved glossary terms
   - Detects when same source term has multiple different target translations (2+ segments)
   - Returns `ConsistencyIssue[]` with segment-level variations
   - Case-insensitive source term matching
-  - O(n*m) complexity where n = segments, m = glossary terms
+  - O(n\*m) complexity where n = segments, m = glossary terms
 
 - `validateConsistencyWithLLM(sourceTerm, variations, targetLanguage, expectedTerm, apiKey)`: Single issue validation
   - Calls Gemini 2.0 Flash with carefully crafted prompt
@@ -33,10 +34,12 @@ Implemented hybrid consistency checking that combines fast deterministic detecti
   - Preserves issue structure for downstream UI
 
 **src/lib/client/consistency-check.spec.ts**
+
 - 7 deterministic logic tests (coverage: empty terms, single segment, multi-segment, case-insensitive, index ordering)
 - 8 LLM validation tests (coverage: API key validation, prompt structure, response parsing, error handling, batch processing)
 
 **src/lib/components/StoryEditorBaseline.svelte**
+
 - New prop: `apiKey?: string | null` - optional Vite environment variable
 - New state: `llmValidating` boolean, `validatedConsistencyIssues` array
 - New $effect: Triggers LLM validation when consistency issues change and API key available
@@ -49,41 +52,53 @@ Implemented hybrid consistency checking that combines fast deterministic detecti
 ## API Contract
 
 ### Gemini API Endpoint
+
 ```
 POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}
 ```
 
 ### Request Body
+
 ```json
 {
-  "contents": [{
-    "parts": [{
-      "text": "[Carefully crafted prompt asking about consistency]"
-    }]
-  }],
-  "generationConfig": {
-    "maxOutputTokens": 100,
-    "temperature": 0.3
-  }
+	"contents": [
+		{
+			"parts": [
+				{
+					"text": "[Carefully crafted prompt asking about consistency]"
+				}
+			]
+		}
+	],
+	"generationConfig": {
+		"maxOutputTokens": 100,
+		"temperature": 0.3
+	}
 }
 ```
 
 ### Response Structure
+
 ```json
 {
-  "candidates": [{
-    "content": {
-      "parts": [{
-        "text": "INCONSISTENCY: ... or ACCEPTABLE: ..."
-      }]
-    }
-  }]
+	"candidates": [
+		{
+			"content": {
+				"parts": [
+					{
+						"text": "INCONSISTENCY: ... or ACCEPTABLE: ..."
+					}
+				]
+			}
+		}
+	]
 }
 ```
 
 ## Workflow
 
 ### Translator Perspective
+
 1. Edit story segments in editor
 2. Consistency check automatically detects variations
 3. If API key configured:
@@ -95,6 +110,7 @@ POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:ge
    - Translator must manually determine if acceptable
 
 ### Example Scenario
+
 ```
 Story has "God" translated as:
 - Segment 1: "Ishwar" (approved glossary term)
@@ -110,6 +126,7 @@ LLM Validation: Asks "In Bible translation, must 'God' always be 'Ishwar' or are
 ## Security & Storage
 
 ### API Key Management
+
 - Stored in `.env` file (Vite pattern): `VITE_GEMINI_API_KEY`
 - NOT stored in git (ignore via .gitignore)
 - Passed as optional prop to component
@@ -117,6 +134,7 @@ LLM Validation: Asks "In Bible translation, must 'God' always be 'Ishwar' or are
 - Safe to configure in CI/CD environments
 
 ### Error Handling
+
 - Network failures: Gracefully flag as inconsistency (safe default)
 - Malformed responses: Extract text safely with null coalescing
 - Missing API key: Skip LLM validation, use deterministic only
@@ -125,6 +143,7 @@ LLM Validation: Asks "In Bible translation, must 'God' always be 'Ishwar' or are
 ## Test Coverage
 
 ### Deterministic Tests (7/7 pass)
+
 - ✅ No terms → empty issues
 - ✅ Single segment → no issues (need 2+ segments)
 - ✅ Multi-segment variation → detected
@@ -134,6 +153,7 @@ LLM Validation: Asks "In Bible translation, must 'God' always be 'Ishwar' or are
 - ✅ Segment indices for UI ordering
 
 ### LLM Tests (8/8 pass)
+
 - ✅ No API key → fallback safe behavior
 - ✅ Single variation → no LLM call
 - ✅ Correct Gemini API URL structure
@@ -145,12 +165,12 @@ LLM Validation: Asks "In Bible translation, must 'God' always be 'Ishwar' or are
 
 ## Performance
 
-| Operation | Time | Notes |
-|-----------|------|-------|
-| Deterministic check (10 segments, 20 terms) | <10ms | O(n*m) tree matching |
-| LLM validation (1 issue) | 1-3s | Network round-trip to Gemini |
-| LLM validation (5 issues) | 5-15s | Sequential processing |
-| UI update with validation badges | <100ms | Svelte reactivity, no re-render |
+| Operation                                   | Time   | Notes                           |
+| ------------------------------------------- | ------ | ------------------------------- |
+| Deterministic check (10 segments, 20 terms) | <10ms  | O(n\*m) tree matching           |
+| LLM validation (1 issue)                    | 1-3s   | Network round-trip to Gemini    |
+| LLM validation (5 issues)                   | 5-15s  | Sequential processing           |
+| UI update with validation badges            | <100ms | Svelte reactivity, no re-render |
 
 ## Browser Compatibility
 

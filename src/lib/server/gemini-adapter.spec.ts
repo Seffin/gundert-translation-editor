@@ -4,7 +4,6 @@ import {
 	buildGeminiWholeStoryRequest,
 	parseGeminiWholeStoryResponse,
 	requestGeminiWholeStoryDraft,
-	type GeminiDraftRequest,
 	type GeminiDraftResponse
 } from '$lib/server/gemini-adapter';
 
@@ -123,11 +122,7 @@ describe('Gemini whole-story draft adapter', () => {
 	});
 
 	it('includes story metadata in request', () => {
-		const request = buildGeminiWholeStoryRequest(
-			SEGMENTS.slice(0, 1),
-			'Hindi',
-			'story-29'
-		);
+		const request = buildGeminiWholeStoryRequest(SEGMENTS.slice(0, 1), 'Hindi', 'story-29');
 
 		expect(request.storyId).toBe('story-29');
 		expect(request.sourceSegments).toHaveLength(1);

@@ -35,9 +35,13 @@ describe('LeadApprovalGate', () => {
 	it('renders blocked vs ready approval states', async () => {
 		render(LeadApprovalGate, { items: ITEMS });
 
-		await expect.element(page.getByRole('heading', { level: 1 })).toHaveTextContent('Project Lead Approval');
+		await expect
+			.element(page.getByRole('heading', { level: 1 }))
+			.toHaveTextContent('Project Lead Approval');
 		await expect.element(page.getByText('1 unresolved comment')).toBeInTheDocument();
-		await expect.element(page.getByRole('button', { name: 'Approve story 06' })).toBeInTheDocument();
+		await expect
+			.element(page.getByRole('button', { name: 'Approve story 06' }))
+			.toBeInTheDocument();
 		await expect.element(page.getByRole('button', { name: 'Blocked story 03' })).toBeDisabled();
 	});
 
@@ -46,9 +50,9 @@ describe('LeadApprovalGate', () => {
 
 		await page.getByRole('button', { name: 'Approve story 06' }).click();
 
-		await expect.element(page.getByTestId('approval-message')).toHaveTextContent(
-			'Story 06 approved for publication.'
-		);
+		await expect
+			.element(page.getByTestId('approval-message'))
+			.toHaveTextContent('Story 06 approved for publication.');
 		await expect.element(page.getByRole('button', { name: 'Approved story 06' })).toBeDisabled();
 	});
 });

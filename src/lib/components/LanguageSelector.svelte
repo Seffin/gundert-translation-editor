@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { SUPPORTED_LANGUAGES } from '$lib/client/target-language';
 
-	let {
-		value,
-		storyId,
-		onchange
-	} = $props<{ value: string; storyId: string; onchange: (lang: string) => void }>();
+	let { value, storyId, onchange } = $props<{
+		value: string;
+		storyId: string;
+		onchange: (lang: string) => void;
+	}>();
 
 	function handleChange(e: Event) {
 		const selected = (e.target as HTMLSelectElement).value;
@@ -17,7 +17,7 @@
 	<label for="language-select-{storyId}" class="language-label">Target Language</label>
 	<select
 		id="language-select-{storyId}"
-		value={value}
+		{value}
 		onchange={handleChange}
 		data-testid="language-selector"
 		aria-label="Select target language"

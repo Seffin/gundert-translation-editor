@@ -20,7 +20,8 @@ export function buildLeadApprovalItems(
 	return stories
 		.filter((story) => story.status === 'In Review')
 		.map((story) => {
-			const blockerState = getReviewBlockerState?.(story) ?? deriveReviewBlockerState(story.storyNumber);
+			const blockerState =
+				getReviewBlockerState?.(story) ?? deriveReviewBlockerState(story.storyNumber);
 			const gate = checkApprovalGate('In Review', 'Lead', blockerState);
 
 			return {

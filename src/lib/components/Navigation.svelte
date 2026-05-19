@@ -23,7 +23,11 @@
 	}
 </script>
 
-<nav class="gundert-nav" style:--primary-color={COLORS.primary} style:--surface-color={COLORS.surface}>
+<nav
+	class="gundert-nav"
+	style:--primary-color={COLORS.primary}
+	style:--surface-color={COLORS.surface}
+>
 	<div class="nav-container">
 		<div class="nav-brand">
 			<span class="brand-kicker">Translation Workspace</span>
@@ -116,7 +120,13 @@
 		font-size: 1.35rem;
 		font-weight: 700;
 		letter-spacing: -0.03em;
-		font-family: Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		font-family:
+			Manrope,
+			-apple-system,
+			BlinkMacSystemFont,
+			'Segoe UI',
+			Roboto,
+			sans-serif;
 	}
 
 	.nav-menu {
@@ -138,9 +148,18 @@
 		color: white;
 		font-size: 0.875rem;
 		font-weight: 600;
-		font-family: Manrope, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		font-family:
+			Manrope,
+			-apple-system,
+			BlinkMacSystemFont,
+			'Segoe UI',
+			Roboto,
+			sans-serif;
 		border-radius: 999px;
-		transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+		transition:
+			background-color 0.2s ease,
+			opacity 0.2s ease,
+			transform 0.2s ease;
 		opacity: 0.82;
 	}
 
@@ -200,14 +219,27 @@
 		background-color: currentColor;
 		position: absolute;
 		left: 0;
-		transition: transform 0.2s ease, opacity 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			opacity 0.2s ease;
 	}
 
-	.hamburger-inner { top: 50%; transform: translateY(-50%); }
-	.hamburger-inner::before { content: ''; top: -8px; }
-	.hamburger-inner::after { content: ''; top: 8px; }
+	.hamburger-inner {
+		top: 50%;
+		transform: translateY(-50%);
+	}
+	.hamburger-inner::before {
+		content: '';
+		top: -8px;
+	}
+	.hamburger-inner::after {
+		content: '';
+		top: 8px;
+	}
 
-	.nav-menu.open { display: flex; }
+	.nav-menu.open {
+		display: flex;
+	}
 
 	.settings-btn {
 		background: none;
@@ -226,7 +258,7 @@
 			right: 0;
 			z-index: 50;
 			background: linear-gradient(180deg, rgba(10, 36, 84, 0.98), rgba(20, 86, 217, 0.98));
-			box-shadow: 0 -12px 30px rgba(10,36,84,0.18);
+			box-shadow: 0 -12px 30px rgba(10, 36, 84, 0.18);
 			backdrop-filter: blur(8px);
 			padding: 0.25rem 0;
 			width: 100%;
@@ -244,8 +276,12 @@
 		}
 
 		/* hide large brand & desktop settings on mobile bottom bar */
-		.nav-brand { display: none; }
-		.nav-settings { display: none; }
+		.nav-brand {
+			display: none;
+		}
+		.nav-settings {
+			display: none;
+		}
 
 		/* show nav as a bottom full-width icon bar */
 		.nav-menu {
@@ -288,35 +324,65 @@
 			white-space: nowrap;
 		}
 
-		.mobile-settings { display: list-item; }
+		.mobile-settings {
+			display: list-item;
+		}
 
-		.icon { font-size: 1.2rem; }
-		.label { font-size: 0.65rem; margin: 0; }
+		.icon {
+			font-size: 1.2rem;
+		}
+		.label {
+			font-size: 0.65rem;
+			margin: 0;
+		}
 
-		.mobile-settings { display: list-item; }
+		.mobile-settings {
+			display: list-item;
+		}
 
 		/* active state emphasis on mobile */
 		.nav-link.active {
-			background: rgba(255,255,255,0.14);
-			box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+			background: rgba(255, 255, 255, 0.14);
+			box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 		}
 
 		/* hide hamburger on bottom nav */
-		.hamburger { display: none; }
+		.hamburger {
+			display: none;
+		}
 	}
 
 	@media (max-width: 540px) {
-		.nav-link { font-size: 0.65rem; padding: 0.3rem 0.2rem; }
-		.label { font-size: 0.55rem; }
+		.nav-link {
+			font-size: 0.65rem;
+			padding: 0.3rem 0.2rem;
+		}
+		.label {
+			font-size: 0.55rem;
+		}
 	}
 
 	/* Tablet improvements: slightly denser layout and visible labels */
 	@media (min-width: 769px) and (max-width: 1024px) {
-		.nav-container { padding: 0.75rem 1rem; gap: 1rem; }
-		.nav-brand h1 { font-size: 1.15rem; }
-		.nav-menu { gap: 0.5rem; }
-		.nav-link { padding: 0.6rem 0.8rem; font-size: 0.8rem; }
-		.hamburger { display: inline-flex; }
-		.nav-settings { display: block; }
+		.nav-container {
+			padding: 0.75rem 1rem;
+			gap: 1rem;
+		}
+		.nav-brand h1 {
+			font-size: 1.15rem;
+		}
+		.nav-menu {
+			gap: 0.5rem;
+		}
+		.nav-link {
+			padding: 0.6rem 0.8rem;
+			font-size: 0.8rem;
+		}
+		.hamburger {
+			display: inline-flex;
+		}
+		.nav-settings {
+			display: block;
+		}
 	}
 </style>

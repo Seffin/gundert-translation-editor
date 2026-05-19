@@ -21,7 +21,14 @@ const MATRIX: MatrixCase[] = [
 	{
 		role: 'Reviewer',
 		allowed: ['resolveReview', 'returnToDraft', 'viewReviewerQueue'],
-		denied: ['editTranslation', 'saveDraft', 'requestAIDraft', 'submitForReview', 'approveStory', 'viewLeadGate']
+		denied: [
+			'editTranslation',
+			'saveDraft',
+			'requestAIDraft',
+			'submitForReview',
+			'approveStory',
+			'viewLeadGate'
+		]
 	},
 	{
 		role: 'Lead',

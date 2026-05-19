@@ -211,7 +211,11 @@ function parseChunkTranslations(responseText: string, selectedCount: number): st
 		return normalized.length > 0 ? [normalized] : [];
 	}
 
-	if (normalized.includes('\n---\n') || normalized.startsWith('---\n') || normalized.endsWith('\n---')) {
+	if (
+		normalized.includes('\n---\n') ||
+		normalized.startsWith('---\n') ||
+		normalized.endsWith('\n---')
+	) {
 		return normalized
 			.split(/\n---\n|^---\n|\n---$/m)
 			.filter((part) => part.trim().length > 0)

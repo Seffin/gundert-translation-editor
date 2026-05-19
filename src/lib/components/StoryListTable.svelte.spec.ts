@@ -29,7 +29,9 @@ describe('StoryListTable', () => {
 	it('renders story rows with status and completion', async () => {
 		render(StoryListTable, { stories: STORIES });
 
-		await expect.element(page.getByRole('heading', { level: 1 })).toHaveTextContent('Open Bible Stories');
+		await expect
+			.element(page.getByRole('heading', { level: 1 }))
+			.toHaveTextContent('Open Bible Stories');
 		await expect.element(page.getByText('The Creation')).toBeInTheDocument();
 		await expect.element(page.getByText('In Review')).toBeInTheDocument();
 		await expect.element(page.getByText('75%')).toBeInTheDocument();

@@ -8,7 +8,10 @@
 
 	let { events = [] } = $props<{ events?: ActivityEvent[] }>();
 
-	let actorOptions = $derived(['all', ...Array.from(new Set(events.map((event) => event.actorId)))]);
+	let actorOptions = $derived([
+		'all',
+		...Array.from(new Set(events.map((event) => event.actorId)))
+	]);
 
 	let filter = $state<ActivityLogFilter>({
 		actorId: 'all',
