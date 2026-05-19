@@ -50,3 +50,4 @@ test-results
 
 build_output.log
 en_obs
+.svelte-kit
