@@ -12,7 +12,7 @@
 	<meta name="description" content={data.description} />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<script>
-		(function() {
+		(function () {
 			const theme = localStorage.getItem('gundert-editor:theme') || 'system';
 			const root = document.documentElement;
 			if (theme === 'dark') {

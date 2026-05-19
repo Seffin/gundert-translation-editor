@@ -28,18 +28,18 @@
 	{:else}
 		<div class="table-responsive">
 			<table class="responsive">
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Title</th>
-					<th>Status</th>
-					<th>Assignee</th>
-					<th>Completion</th>
-					<th>Segments</th>
-				</tr>
-			</thead>
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Title</th>
+						<th>Status</th>
+						<th>Assignee</th>
+						<th>Completion</th>
+						<th>Segments</th>
+					</tr>
+				</thead>
 				<tbody>
-					{#each stories as story}
+					{#each stories as story (story.storyId)}
 						<tr>
 							<td data-label="#">{story.storyId}</td>
 							<td data-label="Title"><a href={`/stories/${story.storyId}`}>{story.title}</a></td>

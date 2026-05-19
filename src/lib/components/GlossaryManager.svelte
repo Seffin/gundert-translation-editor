@@ -89,30 +89,32 @@
 	</form>
 
 	<div class="table-responsive">
-	<table>
-		<thead>
-			<tr>
-				<th>Term (EN)</th>
-				<th>Translation</th>
-				<th>Status</th>
-				<th>Rationale</th>
-				<th>Action</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each terms as term (term.id)}
+		<table>
+			<thead>
 				<tr>
-					<td>{term.sourceTerm}</td>
-					<td>{term.targetTerm}</td>
-					<td>{term.status}</td>
-					<td>{term.rationale}</td>
-					<td>
-						<button type="button" onclick={() => startEdit(term)} aria-label={`Edit ${term.id}`}>Edit</button>
-					</td>
+					<th>Term (EN)</th>
+					<th>Translation</th>
+					<th>Status</th>
+					<th>Rationale</th>
+					<th>Action</th>
 				</tr>
-			{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each terms as term (term.id)}
+					<tr>
+						<td>{term.sourceTerm}</td>
+						<td>{term.targetTerm}</td>
+						<td>{term.status}</td>
+						<td>{term.rationale}</td>
+						<td>
+							<button type="button" onclick={() => startEdit(term)} aria-label={`Edit ${term.id}`}
+								>Edit</button
+							>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 	</div>
 </section>
 
@@ -138,9 +140,15 @@
 	}
 
 	@media (max-width: 700px) {
-		.fields { grid-template-columns: 1fr; }
-		section { padding: 1rem; }
-		button { width: 100%; }
+		.fields {
+			grid-template-columns: 1fr;
+		}
+		section {
+			padding: 1rem;
+		}
+		button {
+			width: 100%;
+		}
 	}
 
 	label {

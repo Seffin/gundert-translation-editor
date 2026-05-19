@@ -36,9 +36,19 @@ yarn-error.log*
 # vercel
 .vercel
 
+<<<<<<< HEAD
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
 .context/
 docs/GLOSSA*
+=======
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+# Playwright
+test-results
+
+build_output.log
+>>>>>>> d7dbcf1 (refactor: improve project quality and code maintainability)
