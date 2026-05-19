@@ -561,8 +561,6 @@
 						</div>
 
 						<div class="segment-meta-block">
-							<span class="segment-meta-item">Last edited by {getLastEditedBy(segment)}</span>
-							<span class="segment-meta-item">{getLastEditedAt(segment)}</span>
 							<label class="select-label">
 								<input
 									type="checkbox"
@@ -649,18 +647,6 @@
 								oninput={() => handleTargetInput(segment.id)}
 								aria-label={`target-${segment.id}`}
 							></textarea>
-						{/if}
-
-						{#if segment.draftedByGemini && segment.aiProvenance}
-							<div class="provenance">
-								AI DRAFT • {segment.aiProvenance.actor} • {formatProvenanceScope(
-									segment.aiProvenance.scope
-								)} • {segment.aiProvenance.generatedAtLabel}
-							</div>
-						{:else if segment.draftedByGemini}
-							<div class="provenance">
-								AI DRAFT • Gemini • Whole story • {segment.updatedAtLabel}
-							</div>
 						{/if}
 
 						{#if commentsExpanded}
