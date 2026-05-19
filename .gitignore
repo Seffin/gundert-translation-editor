@@ -1,6 +1,4 @@
-﻿# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+﻿# dependencies
 /node_modules
 /.pnp
 .pnp.*
@@ -51,5 +49,4 @@ vite.config.ts.timestamp-*
 test-results
 
 build_output.log
->>>>>>> d7dbcf1 (refactor: improve project quality and code maintainability)
 en_obs
