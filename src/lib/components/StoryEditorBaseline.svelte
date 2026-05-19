@@ -982,12 +982,6 @@
 		flex-wrap: wrap;
 	}
 
-	.segment-meta-item {
-		font-size: 0.78rem;
-		font-weight: 700;
-		color: var(--color-on-surface-variant);
-	}
-
 	.select-label {
 		display: flex;
 		align-items: center;
@@ -1285,15 +1279,6 @@
 		100% {
 			background-position: -200% 0;
 		}
-	}
-
-	.provenance {
-		margin-top: 0.5rem;
-		font-size: 0.7rem;
-		color: var(--color-on-surface-variant);
-		font-weight: 700;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
 	}
 
 	@media (max-width: 900px) {
