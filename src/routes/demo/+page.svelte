@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import { SUPPORTED_LANGUAGES } from '$lib/client/target-language';
 
 	let { data } = $props();
 </script>
@@ -11,7 +11,23 @@
 <section class="demo-dashboard" aria-label="demo-dashboard">
 	<div class="dashboard-header">
 		<h1>Demonstration Showcase</h1>
-		<p>Explore the full end-to-end translation pipeline. Write translations, approve them in the Lead Gate, and see the final Malayalam publications live.</p>
+		<p>Explore the full end-to-end translation pipeline. Translate stories, approve them in the Project Lead gate, and view the final target-language publications with illustrations.</p>
+	</div>
+
+	<div class="language-selector-container">
+		<span class="selector-label">View Publications In:</span>
+		<div class="language-pills-scroll">
+			{#each SUPPORTED_LANGUAGES as lang}
+				<a
+					href={`/demo?lang=${lang}`}
+					class="lang-pill"
+					class:lang-pill--active={lang === data.targetLanguage}
+					data-testid={`lang-pill-${lang}`}
+				>
+					{lang}
+				</a>
+			{/each}
+		</div>
 	</div>
 
 	<div class="stories-grid">
@@ -39,9 +55,9 @@
 						<h2>{item.title}</h2>
 						<p class="desc">
 							{#if item.isPublished}
-								Malayalam publication is live and formatted with illustrations.
+								{data.targetLanguage} publication is live and formatted with illustrations.
 							{:else}
-								Awaiting project lead approval in the dashboard to generate Malayalam `.md` file.
+								Awaiting project lead approval in the dashboard to generate {data.targetLanguage} `.md` file.
 							{/if}
 						</p>
 					</div>
@@ -50,9 +66,9 @@
 						<a href={`/stories/${item.storyId}`} class="btn btn--secondary">
 							Edit Translation
 						</a>
-						<a href={`/demo/stories/${item.storyId}`} class="btn btn--primary" class:btn--amber={!item.isPublished}>
+						<a href={`/demo/stories/${item.storyId}?lang=${data.targetLanguage}`} class="btn btn--primary" class:btn--amber={!item.isPublished}>
 							{#if item.isPublished}
-								Read Malayalam
+								Read {data.targetLanguage}
 							{:else}
 								Preview Story
 							{/if}
@@ -96,6 +112,75 @@
 		font-size: 1.1rem;
 		line-height: 1.6;
 		max-width: 800px;
+	}
+
+	.language-selector-container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 2rem;
+		background: var(--color-panel-strong);
+		padding: 1.25rem 1.5rem;
+		border-radius: 1.25rem;
+		border: 1px solid var(--color-outline-variant);
+		box-shadow: var(--shadow-subtle);
+	}
+
+	.selector-label {
+		font-size: 0.85rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--color-on-surface-variant);
+	}
+
+	.language-pills-scroll {
+		display: flex;
+		gap: 0.6rem;
+		overflow-x: auto;
+		padding-bottom: 0.5rem;
+		scrollbar-width: thin;
+	}
+
+	.language-pills-scroll::-webkit-scrollbar {
+		height: 4px;
+	}
+
+	.language-pills-scroll::-webkit-scrollbar-thumb {
+		background: var(--color-outline-variant);
+		border-radius: 4px;
+	}
+
+	.lang-pill {
+		padding: 0.45rem 1rem;
+		border-radius: 999px;
+		font-size: 0.85rem;
+		font-weight: 700;
+		text-decoration: none;
+		background: var(--color-surface);
+		border: 1px solid var(--color-outline-variant);
+		color: var(--color-on-surface-variant);
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.lang-pill:hover {
+		background: var(--color-surface-container-low);
+		color: var(--color-on-background);
+		border-color: var(--color-outline);
+	}
+
+	.lang-pill--active {
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+		border-color: var(--color-primary);
+		box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+	}
+
+	.lang-pill--active:hover {
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+		opacity: 0.95;
 	}
 
 	.stories-grid {

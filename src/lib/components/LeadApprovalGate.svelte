@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { approveLeadApprovalItem, type LeadApprovalItem } from '$lib/lead-approval';
 	import { loadPersistedStoryDraft } from '$lib/client/story-editor-draft';
+	import { loadTargetLanguage } from '$lib/client/target-language';
 
 	const ACTOR_ID = 'lead.demo';
 
@@ -20,10 +21,12 @@
 		const approved = approveLeadApprovalItem(approvalItems[index]);
 		approvalItems[index] = approved;
 		approvalItems = [...approvalItems];
-		message = `Story ${storyId} approved for publication.`;
-
-		// Load client-side translation draft
+		
+		// Load client-side target language and draft
+		const targetLanguage = loadTargetLanguage(storyId);
 		const draft = loadPersistedStoryDraft(storyId);
+		
+		message = `Story ${storyId} approved for publication.`;
 
 		// Emit audit event to server
 		try {
@@ -34,7 +37,8 @@
 					action: 'approve',
 					actorId: ACTOR_ID,
 					storyId,
-					translations: draft ? draft.segments : null
+					translations: draft ? draft.segments : null,
+					targetLanguage
 				})
 			});
 		} catch (error) {

@@ -4,14 +4,14 @@ import {
 	emitStoryReviewEvent,
 	emitStoryApprovalEvent
 } from '$lib/server/audit-events-api';
-import { publishMalayalamStory } from '$lib/server/obs';
+import { publishStory } from '$lib/server/obs';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		const body = await request.json();
-		const { action, actorId, storyId, segmentId, draftScope, decision, translations } = body;
+		const { action, actorId, storyId, segmentId, draftScope, decision, translations, targetLanguage } = body;
 
 		if (!action || !actorId || !storyId) {
 			return json({ error: 'Missing required fields: action, actorId, storyId' }, { status: 400 });
@@ -50,8 +50,8 @@ export const POST: RequestHandler = async ({ request }) => {
 					actorId,
 					storyId
 				});
-				// Compile and save the Malayalam story to ml_obs/content/
-				await publishMalayalamStory(storyId, translations);
+				// Compile and save the story to the respective target language directory
+				await publishStory(storyId, translations, targetLanguage || 'Malayalam');
 				break;
 
 			default:

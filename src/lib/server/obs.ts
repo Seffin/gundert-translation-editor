@@ -134,9 +134,31 @@ export async function parseObsStoryById(
 	return parseObsStoryFile(filePath);
 }
 
-export async function publishMalayalamStory(
+export const LANGUAGE_CODE_MAP: Record<string, string> = {
+	'Amharic': 'am',
+	'Assamese': 'as',
+	'Bengali': 'bn',
+	'Gujarati': 'gu',
+	'Hindi': 'hi',
+	'Indonesian': 'id',
+	'Kannada': 'kn',
+	'Malay': 'ms',
+	'Malayalam': 'ml',
+	'Marathi': 'mr',
+	'Nepali': 'ne',
+	'Odia': 'or',
+	'Punjabi': 'pa',
+	'Sinhala': 'si',
+	'Swahili': 'sw',
+	'Tamil': 'ta',
+	'Telugu': 'te',
+	'Urdu': 'ur'
+};
+
+export async function publishStory(
 	storyId: string,
-	translations: Record<string, { targetText: string }> | null
+	translations: Record<string, { targetText: string }> | null,
+	targetLanguage: string = 'Malayalam'
 ): Promise<void> {
 	const normalizedId = storyId.padStart(2, '0');
 	const enContentDir = join(process.cwd(), 'en_obs', 'content');
@@ -176,8 +198,21 @@ export async function publishMalayalamStory(
 	}
 	lines.push(footerLine);
 
+	// Resolve language folder prefix
+	const langKey = Object.keys(LANGUAGE_CODE_MAP).find(
+		(key) => key.toLowerCase() === targetLanguage.toLowerCase()
+	) || 'Malayalam';
+	const langPrefix = LANGUAGE_CODE_MAP[langKey] || 'ml';
+
 	// Write target file recursively
-	const targetPath = join(process.cwd(), 'ml_obs', 'content', `${normalizedId}.md`);
+	const targetPath = join(process.cwd(), `${langPrefix}_obs`, 'content', `${normalizedId}.md`);
 	await mkdir(dirname(targetPath), { recursive: true });
 	await writeFile(targetPath, lines.join('\n'), 'utf8');
+}
+
+export async function publishMalayalamStory(
+	storyId: string,
+	translations: Record<string, { targetText: string }> | null
+): Promise<void> {
+	await publishStory(storyId, translations, 'Malayalam');
 }
