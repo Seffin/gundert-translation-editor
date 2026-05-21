@@ -9,6 +9,6 @@
 		OBS source folder was not found at <code>en_obs/content</code>. Add source files to view
 		stories.
 	</p>
+{:else}
+	<StoryListTable stories={data.stories} />
 {/if}
-
-<StoryListTable stories={data.stories} />

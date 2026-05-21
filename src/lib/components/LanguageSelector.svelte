@@ -32,29 +32,31 @@
 	.language-selector {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.75rem;
 	}
 
 	.language-label {
-		font-size: 0.8rem;
+		font-size: 0.85rem;
 		font-weight: 700;
-		color: #4b5563;
+		color: var(--color-on-surface-variant);
 		white-space: nowrap;
 	}
 
 	select {
-		font-size: 0.85rem;
+		font-size: 0.95rem;
 		font-weight: 600;
-		padding: 0.3rem 0.6rem;
-		border: 1px solid #d1d5db;
-		border-radius: 0.375rem;
-		background: #fff;
-		color: #111827;
+		padding: 0.75rem 0.95rem;
+		border: 1px solid var(--color-outline-variant);
+		border-radius: 0.75rem;
+		background: var(--color-surface);
+		color: var(--color-on-surface);
 		cursor: pointer;
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
 	}
 
 	select:focus {
-		outline: 2px solid #111827;
-		outline-offset: 1px;
+		outline: none;
+		border-color: var(--color-primary);
+		box-shadow: 0 0 0 4px rgba(31, 92, 230, 0.12);
 	}
 </style>

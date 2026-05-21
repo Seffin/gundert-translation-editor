@@ -93,44 +93,80 @@
 <style>
 	section {
 		padding: 2rem;
+		max-width: 1280px;
+		margin: 0 auto;
+		background: var(--color-panel-strong);
+		border: 1px solid var(--color-outline-variant);
+		border-radius: 1.25rem;
+		box-shadow: var(--shadow-subtle);
 	}
 
 	h1 {
 		margin: 0 0 0.5rem;
 	}
 
+	p {
+		margin: 0;
+		color: var(--color-on-surface-variant);
+	}
+
 	table {
 		width: 100%;
-		border-collapse: collapse;
-		margin-top: 1rem;
+		border-collapse: separate;
+		border-spacing: 0;
+		margin-top: 1.25rem;
+		min-width: 680px;
 	}
 
 	th,
 	td {
-		border-bottom: 1px solid #ddd;
+		padding: 1rem 1.1rem;
 		text-align: left;
-		padding: 0.625rem;
+		border-bottom: 1px solid var(--color-outline-variant);
+	}
+
+	th {
+		background: var(--color-surface-container-high);
+		color: var(--color-on-surface-variant);
+		font-weight: 700;
+	}
+
+	tbody tr {
+		background: var(--color-panel-strong);
+		transition: background-color 0.2s ease;
+	}
+
+	tbody tr:hover {
+		background: var(--color-surface-container-low);
 	}
 
 	button {
-		padding: 0.45rem 0.75rem;
-		border-radius: 0.5rem;
-		border: 1px solid #5b420e;
-		background: #efe6d0;
-		color: #5b420e;
+		padding: 0.75rem 1rem;
+		border-radius: 0.85rem;
+		border: 1px solid var(--color-primary);
+		background: var(--color-primary);
+		color: var(--color-on-primary);
 		font-weight: 700;
 		cursor: pointer;
+		transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	button:hover {
+		background: var(--color-primary-container);
+		color: var(--color-on-primary-container);
+		transform: translateY(-1px);
+		box-shadow: 0 16px 24px rgba(31, 92, 230, 0.16);
 	}
 
 	.message {
 		margin-top: 0.75rem;
 		font-weight: 700;
-		color: #1f4f3f;
+		color: var(--color-success);
 	}
 
 	.error {
 		margin-top: 0.75rem;
 		font-weight: 700;
-		color: #8a1f1f;
+		color: var(--color-error);
 	}
 </style>

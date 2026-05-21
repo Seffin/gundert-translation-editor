@@ -84,12 +84,13 @@
 		position: sticky;
 		top: 0;
 		z-index: 20;
-		background: linear-gradient(180deg, rgba(10, 36, 84, 0.94), rgba(20, 86, 217, 0.88));
-		color: white;
+		background: rgba(255, 255, 255, 0.96);
+		color: var(--color-on-background);
 		padding: 0;
 		margin: 0;
-		box-shadow: 0 16px 36px rgba(10, 36, 84, 0.18);
-		backdrop-filter: blur(16px);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+		box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08);
+		backdrop-filter: blur(15px);
 	}
 
 	.nav-container {
@@ -98,40 +99,35 @@
 		max-width: 1400px;
 		margin: 0 auto;
 		padding: 1rem 1.5rem;
-		gap: 3rem;
+		gap: 2rem;
 	}
 
 	.nav-brand {
 		flex-shrink: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.15rem;
+		gap: 0.18rem;
 	}
 
 	.brand-kicker {
-		font-size: 0.68rem;
-		letter-spacing: 0.16em;
+		font-size: 0.72rem;
+		letter-spacing: 0.18em;
 		text-transform: uppercase;
-		opacity: 0.72;
+		opacity: 0.85;
+		color: rgba(15, 23, 42, 0.7);
 	}
 
 	.nav-brand h1 {
 		margin: 0;
-		font-size: 1.35rem;
+		font-size: 1.4rem;
 		font-weight: 700;
 		letter-spacing: -0.03em;
-		font-family:
-			Manrope,
-			-apple-system,
-			BlinkMacSystemFont,
-			'Segoe UI',
-			Roboto,
-			sans-serif;
+		color: var(--color-primary);
 	}
 
 	.nav-menu {
 		display: flex;
-		gap: 0;
+		gap: 0.5rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
@@ -143,46 +139,31 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.8rem 1rem;
+		padding: 0.85rem 1.1rem;
 		text-decoration: none;
-		color: white;
-		font-size: 0.875rem;
+		color: var(--color-on-background);
+		font-size: 0.95rem;
 		font-weight: 600;
-		font-family:
-			Manrope,
-			-apple-system,
-			BlinkMacSystemFont,
-			'Segoe UI',
-			Roboto,
-			sans-serif;
 		border-radius: 999px;
-		transition:
-			background-color 0.2s ease,
-			opacity 0.2s ease,
-			transform 0.2s ease;
-		opacity: 0.82;
+		transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+		opacity: 0.95;
 	}
 
 	.nav-link:hover {
 		opacity: 1;
-		background-color: rgba(255, 255, 255, 0.14);
+		background-color: rgba(79, 70, 229, 0.08);
 		transform: translateY(-1px);
 	}
 
 	.nav-link.active {
 		opacity: 1;
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.18));
-		font-weight: 600;
-		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+		background: rgba(79, 70, 229, 0.12);
+		color: var(--color-primary);
+		box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.14);
 	}
 
 	.icon {
-		font-size: 1rem;
-		display: inline-block;
-	}
-
-	.label {
-		display: inline;
+		font-size: 1.05rem;
 	}
 
 	.nav-settings {
@@ -193,35 +174,31 @@
 		display: none;
 	}
 
-	/* Hamburger button */
 	.hamburger {
 		display: none;
 		background: transparent;
 		border: none;
-		padding: 0.5rem;
+		padding: 0.6rem;
 		margin-left: 0.5rem;
 		cursor: pointer;
 		color: inherit;
 	}
 
 	.hamburger-box {
-		width: 24px;
-		height: 16px;
-		display: inline-block;
+		width: 26px;
+		height: 18px;
 		position: relative;
 	}
 
 	.hamburger-inner,
 	.hamburger-inner::before,
 	.hamburger-inner::after {
-		width: 24px;
+		width: 26px;
 		height: 2px;
 		background-color: currentColor;
 		position: absolute;
 		left: 0;
-		transition:
-			transform 0.2s ease,
-			opacity 0.2s ease;
+		transition: transform 0.2s ease, opacity 0.2s ease;
 	}
 
 	.hamburger-inner {
@@ -242,14 +219,14 @@
 	}
 
 	.settings-btn {
-		background: none;
-		border: none;
-		cursor: pointer;
-		color: white;
+		background: var(--color-surface);
+		border: 1px solid rgba(79, 70, 229, 0.18);
+		color: var(--color-on-background);
+		border-radius: 999px;
+		padding: 0.8rem 1rem;
 	}
 
 	@media (max-width: 768px) {
-		/* Bottom fixed navigation for mobile */
 		.gundert-nav {
 			position: fixed;
 			bottom: 0;
@@ -257,49 +234,31 @@
 			left: 0;
 			right: 0;
 			z-index: 50;
-			background: linear-gradient(180deg, rgba(10, 36, 84, 0.98), rgba(20, 86, 217, 0.98));
-			box-shadow: 0 -12px 30px rgba(10, 36, 84, 0.18);
-			backdrop-filter: blur(8px);
+			background: rgba(255, 255, 255, 0.98);
+			box-shadow: 0 -14px 36px rgba(15, 30, 60, 0.12);
+			backdrop-filter: blur(12px);
 			padding: 0.25rem 0;
-			width: 100%;
-			max-width: 100vw;
 		}
 
 		.nav-container {
-			padding: 0 0.5rem;
-			gap: 0.5rem;
-			max-width: 100%;
-			margin: 0 auto;
-			align-items: center;
+			padding: 0 0.75rem;
+			gap: 0.75rem;
 			justify-content: space-between;
-			box-sizing: border-box;
 		}
 
-		/* hide large brand & desktop settings on mobile bottom bar */
-		.nav-brand {
-			display: none;
-		}
+		.nav-brand,
 		.nav-settings {
 			display: none;
 		}
 
-		/* show nav as a bottom full-width icon bar */
 		.nav-menu {
 			display: flex;
-			position: relative;
-			top: auto;
-			left: auto;
-			right: auto;
-			background: transparent;
 			flex-direction: row;
 			flex-wrap: nowrap;
 			padding: 0.25rem 0.25rem;
-			gap: 0.125rem;
+			gap: 0.25rem;
 			justify-content: space-between;
-			align-items: center;
 			width: 100%;
-			max-width: 100vw;
-			overflow-x: hidden;
 		}
 
 		.nav-menu li {
@@ -313,10 +272,10 @@
 			align-items: center;
 			justify-content: center;
 			gap: 0.2rem;
-			padding: 0.35rem 0.25rem;
-			font-size: 0.7rem;
+			padding: 0.4rem 0.25rem;
+			font-size: 0.72rem;
 			min-width: 0;
-			border-radius: 0.5rem;
+			border-radius: 0.65rem;
 			opacity: 0.95;
 			width: 100%;
 			box-sizing: border-box;
@@ -336,17 +295,11 @@
 			margin: 0;
 		}
 
-		.mobile-settings {
-			display: list-item;
-		}
-
-		/* active state emphasis on mobile */
 		.nav-link.active {
-			background: rgba(255, 255, 255, 0.14);
-			box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+			background: rgba(255, 255, 255, 0.16);
+			box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 		}
 
-		/* hide hamburger on bottom nav */
 		.hamburger {
 			display: none;
 		}
@@ -362,7 +315,6 @@
 		}
 	}
 
-	/* Tablet improvements: slightly denser layout and visible labels */
 	@media (min-width: 769px) and (max-width: 1024px) {
 		.nav-container {
 			padding: 0.75rem 1rem;

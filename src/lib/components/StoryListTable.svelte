@@ -59,54 +59,96 @@
 
 <style>
 	section {
-		padding: 2rem;
+		padding: 2rem 0;
+		max-width: 1400px;
+		margin: 0 auto;
 	}
 
 	h1 {
 		margin: 0 0 0.5rem;
 	}
 
+	p {
+		margin: 0;
+		color: var(--color-on-surface-variant);
+	}
+
+	.table-responsive {
+		overflow-x: auto;
+		border-radius: 1.25rem;
+		background: var(--color-panel);
+		border: 1px solid var(--color-outline-variant);
+		box-shadow: var(--shadow-subtle);
+	}
+
 	table {
 		width: 100%;
-		border-collapse: collapse;
-		margin-top: 1rem;
+		border-collapse: separate;
+		border-spacing: 0;
+		min-width: 720px;
 	}
 
 	th,
 	td {
-		border-bottom: 1px solid #ddd;
+		padding: 1rem 1.1rem;
 		text-align: left;
-		padding: 0.625rem;
+		border-bottom: 1px solid var(--color-outline-variant);
+	}
+
+	th {
+		background: var(--color-surface-container-high);
+		color: var(--color-on-surface-variant);
+		font-weight: 700;
+	}
+
+	tbody tr {
+		background: var(--color-panel-strong);
+		transition: background-color 0.2s ease;
+	}
+
+	tbody tr:hover {
+		background: var(--color-surface-container-low);
+	}
+
+	a {
+		color: var(--color-primary);
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: underline;
 	}
 
 	.status-draft,
 	.status-review,
 	.status-approved,
 	.status-blocked {
-		display: inline-block;
-		padding: 0.125rem 0.5rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.25rem 0.8rem;
 		border-radius: 999px;
-		font-size: 0.75rem;
+		font-size: 0.82rem;
 		font-weight: 700;
 	}
 
 	.status-draft {
-		background: #e9eef8;
-		color: #213057;
+		background: var(--color-surface-container);
+		color: var(--color-on-surface-variant);
 	}
 
 	.status-review {
-		background: #efe6d0;
-		color: #5b420e;
+		background: var(--color-warning-container);
+		color: var(--color-warning);
 	}
 
 	.status-approved {
-		background: #dbf1e8;
-		color: #1f4f3f;
+		background: var(--color-success-container);
+		color: var(--color-success);
 	}
 
 	.status-blocked {
-		background: #ffd9d4;
-		color: #7a1f1a;
+		background: var(--color-error-container);
+		color: var(--color-error);
 	}
 </style>
