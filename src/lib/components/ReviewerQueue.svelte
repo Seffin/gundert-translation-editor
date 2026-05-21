@@ -55,38 +55,40 @@
 	{#if queueItems.length === 0}
 		<p>No stories currently need reviewer action.</p>
 	{:else}
-		<table>
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Title</th>
-					<th>Assignee</th>
-					<th>Comments</th>
-					<th>Segments</th>
-					<th>Action</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each queueItems as item (item.storyId)}
+		<div class="table-responsive">
+			<table>
+				<thead>
 					<tr>
-						<td>{item.storyId}</td>
-						<td><a href={`/stories/${item.storyId}`}>{item.title}</a></td>
-						<td>{item.assignee}</td>
-						<td>{commentLabel(item.pendingComments)}</td>
-						<td>{item.segmentCount}</td>
-						<td>
-							<button
-								type="button"
-								onclick={() => resolveItem(item.storyId)}
-								aria-label={`Resolve for ${item.storyId}`}
-							>
-								Resolve and Return to Draft
-							</button>
-						</td>
+						<th>#</th>
+						<th>Title</th>
+						<th>Assignee</th>
+						<th>Comments</th>
+						<th>Segments</th>
+						<th>Action</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each queueItems as item (item.storyId)}
+						<tr>
+							<td>{item.storyId}</td>
+							<td><a href={`/stories/${item.storyId}`}>{item.title}</a></td>
+							<td>{item.assignee}</td>
+							<td>{commentLabel(item.pendingComments)}</td>
+							<td>{item.segmentCount}</td>
+							<td>
+								<button
+									type="button"
+									onclick={() => resolveItem(item.storyId)}
+									aria-label={`Resolve for ${item.storyId}`}
+								>
+									Resolve and Return to Draft
+								</button>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	{/if}
 </section>
 
@@ -110,11 +112,33 @@
 		color: var(--color-on-surface-variant);
 	}
 
+	.table-responsive {
+		overflow-x: auto;
+		margin-top: 1.25rem;
+	}
+
+	.table-responsive::-webkit-scrollbar {
+		height: 8px;
+	}
+
+	.table-responsive::-webkit-scrollbar-track {
+		background: var(--color-surface-container-low);
+		border-radius: 4px;
+	}
+
+	.table-responsive::-webkit-scrollbar-thumb {
+		background: var(--color-outline-variant);
+		border-radius: 4px;
+	}
+
+	.table-responsive::-webkit-scrollbar-thumb:hover {
+		background: var(--color-on-surface-variant);
+	}
+
 	table {
 		width: 100%;
 		border-collapse: separate;
 		border-spacing: 0;
-		margin-top: 1.25rem;
 		min-width: 680px;
 	}
 
@@ -138,6 +162,53 @@
 
 	tbody tr:hover {
 		background: var(--color-surface-container-low);
+	}
+
+	/* Sticky columns to keep # and Title link always visible during horizontal scrolling */
+	th:first-child,
+	td:first-child {
+		position: sticky;
+		left: 0;
+		z-index: 10;
+		background: var(--color-surface-container-high);
+		width: 60px;
+		min-width: 60px;
+		max-width: 60px;
+	}
+
+	td:first-child {
+		background: var(--color-panel-strong);
+	}
+
+	th:nth-child(2),
+	td:nth-child(2) {
+		position: sticky;
+		left: 60px;
+		z-index: 10;
+		background: var(--color-surface-container-high);
+		border-right: 1px solid var(--color-outline-variant);
+		max-width: 240px;
+	}
+
+	td:nth-child(2) {
+		background: var(--color-panel-strong);
+	}
+
+	tbody tr:hover td:first-child,
+	tbody tr:hover td:nth-child(2) {
+		background: var(--color-surface-container-low);
+	}
+
+	a {
+		color: var(--color-primary);
+		text-decoration: none;
+		word-break: break-word;
+		overflow-wrap: break-word;
+		white-space: normal;
+	}
+
+	a:hover {
+		text-decoration: underline;
 	}
 
 	button {
@@ -168,5 +239,15 @@
 		margin-top: 0.75rem;
 		font-weight: 700;
 		color: var(--color-error);
+	}
+
+	@media (max-width: 768px) {
+		section {
+			padding: 1rem;
+			background: transparent;
+			border: none;
+			box-shadow: none;
+			border-radius: 0;
+		}
 	}
 </style>

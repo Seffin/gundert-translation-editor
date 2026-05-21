@@ -9,7 +9,7 @@ describe('+page.svelte', () => {
 		render(Page, { data: { stories: [], sourceAvailable: false } });
 
 		await expect.element(page.getByText('OBS source folder was not found')).toBeInTheDocument();
-		await expect(page.getByRole('table')).toHaveCount(0);
+		await expect.element(page.getByRole('table')).not.toBeInTheDocument();
 	});
 
 	it('renders the story list table when source is available', async () => {

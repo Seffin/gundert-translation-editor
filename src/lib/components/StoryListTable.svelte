@@ -59,9 +59,13 @@
 
 <style>
 	section {
-		padding: 2rem 0;
-		max-width: 1400px;
+		padding: 2rem;
+		max-width: 1280px;
 		margin: 0 auto;
+		background: var(--color-panel-strong);
+		border: 1px solid var(--color-outline-variant);
+		border-radius: 1.25rem;
+		box-shadow: var(--shadow-subtle);
 	}
 
 	h1 {
@@ -75,10 +79,25 @@
 
 	.table-responsive {
 		overflow-x: auto;
-		border-radius: 1.25rem;
-		background: var(--color-panel);
-		border: 1px solid var(--color-outline-variant);
-		box-shadow: var(--shadow-subtle);
+		margin-top: 1.25rem;
+	}
+
+	.table-responsive::-webkit-scrollbar {
+		height: 8px;
+	}
+
+	.table-responsive::-webkit-scrollbar-track {
+		background: var(--color-surface-container-low);
+		border-radius: 4px;
+	}
+
+	.table-responsive::-webkit-scrollbar-thumb {
+		background: var(--color-outline-variant);
+		border-radius: 4px;
+	}
+
+	.table-responsive::-webkit-scrollbar-thumb:hover {
+		background: var(--color-on-surface-variant);
 	}
 
 	table {
@@ -110,9 +129,47 @@
 		background: var(--color-surface-container-low);
 	}
 
+	/* Sticky columns to keep # and Title link always visible during horizontal scrolling */
+	th:first-child,
+	td:first-child {
+		position: sticky;
+		left: 0;
+		z-index: 10;
+		background: var(--color-surface-container-high);
+		width: 60px;
+		min-width: 60px;
+		max-width: 60px;
+	}
+
+	td:first-child {
+		background: var(--color-panel-strong);
+	}
+
+	th:nth-child(2),
+	td:nth-child(2) {
+		position: sticky;
+		left: 60px;
+		z-index: 10;
+		background: var(--color-surface-container-high);
+		border-right: 1px solid var(--color-outline-variant);
+		max-width: 240px;
+	}
+
+	td:nth-child(2) {
+		background: var(--color-panel-strong);
+	}
+
+	tbody tr:hover td:first-child,
+	tbody tr:hover td:nth-child(2) {
+		background: var(--color-surface-container-low);
+	}
+
 	a {
 		color: var(--color-primary);
 		text-decoration: none;
+		word-break: break-word;
+		overflow-wrap: break-word;
+		white-space: normal;
 	}
 
 	a:hover {
@@ -150,5 +207,15 @@
 	.status-blocked {
 		background: var(--color-error-container);
 		color: var(--color-error);
+	}
+
+	@media (max-width: 768px) {
+		section {
+			padding: 1rem;
+			background: transparent;
+			border: none;
+			box-shadow: none;
+			border-radius: 0;
+		}
 	}
 </style>
