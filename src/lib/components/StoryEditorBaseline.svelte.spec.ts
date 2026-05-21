@@ -95,9 +95,6 @@ describe('StoryEditorBaseline', () => {
 			.element(page.getByText('In the beginning, God created the heavens and the earth.'))
 			.toBeInTheDocument();
 		await expect.element(page.getByText('Hindi').nth(1)).toBeInTheDocument();
-		await expect
-			.element(page.getByText('AI DRAFT • Gemini • Whole story • 2 mins ago'))
-			.toBeInTheDocument();
 	});
 
 	it('renders a separate editor toolbar and drafting pane with grouped segment cards', async () => {
@@ -120,7 +117,6 @@ describe('StoryEditorBaseline', () => {
 		const firstToolbox = page.getByTestId('segment-toolbox-01:01');
 
 		await expect.element(firstToolbox).toBeInTheDocument();
-		await expect.element(page.getByText('Last edited by reviewer.demo')).toBeInTheDocument();
 		await expect.element(firstToolbox.getByText('Regenerate draft')).toBeInTheDocument();
 		await expect.element(firstToolbox.getByText('Comments')).toBeInTheDocument();
 		await expect

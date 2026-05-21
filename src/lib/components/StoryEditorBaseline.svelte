@@ -471,69 +471,69 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="toolbar-actions" data-testid="save-bar">
-				<div class="save-bar">
-					<LanguageSelector
-						storyId={story.storyId}
-						value={selectedLanguage}
-						onchange={handleLanguageChange}
-					/>
-					<button
-						type="button"
-						class="bulk-select-btn"
-						onclick={toggleAllSegments}
-						disabled={editorSegments.length === 0}
-						data-testid="bulk-select-btn"
-					>
-						{selection.count === editorSegments.length && editorSegments.length > 0
-							? 'Deselect All'
-							: 'Select All'}
-					</button>
-					<button onclick={saveChanges} disabled={!isDirty || saving}>
-						{saving ? 'Saving...' : 'Save Changes'}
-					</button>
-					<button
-						class="draft-btn"
-						onclick={draftSelected}
-						disabled={selection.count === 0 || drafting}
-						data-testid="draft-selected-btn"
-					>
-						{drafting ? 'Drafting…' : `Draft Selected (${selection.count})`}
-					</button>
-					{#if isDirty}
-						<span class="dirty-indicator">Unsaved changes</span>
-					{/if}
-					{#if saveMessage}
-						<span class="save-message" data-testid="save-message">{saveMessage}</span>
-					{/if}
-					{#if draftError}
-						<span class="draft-error" data-testid="draft-error">{draftError}</span>
-					{/if}
-					{#if commentError}
-						<span class="draft-error">{commentError}</span>
-					{/if}
-				</div>
-
-				<div class="toolbar-summary-row">
-					{#if commentsLoading}
-						<span class="summary-pill">Loading comments...</span>
-					{:else if unresolvedCommentCount > 0}
-						<span class="summary-pill summary-pill--accent"
-							>{unresolvedCommentCount} open comments</span
-						>
-					{/if}
-					{#if llmValidating}
-						<span class="summary-pill">Validating consistency...</span>
-					{:else if consistencyIssueCount > 0}
-						<span class="summary-pill">{consistencyIssueCount} consistency checks</span>
-					{/if}
-					{#if storyLevelComments.length > 0}
-						<span class="summary-pill">{storyLevelComments.length} story-level notes</span>
-					{/if}
-				</div>
-			</div>
 		</header>
+
+		<div class="toolbar-actions" data-testid="save-bar">
+			<div class="save-bar">
+				<LanguageSelector
+					storyId={story.storyId}
+					value={selectedLanguage}
+					onchange={handleLanguageChange}
+				/>
+				<button
+					type="button"
+					class="bulk-select-btn"
+					onclick={toggleAllSegments}
+					disabled={editorSegments.length === 0}
+					data-testid="bulk-select-btn"
+				>
+					{selection.count === editorSegments.length && editorSegments.length > 0
+						? 'Deselect All'
+						: 'Select All'}
+				</button>
+				<button onclick={saveChanges} disabled={!isDirty || saving}>
+					{saving ? 'Saving...' : 'Save Changes'}
+				</button>
+				<button
+					class="draft-btn"
+					onclick={draftSelected}
+					disabled={selection.count === 0 || drafting}
+					data-testid="draft-selected-btn"
+				>
+					{drafting ? 'Drafting…' : `Draft Selected (${selection.count})`}
+				</button>
+				{#if isDirty}
+					<span class="dirty-indicator">Unsaved changes</span>
+				{/if}
+				{#if saveMessage}
+					<span class="save-message" data-testid="save-message">{saveMessage}</span>
+				{/if}
+				{#if draftError}
+					<span class="draft-error" data-testid="draft-error">{draftError}</span>
+				{/if}
+				{#if commentError}
+					<span class="draft-error">{commentError}</span>
+				{/if}
+			</div>
+
+			<div class="toolbar-summary-row">
+				{#if commentsLoading}
+					<span class="summary-pill">Loading comments...</span>
+				{:else if unresolvedCommentCount > 0}
+					<span class="summary-pill summary-pill--accent"
+						>{unresolvedCommentCount} open comments</span
+					>
+				{/if}
+				{#if llmValidating}
+					<span class="summary-pill">Validating consistency...</span>
+				{:else if consistencyIssueCount > 0}
+					<span class="summary-pill">{consistencyIssueCount} consistency checks</span>
+				{/if}
+				{#if storyLevelComments.length > 0}
+					<span class="summary-pill">{storyLevelComments.length} story-level notes</span>
+				{/if}
+			</div>
+		</div>
 
 		<section class="drafting-area" data-testid="drafting-area" aria-label="source-target-editor">
 			{#each editorSegments as segment, index (segment.id)}
@@ -733,10 +733,11 @@
 <style>
 	.editor {
 		display: flex;
-		height: calc(100vh - 4.75rem);
+		height: auto;
+		min-height: calc(100vh - 4.75rem);
 		background: transparent;
 		width: 100%;
-		overflow: hidden;
+		overflow: visible;
 	}
 
 	.editor-shell {
@@ -744,23 +745,20 @@
 		flex: 1;
 		flex-direction: column;
 		width: 100%;
-		height: 100%;
-		overflow: hidden;
+		height: auto;
+		overflow: visible;
 	}
 
 	.editor-toolbar {
 		flex-shrink: 0;
-		padding: 1.2rem 1.5rem 1rem;
+		padding: 1.2rem 1.5rem 0.5rem;
 		background: var(--color-surface);
 		color: var(--color-on-surface);
-		border-bottom: 1px solid var(--color-outline-variant);
-		box-shadow: var(--shadow-subtle);
-		backdrop-filter: blur(16px);
 	}
 
 	.drafting-area {
 		flex: 1;
-		overflow-y: auto;
+		overflow: visible;
 		padding: 1.1rem 1.5rem 2rem;
 		display: flex;
 		flex-direction: column;
@@ -823,9 +821,18 @@
 	}
 
 	.toolbar-actions {
+		position: sticky;
+		top: 4.75rem;
+		z-index: 15;
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
+		background: var(--color-surface);
+		padding: 0.5rem 1.5rem 1rem;
+		margin: 0 -1.5rem;
+		border-bottom: 1px solid var(--color-outline-variant);
+		box-shadow: var(--shadow-subtle);
+		backdrop-filter: blur(16px);
 	}
 
 	.save-bar {
@@ -1286,19 +1293,17 @@
 			grid-template-columns: 1fr;
 		}
 
-		.editor {
-			height: auto;
-			min-height: calc(100vh - 4.75rem);
-			overflow: visible;
+		.editor-toolbar {
+			padding: 1rem 1rem 0.25rem;
 		}
 
-		.editor-toolbar {
-			padding: 1rem;
+		.toolbar-actions {
+			margin: 0 -1rem;
+			padding: 0.5rem 1rem 1rem;
 		}
 
 		.drafting-area {
 			padding: 1rem;
-			overflow: visible;
 		}
 
 		.toolbar-heading-row {
@@ -1334,6 +1339,12 @@
 		.segment-comments-header {
 			flex-direction: column;
 			align-items: flex-start;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.toolbar-actions {
+			top: 0;
 		}
 	}
 </style>
