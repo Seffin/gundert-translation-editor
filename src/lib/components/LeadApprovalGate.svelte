@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { approveLeadApprovalItem, type LeadApprovalItem } from '$lib/lead-approval';
+	import { loadPersistedStoryDraft } from '$lib/client/story-editor-draft';
 
 	const ACTOR_ID = 'lead.demo';
 
@@ -21,6 +22,9 @@
 		approvalItems = [...approvalItems];
 		message = `Story ${storyId} approved for publication.`;
 
+		// Load client-side translation draft
+		const draft = loadPersistedStoryDraft(storyId);
+
 		// Emit audit event to server
 		try {
 			await fetch('/api/audit-events', {
@@ -29,7 +33,8 @@
 				body: JSON.stringify({
 					action: 'approve',
 					actorId: ACTOR_ID,
-					storyId
+					storyId,
+					translations: draft ? draft.segments : null
 				})
 			});
 		} catch (error) {

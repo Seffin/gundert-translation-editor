@@ -574,6 +574,11 @@
 					</header>
 
 					<section class="source-column" aria-label={`source-${segment.id}`}>
+						{#if segment.imageUrl}
+							<div class="segment-image-container">
+								<img src={segment.imageUrl} alt="Segment Illustration" class="segment-image" />
+							</div>
+						{/if}
 						<p class="source-text">{segment.sourceText}</p>
 					</section>
 
@@ -1010,6 +1015,29 @@
 
 	.source-column {
 		background: var(--color-surface-container-lowest);
+	}
+
+	.segment-image-container {
+		margin-bottom: 1rem;
+		border-radius: 0.75rem;
+		overflow: hidden;
+		border: 1px solid var(--color-outline-variant);
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		background: var(--color-surface-container-low);
+		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+	}
+
+	.segment-image-container:hover {
+		transform: translateY(-2px) scale(1.01);
+		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+	}
+
+	.segment-image {
+		width: 100%;
+		height: auto;
+		max-height: 240px;
+		object-fit: cover;
+		display: block;
 	}
 
 	.target-column {

@@ -1,9 +1,10 @@
-import { readdir, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
+import { join, dirname } from 'node:path';
 
 export type ObsSegment = {
 	id: string;
 	text: string;
+	imageUrl?: string;
 };
 
 export type ObsStory = {
@@ -53,18 +54,34 @@ export function parseObsStoryMarkdown(markdown: string, storyNumber: number): Ob
 		paragraphs.push(current.join(' ').trim());
 	}
 
-	const contentParagraphs = paragraphs.filter((paragraph) => {
-		if (paragraph.startsWith('#')) return false;
-		if (paragraph.startsWith('![')) return false;
-		if (paragraph.startsWith('_A Bible story from:')) return false;
-		return true;
-	});
-
 	const storyId = String(storyNumber).padStart(2, '0');
-	const segments = contentParagraphs.map((text, index) => ({
-		id: `${storyId}:${String(index + 1).padStart(2, '0')}`,
-		text
-	}));
+	const segments: ObsSegment[] = [];
+	let lastImageUrl: string | undefined = undefined;
+	let segmentCounter = 1;
+
+	for (const paragraph of paragraphs) {
+		if (paragraph.startsWith('#')) {
+			continue;
+		}
+		if (paragraph.startsWith('![')) {
+			const match = paragraph.match(/!\[.*?\]\((.*?)\)/);
+			if (match) {
+				lastImageUrl = match[1];
+			}
+			continue;
+		}
+		if (paragraph.startsWith('_A Bible story from:')) {
+			continue;
+		}
+
+		segments.push({
+			id: `${storyId}:${String(segmentCounter).padStart(2, '0')}`,
+			text: paragraph,
+			imageUrl: lastImageUrl
+		});
+		segmentCounter++;
+		lastImageUrl = undefined;
+	}
 
 	return {
 		storyNumber,
@@ -115,4 +132,52 @@ export async function parseObsStoryById(
 	const normalizedId = storyId.padStart(2, '0');
 	const filePath = join(contentDirPath, `${normalizedId}.md`);
 	return parseObsStoryFile(filePath);
+}
+
+export async function publishMalayalamStory(
+	storyId: string,
+	translations: Record<string, { targetText: string }> | null
+): Promise<void> {
+	const normalizedId = storyId.padStart(2, '0');
+	const enContentDir = join(process.cwd(), 'en_obs', 'content');
+	const story = await parseObsStoryById(enContentDir, normalizedId);
+
+	const lines: string[] = [];
+
+	// Add Title Line
+	lines.push(`# ${story.storyNumber}. ${story.title}`);
+	lines.push('');
+
+	// Add alternating segments and images
+	for (const segment of story.segments) {
+		if (segment.imageUrl) {
+			lines.push(`![OBS Image](${segment.imageUrl})`);
+			lines.push('');
+		}
+
+		const targetText = translations?.[segment.id]?.targetText || segment.text;
+		lines.push(targetText);
+		lines.push('');
+	}
+
+	// Extract original footer
+	let footerLine = '_A Bible story from: Scripture_';
+	if (story.sourcePath) {
+		try {
+			const rawEn = await readFile(story.sourcePath, 'utf8');
+			const rawLines = rawEn.split(/\r?\n/);
+			const found = rawLines.find((line) => line.trim().startsWith('_A Bible story from:'));
+			if (found) {
+				footerLine = found.trim();
+			}
+		} catch (e) {
+			console.error('Failed to read English footer line:', e);
+		}
+	}
+	lines.push(footerLine);
+
+	// Write target file recursively
+	const targetPath = join(process.cwd(), 'ml_obs', 'content', `${normalizedId}.md`);
+	await mkdir(dirname(targetPath), { recursive: true });
+	await writeFile(targetPath, lines.join('\n'), 'utf8');
 }

@@ -12,6 +12,7 @@ export type EditorSegment = {
 	status: 'Draft' | 'Done';
 	draftedByGemini: boolean;
 	updatedAtLabel: string;
+	imageUrl?: string;
 	aiProvenance?: AIDraftProvenance;
 	lastSavedByActorId?: string;
 	lastSavedAtIso?: string;
@@ -100,6 +101,7 @@ function mapSegment(segment: ObsSegment, index: number, targetLanguage: string):
 		status,
 		draftedByGemini,
 		updatedAtLabel,
+		imageUrl: segment.imageUrl,
 		aiProvenance: draftedByGemini
 			? {
 					actor: 'Gemini',
