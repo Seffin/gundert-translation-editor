@@ -60,7 +60,8 @@
 	{#if approvalItems.length === 0}
 		<p>No stories are currently in review for lead approval.</p>
 	{:else}
-		<table>
+		<div class="table-responsive">
+			<table>
 			<thead>
 				<tr>
 					<th>#</th>
@@ -102,53 +103,121 @@
 				{/each}
 			</tbody>
 		</table>
+		</div>
 	{/if}
 </section>
 
 <style>
 	section {
 		padding: 2rem;
+		max-width: 1280px;
+		margin: 0 auto;
+		background: var(--color-panel-strong);
+		border: 1px solid var(--color-outline-variant);
+		border-radius: 1.25rem;
+		box-shadow: var(--shadow-subtle);
 	}
 
 	h1 {
 		margin: 0 0 0.5rem;
 	}
 
+	p {
+		margin: 0;
+		color: var(--color-on-surface-variant);
+	}
+
+	.table-responsive {
+		overflow-x: auto;
+		margin-top: 1.25rem;
+	}
+
+	.table-responsive::-webkit-scrollbar {
+		height: 8px;
+	}
+
+	.table-responsive::-webkit-scrollbar-track {
+		background: var(--color-surface-container-low);
+		border-radius: 4px;
+	}
+
+	.table-responsive::-webkit-scrollbar-thumb {
+		background: var(--color-outline-variant);
+		border-radius: 4px;
+	}
+
+	.table-responsive::-webkit-scrollbar-thumb:hover {
+		background: var(--color-on-surface-variant);
+	}
+
 	table {
 		width: 100%;
-		border-collapse: collapse;
-		margin-top: 1rem;
+		border-collapse: separate;
+		border-spacing: 0;
+		min-width: 720px;
 	}
 
 	th,
 	td {
-		border-bottom: 1px solid #ddd;
+		border-bottom: 1px solid var(--color-outline-variant);
 		text-align: left;
-		padding: 0.625rem;
+		padding: 1rem 1.1rem;
+	}
+
+	th {
+		background: var(--color-surface-container-high);
+		color: var(--color-on-surface-variant);
+		font-weight: 700;
+	}
+
+	tbody tr {
+		background: var(--color-panel-strong);
+		transition: background-color 0.2s ease;
+	}
+
+	tbody tr:hover {
+		background: var(--color-surface-container-low);
 	}
 
 	button {
 		padding: 0.45rem 0.75rem;
 		border-radius: 0.5rem;
 		font-weight: 700;
+		transition: all 0.2s ease;
 	}
 
 	button:not(:disabled) {
-		border: 1px solid #1f4f3f;
-		background: #dbf1e8;
-		color: #1f4f3f;
+		border: 1px solid var(--color-success);
+		background: var(--color-success-container);
+		color: var(--color-success);
 		cursor: pointer;
 	}
 
+	button:not(:disabled):hover {
+		background: var(--color-success);
+		color: var(--color-on-primary);
+		transform: translateY(-1px);
+	}
+
 	button:disabled {
-		border: 1px solid #9ca3af;
-		background: #f3f4f6;
-		color: #6b7280;
+		border: 1px solid var(--color-outline-variant);
+		background: var(--color-surface-container-low);
+		color: var(--color-on-surface-variant);
 	}
 
 	.message {
 		margin-top: 0.75rem;
 		font-weight: 700;
-		color: #1f4f3f;
+		color: var(--color-success);
+	}
+
+	@media (max-width: 768px) {
+		section {
+			padding: 1rem;
+			background: transparent;
+			border: none;
+			box-shadow: none;
+			border-radius: 0;
+		}
 	}
 </style>

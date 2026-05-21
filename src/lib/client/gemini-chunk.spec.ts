@@ -427,4 +427,49 @@ describe('selective chunk draft', () => {
 		expect(result[0].targetText).toBe(firstTranslation);
 		expect(result[1].targetText).toBe(secondTranslation);
 	});
+
+	it('successfully parses JSON containing unescaped double quotes in translated text', async () => {
+		const firstTranslation =
+			'രണ്ടാം ദിവസം ദൈവം അരുളിച്ചെയ്തു: "വെള്ളങ്ങൾക്കു മീതെ ഒരു വിതാനം ഉണ്ടാകട്ടെ." അങ്ങനെ വിതാനം ഉണ്ടായി. ദൈവം ഈ വിതാനത്തിന് ആകാശം എന്നു പേരിട്ടു.';
+
+		const invalidJsonString =
+			'{"translations":[{"id":"01:03","text":"രണ്ടാം ദിവസം ദൈവം അരുളിച്ചെയ്തു: "വെള്ളങ്ങൾക്കു മീതെ ഒരു വിതാനം ഉണ്ടാകട്ടെ." അങ്ങനെ വിതാനം ഉണ്ടായി. ദൈവം ഈ വിതാനത്തിന് ആകാശം എന്നു പേരിട്ടു."}]}';
+
+		const mockFetch = vi.fn(() =>
+			Promise.resolve(
+				new Response(
+					JSON.stringify({
+						candidates: [
+							{
+								content: {
+									parts: [{ text: invalidJsonString }]
+								},
+								finishReason: 'STOP'
+							}
+						]
+					}),
+					{
+						status: 200,
+						headers: { 'content-type': 'application/json' }
+					}
+				)
+			)
+		);
+		vi.stubGlobal('fetch', mockFetch);
+
+		const selection: SegmentSelectionModel = {
+			selected: { '01:01': false, '01:02': false, '01:03': true },
+			count: 1
+		};
+
+		const result = await requestGeminiChunkDraft(
+			SEGMENTS,
+			selection,
+			'Malayalam',
+			'story-01',
+			'fake-api-key'
+		);
+
+		expect(result[2].targetText).toBe(firstTranslation);
+	});
 });

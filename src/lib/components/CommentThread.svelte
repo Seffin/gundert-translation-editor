@@ -198,7 +198,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-		border-bottom: 1px solid #e0e0e0;
+		border-bottom: 1px solid var(--color-outline-variant);
 		padding-bottom: 1rem;
 	}
 
@@ -206,6 +206,7 @@
 		margin: 0;
 		font-size: 1.1rem;
 		font-weight: 600;
+		color: var(--color-on-surface);
 	}
 
 	.badge-row {
@@ -218,23 +219,23 @@
 		font-size: 0.75rem;
 		padding: 0.25rem 0.75rem;
 		border-radius: 9999px;
-		font-weight: 500;
+		font-weight: 700;
 	}
 
 	.badge-unresolved {
-		background: #fef3c7;
-		color: #92400e;
+		background: var(--color-warning-container);
+		color: var(--color-warning);
 	}
 
 	.badge-resolved {
-		background: #dbeafe;
-		color: #0c4a6e;
+		background: var(--color-success-container);
+		color: var(--color-success);
 	}
 
 	.error-message {
 		padding: 0.75rem;
-		background: #fee2e2;
-		color: #991b1b;
+		background: var(--color-error-container);
+		color: var(--color-error);
 		border-radius: 0.375rem;
 		font-size: 0.875rem;
 	}
@@ -243,7 +244,7 @@
 	.empty-state {
 		padding: 1rem;
 		text-align: center;
-		color: #6b7280;
+		color: var(--color-on-surface-variant);
 		font-size: 0.875rem;
 	}
 
@@ -257,8 +258,8 @@
 
 	.comment {
 		padding: 0.75rem;
-		background: white;
-		border: 1px solid #e5e7eb;
+		background: var(--color-surface-container-lowest);
+		border: 1px solid var(--color-outline-variant);
 		border-radius: 0.375rem;
 		transition: opacity 0.2s;
 	}
@@ -273,31 +274,33 @@
 		gap: 0.5rem;
 		margin-bottom: 0.5rem;
 		font-size: 0.875rem;
+		color: var(--color-on-surface-variant);
 	}
 
 	.author {
 		font-weight: 600;
+		color: var(--color-on-surface);
 	}
 
 	.timestamp {
-		color: #9ca3af;
+		color: var(--color-on-surface-variant);
 		font-size: 0.75rem;
 	}
 
 	.resolved-label {
 		margin-left: auto;
-		color: #059669;
+		color: var(--color-success);
 		font-size: 0.75rem;
-		font-weight: 500;
+		font-weight: 700;
 	}
 
 	.segment-badge {
-		background: #e0e7ff;
-		color: #3730a3;
+		background: var(--color-secondary-container);
+		color: var(--color-on-secondary-container);
 		padding: 0.25rem 0.5rem;
 		border-radius: 0.25rem;
 		font-size: 0.7rem;
-		font-weight: 500;
+		font-weight: 700;
 	}
 
 	.message {
@@ -305,39 +308,41 @@
 		font-size: 0.875rem;
 		line-height: 1.5;
 		word-wrap: break-word;
+		color: var(--color-on-surface);
 	}
 
 	.resolve-btn {
-		background: #dbeafe;
-		color: #0c4a6e;
-		border: 1px solid #0c4a6e;
+		background: var(--color-secondary-container);
+		color: var(--color-on-secondary-container);
+		border: 1px solid var(--color-outline-variant);
 		padding: 0.375rem 0.75rem;
 		border-radius: 0.25rem;
 		font-size: 0.75rem;
 		cursor: pointer;
-		font-weight: 500;
-		transition: background 0.2s;
+		font-weight: 700;
+		transition: background 0.2s, transform 0.2s;
 	}
 
 	.resolve-btn:hover {
-		background: #bfdbfe;
+		background: var(--color-surface-container-high);
 	}
 
 	.resolve-all-btn {
-		background: #10b981;
-		color: white;
-		border: none;
+		background: var(--color-success);
+		color: var(--color-on-primary);
+		border: 1px solid var(--color-success);
 		padding: 0.5rem 1rem;
 		border-radius: 0.375rem;
 		font-size: 0.875rem;
 		cursor: pointer;
-		font-weight: 500;
-		transition: background 0.2s;
+		font-weight: 700;
+		transition: background 0.2s, transform 0.2s;
 		width: 100%;
 	}
 
 	.resolve-all-btn:hover {
-		background: #059669;
+		background: var(--color-success-container);
+		color: var(--color-success);
 	}
 
 	.add-comment {
@@ -346,7 +351,7 @@
 		gap: 0.5rem;
 		margin-top: 1rem;
 		padding-top: 1rem;
-		border-top: 1px solid #e0e0e0;
+		border-top: 1px solid var(--color-outline-variant);
 	}
 
 	.segment-selector {
@@ -357,64 +362,72 @@
 	}
 
 	.segment-selector label {
-		font-weight: 500;
+		font-weight: 600;
 		white-space: nowrap;
+		color: var(--color-on-background);
 	}
 
 	.segment-selector select {
 		flex: 1;
 		padding: 0.375rem;
-		border: 1px solid #d1d5db;
+		border: 1px solid var(--color-outline-variant);
 		border-radius: 0.25rem;
 		font-size: 0.875rem;
 		font-family: inherit;
-		background: white;
+		background: var(--color-surface-container-lowest);
+		color: var(--color-on-background);
 	}
 
 	.segment-selector select:focus {
 		outline: none;
-		border-color: #3b82f6;
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+		border-color: var(--color-primary);
+		box-shadow: 0 0 0 2px var(--color-accent-soft);
 	}
 
 	.add-comment textarea {
 		padding: 0.5rem;
-		border: 1px solid #d1d5db;
+		border: 1px solid var(--color-outline-variant);
 		border-radius: 0.375rem;
 		font-family: inherit;
 		font-size: 0.875rem;
 		resize: none;
+		background: var(--color-surface-container-lowest);
+		color: var(--color-on-background);
 	}
 
 	.add-comment textarea:focus {
 		outline: none;
-		border-color: #3b82f6;
-		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+		border-color: var(--color-primary);
+		box-shadow: 0 0 0 2px var(--color-accent-soft);
 	}
 
 	.add-comment textarea:disabled {
-		background: #f3f4f6;
+		background: var(--color-surface-container-low);
+		color: var(--color-on-surface-variant);
 		cursor: not-allowed;
 	}
 
 	.add-comment button {
-		background: #3b82f6;
-		color: white;
-		border: none;
+		background: var(--color-primary);
+		color: var(--color-on-primary);
+		border: 1px solid var(--color-primary);
 		padding: 0.5rem 1rem;
 		border-radius: 0.375rem;
 		font-size: 0.875rem;
 		cursor: pointer;
-		font-weight: 500;
-		transition: background 0.2s;
+		font-weight: 700;
+		transition: background 0.2s, transform 0.2s;
 	}
 
 	.add-comment button:hover:not(:disabled) {
-		background: #2563eb;
+		background: var(--color-primary-container);
+		color: var(--color-on-primary-container);
 	}
 
 	.add-comment button:disabled {
-		background: #d1d5db;
+		background: var(--color-surface-container-low);
+		color: var(--color-on-surface-variant);
+		border: 1px solid var(--color-outline-variant);
 		cursor: not-allowed;
 	}
 

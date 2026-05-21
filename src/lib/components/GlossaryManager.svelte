@@ -121,10 +121,21 @@
 <style>
 	section {
 		padding: 2rem;
+		max-width: 1280px;
+		margin: 0 auto;
+		background: var(--color-panel-strong);
+		border: 1px solid var(--color-outline-variant);
+		border-radius: 1.25rem;
+		box-shadow: var(--shadow-subtle);
 	}
 
 	h1 {
 		margin: 0 0 0.5rem;
+	}
+
+	p {
+		margin: 0;
+		color: var(--color-on-surface-variant);
 	}
 
 	form {
@@ -145,6 +156,10 @@
 		}
 		section {
 			padding: 1rem;
+			background: transparent;
+			border: none;
+			box-shadow: none;
+			border-radius: 0;
 		}
 		button {
 			width: 100%;
@@ -156,40 +171,74 @@
 		flex-direction: column;
 		gap: 0.25rem;
 		font-weight: 600;
+		color: var(--color-on-background);
 	}
 
 	input,
 	select {
 		padding: 0.45rem 0.5rem;
-		border: 1px solid #c7c5d1;
+		border: 1px solid var(--color-outline-variant);
+		background-color: var(--color-surface-container-lowest);
+		color: var(--color-on-background);
+		border-radius: var(--radius-sm);
+	}
+
+	input:focus,
+	select:focus {
+		outline: none;
+		border-color: var(--color-primary);
+		box-shadow: 0 0 0 2px var(--color-accent-soft);
 	}
 
 	button {
 		padding: 0.45rem 0.75rem;
 		border-radius: 0.5rem;
-		border: 1px solid #2d336b;
-		background: #dfe0ff;
-		color: #161c54;
+		border: 1px solid var(--color-primary);
+		background: var(--color-primary);
+		color: var(--color-on-primary);
 		font-weight: 700;
 		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	button:hover {
+		background: var(--color-primary-container);
+		color: var(--color-on-primary-container);
+		transform: translateY(-1px);
 	}
 
 	table {
 		width: 100%;
-		border-collapse: collapse;
+		border-collapse: separate;
+		border-spacing: 0;
 	}
 
 	th,
 	td {
-		border-bottom: 1px solid #ddd;
+		border-bottom: 1px solid var(--color-outline-variant);
 		text-align: left;
-		padding: 0.625rem;
+		padding: 1rem 1.1rem;
+	}
+
+	th {
+		background: var(--color-surface-container-high);
+		color: var(--color-on-surface-variant);
+		font-weight: 700;
+	}
+
+	tbody tr {
+		background: var(--color-panel-strong);
+		transition: background-color 0.2s ease;
+	}
+
+	tbody tr:hover {
+		background: var(--color-surface-container-low);
 	}
 
 	.message {
 		margin-top: 0.5rem;
 		margin-bottom: 0.5rem;
 		font-weight: 700;
-		color: #1f4f3f;
+		color: var(--color-success);
 	}
 </style>

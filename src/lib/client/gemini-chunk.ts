@@ -103,7 +103,53 @@ Return ONLY valid JSON using this exact schema:
 Rules:
 - Include exactly one object for each selected segment ID.
 - Each translation must be a single block in the "text" field, even if it has multiple paragraphs.
+- Crucial: If the translated text contains any double quotes ("), they MUST be properly escaped as \\" (with a backslash) to ensure the JSON is valid and parsable.
 - Do not include markdown fences or commentary.`;
+}
+
+function regexParseJsonDraft(text: string): ParsedJsonDraft | undefined {
+	const translations: Array<{ id: string; text: string }> = [];
+	const regex = /"id"\s*:\s*"([^"]+)"\s*,\s*"text"\s*:\s*"/g;
+	let match;
+	const matches: Array<{ id: string; index: number; textStart: number }> = [];
+
+	while ((match = regex.exec(text)) !== null) {
+		matches.push({
+			id: match[1],
+			index: match.index,
+			textStart: match.index + match[0].length
+		});
+	}
+
+	for (let i = 0; i < matches.length; i++) {
+		const current = matches[i];
+		const endBoundary = i + 1 < matches.length ? matches[i + 1].index : text.length;
+		let segmentTextChunk = text.slice(current.textStart, endBoundary);
+
+		const trailingMatch = segmentTextChunk.match(/\s*"\s*\}\s*[\],\}\s]*$/);
+		if (trailingMatch) {
+			const trimLen = trailingMatch[0].length;
+			segmentTextChunk = segmentTextChunk.slice(0, segmentTextChunk.length - trimLen);
+		} else {
+			segmentTextChunk = segmentTextChunk
+				.replace(/\s*"\s*\}\s*,?\s*$/, '')
+				.replace(/\s*"?\s*\]?\s*\}?\s*$/, '');
+		}
+
+		const unescapedText = segmentTextChunk.replace(/\\"/g, '"').replace(/\\\\/g, '\\').trim();
+
+		if (unescapedText) {
+			translations.push({
+				id: current.id,
+				text: unescapedText
+			});
+		}
+	}
+
+	if (translations.length > 0) {
+		return { translations };
+	}
+	return undefined;
 }
 
 function parseJsonDraftResponse(responseText: string): ParsedJsonDraft | undefined {
@@ -116,12 +162,12 @@ function parseJsonDraftResponse(responseText: string): ParsedJsonDraft | undefin
 	try {
 		const parsed = JSON.parse(jsonText) as unknown;
 		if (!parsed || typeof parsed !== 'object' || !('translations' in parsed)) {
-			return undefined;
+			return regexParseJsonDraft(jsonText);
 		}
 
 		const translations = (parsed as { translations?: unknown }).translations;
 		if (!Array.isArray(translations)) {
-			return undefined;
+			return regexParseJsonDraft(jsonText);
 		}
 
 		const normalizedTranslations = translations
@@ -136,12 +182,12 @@ function parseJsonDraftResponse(responseText: string): ParsedJsonDraft | undefin
 			.filter((item) => item.id.trim().length > 0 && item.text.length > 0);
 
 		if (normalizedTranslations.length === 0) {
-			return undefined;
+			return regexParseJsonDraft(jsonText);
 		}
 
 		return { translations: normalizedTranslations };
 	} catch {
-		return undefined;
+		return regexParseJsonDraft(jsonText);
 	}
 }
 

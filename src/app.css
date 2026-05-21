@@ -17,6 +17,11 @@
 	--color-on-error: #ffffff;
 	--color-error-container: #ffe0dd;
 
+	--color-success: #1a7f37;
+	--color-success-container: #dafbe1;
+	--color-warning: #9a6700;
+	--color-warning-container: #fff8c5;
+
 	--color-surface: #f7faff;
 	--color-surface-dim: #d8e3f2;
 	--color-surface-container-lowest: #ffffff;
@@ -74,6 +79,15 @@
 
 	--color-outline: #334155;
 	--color-outline-variant: rgba(255, 255, 255, 0.1);
+
+	--color-error: #ff847c;
+	--color-on-error: #ffffff;
+	--color-error-container: rgba(255, 132, 124, 0.15);
+
+	--color-success: #3fdb75;
+	--color-success-container: rgba(63, 219, 117, 0.15);
+	--color-warning: #f1b42f;
+	--color-warning-container: rgba(241, 180, 47, 0.15);
 
 	--color-panel: rgba(11, 15, 25, 0.65);
 	--color-panel-strong: rgba(11, 15, 25, 0.8);

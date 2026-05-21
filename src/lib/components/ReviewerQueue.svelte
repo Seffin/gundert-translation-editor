@@ -177,7 +177,7 @@
 	}
 
 	td:first-child {
-		background: var(--color-panel-strong);
+		background: var(--color-surface);
 	}
 
 	th:nth-child(2),
@@ -191,7 +191,7 @@
 	}
 
 	td:nth-child(2) {
-		background: var(--color-panel-strong);
+		background: var(--color-surface);
 	}
 
 	tbody tr:hover td:first-child,

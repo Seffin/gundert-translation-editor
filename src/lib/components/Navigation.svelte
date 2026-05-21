@@ -84,11 +84,11 @@
 		position: sticky;
 		top: 0;
 		z-index: 20;
-		background: rgba(255, 255, 255, 0.96);
+		background: var(--color-panel-strong);
 		color: var(--color-on-background);
 		padding: 0;
 		margin: 0;
-		border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+		border-bottom: 1px solid var(--color-outline-variant);
 		box-shadow: 0 18px 40px rgba(15, 30, 60, 0.08);
 		backdrop-filter: blur(15px);
 	}
@@ -114,7 +114,7 @@
 		letter-spacing: 0.18em;
 		text-transform: uppercase;
 		opacity: 0.85;
-		color: rgba(15, 23, 42, 0.7);
+		color: var(--color-on-surface-variant);
 	}
 
 	.nav-brand h1 {
@@ -234,7 +234,7 @@
 			left: 0;
 			right: 0;
 			z-index: 50;
-			background: rgba(255, 255, 255, 0.98);
+			background: var(--color-panel-strong);
 			box-shadow: 0 -14px 36px rgba(15, 30, 60, 0.12);
 			backdrop-filter: blur(12px);
 			padding: 0.25rem 0;
