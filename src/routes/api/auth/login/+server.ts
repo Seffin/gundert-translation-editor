@@ -38,13 +38,13 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
 		`);
 		insertSession.run(sessionId, user.id, expiresAt);
 
-		const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+		const isHttps = url.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https';
 
 		// Set httpOnly session cookie
 		cookies.set('gundert_session', sessionId, {
 			path: '/',
 			httpOnly: true,
-			secure: !dev && !isLocalhost,
+			secure: !dev && isHttps,
 			sameSite: 'lax',
 			maxAge: 60 * 60 * 24 // 24 hours in seconds
 		});
