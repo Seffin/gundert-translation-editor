@@ -16,8 +16,20 @@ export const load: PageServerLoad = async ({ locals }) => {
 		role: string;
 	}>;
 
+	// Fetch all pre-registrations ordered by creation time (newest first)
+	const preRegistrations = (await db.prepare('SELECT * FROM pre_registrations ORDER BY created_at DESC').all()) as Array<{
+		id: number;
+		email: string;
+		name: string;
+		requested_role: string;
+		justification: string;
+		status: string;
+		created_at: number;
+	}>;
+
 	return {
-		users
+		users,
+		preRegistrations
 	};
 };
 
@@ -153,6 +165,90 @@ export const actions: Actions = {
 		} catch (err) {
 			console.error('Error deleting user:', err);
 			return fail(500, { error: 'Failed to delete user from database' });
+		}
+	},
+
+	approveRequest: async ({ request, locals }) => {
+		if (!locals.user || locals.user.role !== 'SuperAdmin') {
+			throw error(403, 'Unauthorized');
+		}
+
+		const data = await request.formData();
+		const requestIdStr = data.get('requestId')?.toString();
+		const email = data.get('email')?.toString().trim();
+		const requestedRole = data.get('role')?.toString().trim();
+
+		if (!requestIdStr || !email || !requestedRole) {
+			return fail(400, { error: 'Request ID, email and role are required' });
+		}
+
+		const requestId = parseInt(requestIdStr, 10);
+
+		try {
+			// Find the pre-registration request
+			const preRegs = await db.prepare('SELECT * FROM pre_registrations').all();
+			const req = preRegs.find((r: any) => r.id === requestId);
+			if (!req) {
+				return fail(404, { error: 'Access request not found' });
+			}
+
+			// Update the status of pre-registration request to Approved
+			await db.prepare('UPDATE pre_registrations SET status = ? WHERE id = ?').run('Approved', requestId);
+
+			// Check if user already exists
+			const existing = await db.prepare('SELECT id FROM users WHERE username = ?').get(email);
+			if (!existing) {
+				const salt = generateSalt();
+				// Generate a secure fallback password
+				const defaultPassword = Math.random().toString(36).substring(2, 12);
+				const passwordHash = hashPassword(defaultPassword, salt);
+
+				const insertUser = db.prepare(`
+					INSERT INTO users (username, password_hash, salt, role)
+					VALUES (?, ?, ?, ?)
+				`);
+				await insertUser.run(email, passwordHash, salt, requestedRole);
+			} else {
+				// If user already exists, update their role to the requested role
+				await db.prepare('UPDATE users SET role = ? WHERE id = ?').run(requestedRole, existing.id);
+			}
+
+			return { success: true, message: `Successfully approved request and whitelisted ${email} as ${requestedRole}` };
+		} catch (err) {
+			console.error('Error approving request:', err);
+			return fail(500, { error: 'Failed to approve access request' });
+		}
+	},
+
+	rejectRequest: async ({ request, locals }) => {
+		if (!locals.user || locals.user.role !== 'SuperAdmin') {
+			throw error(403, 'Unauthorized');
+		}
+
+		const data = await request.formData();
+		const requestIdStr = data.get('requestId')?.toString();
+
+		if (!requestIdStr) {
+			return fail(400, { error: 'Request ID is required' });
+		}
+
+		const requestId = parseInt(requestIdStr, 10);
+
+		try {
+			// Find the pre-registration request
+			const preRegs = await db.prepare('SELECT * FROM pre_registrations').all();
+			const req = preRegs.find((r: any) => r.id === requestId);
+			if (!req) {
+				return fail(404, { error: 'Access request not found' });
+			}
+
+			// Update the status of pre-registration request to Rejected
+			await db.prepare('UPDATE pre_registrations SET status = ? WHERE id = ?').run('Rejected', requestId);
+
+			return { success: true, message: `Successfully rejected access request for ${req.email}` };
+		} catch (err) {
+			console.error('Error rejecting request:', err);
+			return fail(500, { error: 'Failed to reject access request' });
 		}
 	}
 };

@@ -17,9 +17,11 @@ class MockDatabase {
 		sessions: [] as any[],
 		story_assignments: [] as any[],
 		story_drafts: [] as any[],
-		editing_locks: [] as any[]
+		editing_locks: [] as any[],
+		pre_registrations: [] as any[]
 	};
 	private nextUserId = 1;
+	private nextPreRegId = 1;
 	private filepath: string;
 
 	constructor(path?: string) {
@@ -33,7 +35,11 @@ class MockDatabase {
 				const content = readFileSync(this.filepath, 'utf8');
 				const data = JSON.parse(content);
 				this.tables = data.tables || this.tables;
+				if (!this.tables.pre_registrations) {
+					this.tables.pre_registrations = [];
+				}
 				this.nextUserId = data.nextUserId || this.nextUserId;
+				this.nextPreRegId = data.nextPreRegId || this.nextPreRegId;
 			}
 		} catch (e) {
 			console.error('Failed to load mock database:', e);
@@ -48,7 +54,8 @@ class MockDatabase {
 			}
 			writeFileSync(this.filepath, JSON.stringify({
 				tables: this.tables,
-				nextUserId: this.nextUserId
+				nextUserId: this.nextUserId,
+				nextPreRegId: this.nextPreRegId
 			}, null, 2), 'utf8');
 		} catch (e) {
 			console.error('Failed to save mock database:', e);
@@ -170,6 +177,36 @@ class MockDatabase {
 					changed = self.tables.editing_locks.length !== lengthBefore;
 				}
 
+				else if (cleanSql.toUpperCase().includes('INSERT INTO PRE_REGISTRATIONS')) {
+					const email = mergedParams[0];
+					const name = mergedParams[1];
+					const requested_role = mergedParams[2];
+					const justification = mergedParams[3];
+					const status = mergedParams[4] ?? 'Pending';
+					const created_at = mergedParams[5] ?? Date.now();
+					const id = self.nextPreRegId++;
+					self.tables.pre_registrations.push({ id, email, name, requested_role, justification, status, created_at });
+					changed = true;
+					lastInsertRowid = id;
+				}
+
+				else if (cleanSql.toUpperCase().includes('UPDATE PRE_REGISTRATIONS SET STATUS =')) {
+					const status = mergedParams[0];
+					const id = mergedParams[1];
+					const req = self.tables.pre_registrations.find(x => x.id === id);
+					if (req) {
+						req.status = status;
+						changed = true;
+					}
+				}
+
+				else if (cleanSql.toUpperCase().includes('DELETE FROM PRE_REGISTRATIONS WHERE ID =')) {
+					const id = mergedParams[0];
+					const lengthBefore = self.tables.pre_registrations.length;
+					self.tables.pre_registrations = self.tables.pre_registrations.filter(x => x.id !== id);
+					changed = self.tables.pre_registrations.length !== lengthBefore;
+				}
+
 				if (changed) {
 					self.save();
 					return { changes: 1, lastInsertRowid };
@@ -216,6 +253,19 @@ class MockDatabase {
 					return { story_id: l.story_id, locked_at: l.locked_at, expires_at: l.expires_at, username: u.username, user_id: u.id };
 				}
 
+				if (cleanSql.toUpperCase().includes('FROM PRE_REGISTRATIONS WHERE EMAIL =')) {
+					const email = mergedParams[0];
+					const r = self.tables.pre_registrations.find(x => x.email === email);
+					if (!r) return undefined;
+					if (cleanSql.toUpperCase().includes('SELECT STATUS FROM')) {
+						return { status: r.status };
+					}
+					if (cleanSql.toUpperCase().includes('SELECT ID FROM')) {
+						return { id: r.id };
+					}
+					return r;
+				}
+
 				return undefined;
 			},
 
@@ -236,6 +286,14 @@ class MockDatabase {
 				if (cleanSql.toUpperCase().includes('SELECT * FROM STORY_DRAFTS WHERE STORY_ID =')) {
 					const storyId = mergedParams[0];
 					return self.tables.story_drafts.filter(d => d.story_id === storyId);
+				}
+
+				if (cleanSql.toUpperCase().includes('SELECT * FROM PRE_REGISTRATIONS')) {
+					const sorted = [...self.tables.pre_registrations];
+					if (cleanSql.toUpperCase().includes('ORDER BY CREATED_AT DESC')) {
+						sorted.sort((a, b) => b.created_at - a.created_at);
+					}
+					return sorted;
 				}
 
 				return [];
@@ -423,6 +481,18 @@ export async function initializeDatabase() {
 				FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 			);
 		`);
+
+		await db.run(`
+			CREATE TABLE IF NOT EXISTS pre_registrations (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				email TEXT UNIQUE NOT NULL,
+				name TEXT NOT NULL,
+				requested_role TEXT NOT NULL,
+				justification TEXT,
+				status TEXT NOT NULL DEFAULT 'Pending',
+				created_at INTEGER NOT NULL
+			);
+		`);
 	}
 
 	// Seeding Default Credentials (runs for both Mock and Real databases)
@@ -498,4 +568,14 @@ export interface DBEditingLock {
 	user_id: number;
 	locked_at: number;
 	expires_at: number;
+}
+
+export interface DBPreRegistration {
+	id: number;
+	email: string;
+	name: string;
+	requested_role: string;
+	justification: string;
+	status: string;
+	created_at: number;
 }

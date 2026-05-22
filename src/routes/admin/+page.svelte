@@ -9,6 +9,9 @@
 	let passwordInput = $state('');
 	let showPassword = $state(false);
 
+	let activeTab = $state('members'); // 'members' | 'requests'
+	let pendingCount = $derived(data.preRegistrations?.filter((r: any) => r.status === 'Pending').length || 0);
+
 	let loading = $state(false);
 	let message = $derived(form?.message || form?.error || '');
 	let isError = $derived(!!form?.error);
@@ -121,89 +124,212 @@
 				</form>
 			</section>
 
-			<!-- Users Directory Panel -->
-			<section class="glass-card directory-panel">
-				<h2>Authorized Directory</h2>
-				<p class="panel-desc">Active system access maps. Changing a role updates permissions instantly.</p>
-
-				<div class="table-responsive">
-					<table class="user-table">
-						<thead>
-							<tr>
-								<th>Email / Username</th>
-								<th>Access Level / Role Mapping</th>
-								<th class="actions-header">Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each data.users as user (user.id)}
-								<tr class="user-row">
-									<td class="username-cell">
-										<span class="user-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
-										<span class="user-name">{user.username}</span>
-									</td>
-									<td>
-										<form
-											method="POST"
-											action="?/updateRole"
-											use:enhance={() => {
-												loading = true;
-												return async ({ update }) => {
-													loading = false;
-													await update();
-												};
-											}}
-											class="role-update-form"
-										>
-											<input type="hidden" name="userId" value={user.id} />
-											<select
-												name="role"
-												value={user.role}
-												onchange={(e) => e.currentTarget.form?.requestSubmit()}
-												disabled={loading}
-												class="role-pill-select"
-												style:--role-color={user.role === 'SuperAdmin'
-													? '#ef4444'
-													: user.role === 'Lead'
-														? '#f59e0b'
-														: user.role === 'Reviewer'
-															? '#a855f7'
-															: '#3b82f6'}
-											>
-												{#each roles as r}
-													<option value={r.id}>{r.name}</option>
-												{/each}
-											</select>
-										</form>
-									</td>
-									<td class="actions-cell">
-										<form
-											method="POST"
-											action="?/deleteUser"
-											use:enhance={() => {
-												loading = true;
-												return async ({ update }) => {
-													loading = false;
-													await update();
-												};
-											}}
-											onsubmit={(e) => {
-												if (!confirm(`Are you sure you want to revoke access and delete ${user.username}?`)) {
-													e.preventDefault();
-												}
-											}}
-										>
-											<input type="hidden" name="userId" value={user.id} />
-											<button type="submit" class="revoke-btn" disabled={loading} title="Revoke system access">
-												Revoke Access
-											</button>
-										</form>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
+			<!-- Directory / Requests Control Desk -->
+			<section class="glass-card directory-panel control-desk-panel">
+				<div class="panel-header-tabs">
+					<button 
+						type="button" 
+						class="tab-btn" 
+						class:active={activeTab === 'members'} 
+						onclick={() => activeTab = 'members'}
+					>
+						Active Members
+						<span class="tab-badge-members">{data.users.length}</span>
+					</button>
+					<button 
+						type="button" 
+						class="tab-btn" 
+						class:active={activeTab === 'requests'} 
+						onclick={() => activeTab = 'requests'}
+					>
+						Access Requests
+						{#if pendingCount > 0}
+							<span class="tab-badge-requests pulse">{pendingCount}</span>
+						{/if}
+					</button>
 				</div>
+
+				{#if activeTab === 'members'}
+					<p class="panel-desc">Active system access maps. Changing a role updates permissions instantly.</p>
+
+					<div class="table-responsive">
+						<table class="user-table">
+							<thead>
+								<tr>
+									<th>Email / Username</th>
+									<th>Access Level / Role Mapping</th>
+									<th class="actions-header">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each data.users as user (user.id)}
+									<tr class="user-row">
+										<td class="username-cell">
+											<span class="user-avatar">{user.username.slice(0, 2).toUpperCase()}</span>
+											<span class="user-name">{user.username}</span>
+										</td>
+										<td>
+											<form
+												method="POST"
+												action="?/updateRole"
+												use:enhance={() => {
+													loading = true;
+													return async ({ update }) => {
+														loading = false;
+														await update();
+													};
+												}}
+												class="role-update-form"
+											>
+												<input type="hidden" name="userId" value={user.id} />
+												<select
+													name="role"
+													value={user.role}
+													onchange={(e) => e.currentTarget.form?.requestSubmit()}
+													disabled={loading}
+													class="role-pill-select"
+													style:--role-color={user.role === 'SuperAdmin'
+														? '#ef4444'
+														: user.role === 'Lead'
+															? '#f59e0b'
+															: user.role === 'Reviewer'
+																? '#a855f7'
+																: '#3b82f6'}
+												>
+													{#each roles as r}
+														<option value={r.id}>{r.name}</option>
+													{/each}
+												</select>
+											</form>
+										</td>
+										<td class="actions-cell">
+											<form
+												method="POST"
+												action="?/deleteUser"
+												use:enhance={() => {
+													loading = true;
+													return async ({ update }) => {
+														loading = false;
+														await update();
+													};
+												}}
+												onsubmit={(e) => {
+													if (!confirm(`Are you sure you want to revoke access and delete ${user.username}?`)) {
+														e.preventDefault();
+													}
+												}}
+											>
+												<input type="hidden" name="userId" value={user.id} />
+												<button type="submit" class="revoke-btn" disabled={loading} title="Revoke system access">
+													Revoke Access
+												</button>
+											</form>
+										</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				{:else}
+					<p class="panel-desc">Review self-service registrations. Approving whitelist credentials grants immediate Google login clearance.</p>
+
+					{#if !data.preRegistrations || data.preRegistrations.length === 0}
+						<div class="empty-state">
+							<span class="empty-icon">📨</span>
+							<p>No access requests have been submitted yet.</p>
+						</div>
+					{:else}
+						<div class="requests-list">
+							{#each data.preRegistrations as req (req.id)}
+								<div 
+									class="request-card" 
+									class:pending-card={req.status === 'Pending'} 
+									class:approved-card={req.status === 'Approved'} 
+									class:rejected-card={req.status === 'Rejected'}
+								>
+									<div class="request-card-header">
+										<div class="request-user-info">
+											<span class="request-avatar">{req.name.slice(0, 2).toUpperCase()}</span>
+											<div>
+												<h4 class="request-name">{req.name}</h4>
+												<p class="request-email">{req.email}</p>
+											</div>
+										</div>
+										<span class="status-badge" class:pending={req.status === 'Pending'} class:approved={req.status === 'Approved'} class:rejected={req.status === 'Rejected'}>
+											{req.status}
+										</span>
+									</div>
+
+									<div class="request-card-body">
+										<div class="request-detail">
+											<span class="detail-label">Requested Role:</span>
+											<span 
+												class="role-badge-small" 
+												style:--role-bg-color={req.requested_role === 'Lead' ? 'rgba(245, 158, 11, 0.15)' : req.requested_role === 'Reviewer' ? 'rgba(168, 85, 247, 0.15)' : 'rgba(59, 130, 246, 0.15)'} 
+												style:--role-text-color={req.requested_role === 'Lead' ? '#f59e0b' : req.requested_role === 'Reviewer' ? '#c084fc' : '#60a5fa'}
+											>
+												{req.requested_role}
+											</span>
+										</div>
+
+										{#if req.justification}
+											<div class="request-justification">
+												<h5>Justification / Experience</h5>
+												<p>{req.justification}</p>
+											</div>
+										{/if}
+
+										<div class="request-meta">
+											Submitted on {new Date(req.created_at).toLocaleString()}
+										</div>
+									</div>
+
+									{#if req.status === 'Pending'}
+										<div class="request-actions">
+											<form
+												method="POST"
+												action="?/approveRequest"
+												use:enhance={() => {
+													loading = true;
+													return async ({ update }) => {
+														loading = false;
+														await update();
+													};
+												}}
+												class="inline-form"
+											>
+												<input type="hidden" name="requestId" value={req.id} />
+												<input type="hidden" name="email" value={req.email} />
+												<input type="hidden" name="role" value={req.requested_role} />
+												<button type="submit" class="approve-btn" disabled={loading}>
+													Approve
+												</button>
+											</form>
+
+											<form
+												method="POST"
+												action="?/rejectRequest"
+												use:enhance={() => {
+													loading = true;
+													return async ({ update }) => {
+														loading = false;
+														await update();
+													};
+												}}
+												class="inline-form"
+											>
+												<input type="hidden" name="requestId" value={req.id} />
+												<button type="submit" class="reject-btn" disabled={loading}>
+													Reject
+												</button>
+											</form>
+										</div>
+									{/if}
+								</div>
+							{/each}
+						</div>
+					{/if}
+				{/if}
 			</section>
 		</div>
 	</div>
@@ -629,5 +755,318 @@
 		to {
 			transform: rotate(360deg);
 		}
+	}
+
+	/* Tab Control Desk styles */
+	.panel-header-tabs {
+		display: flex;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		margin-bottom: 1.5rem;
+		gap: 1.5rem;
+	}
+
+	.tab-btn {
+		background: transparent;
+		border: none;
+		border-bottom: 2px solid transparent;
+		color: #94a3b8;
+		font-size: 1.1rem;
+		font-weight: 700;
+		padding: 0.75rem 0.25rem 1rem 0.25rem;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		transition: all 0.2s ease;
+		box-shadow: none;
+		border-radius: 0;
+	}
+
+	.tab-btn:hover {
+		color: #ffffff;
+		background: transparent;
+	}
+
+	.tab-btn.active {
+		color: #ffffff;
+		border-bottom-color: #ef4444;
+	}
+
+	.tab-badge-members {
+		font-size: 0.72rem;
+		background: rgba(255, 255, 255, 0.08);
+		color: #cbd5e1;
+		padding: 0.15rem 0.5rem;
+		border-radius: 999px;
+		font-weight: 600;
+	}
+
+	.tab-badge-requests {
+		font-size: 0.72rem;
+		background: rgba(239, 68, 68, 0.2);
+		color: #fca5a5;
+		border: 1px solid rgba(239, 68, 68, 0.3);
+		padding: 0.15rem 0.5rem;
+		border-radius: 999px;
+		font-weight: 700;
+	}
+
+	.pulse {
+		animation: pulse-glow 2s infinite alternate;
+	}
+
+	@keyframes pulse-glow {
+		0% {
+			box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+		}
+		100% {
+			box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+		}
+	}
+
+	/* Empty state placeholder */
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 4rem 2rem;
+		background: rgba(255, 255, 255, 0.01);
+		border: 1px dashed rgba(255, 255, 255, 0.08);
+		border-radius: 1rem;
+		color: #64748b;
+		text-align: center;
+	}
+
+	.empty-icon {
+		font-size: 3rem;
+		margin-bottom: 1rem;
+		opacity: 0.5;
+	}
+
+	.empty-state p {
+		margin: 0;
+		font-size: 0.95rem;
+	}
+
+	/* Requests Cards layout */
+	.requests-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.request-card {
+		background: rgba(30, 41, 59, 0.15);
+		border: 1px solid rgba(255, 255, 255, 0.06);
+		border-left: 4px solid #64748b;
+		border-radius: 1rem;
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		transition: all 0.2s ease;
+	}
+
+	.request-card.pending-card {
+		border-left-color: #f59e0b;
+		background: rgba(245, 158, 11, 0.02);
+	}
+
+	.request-card.approved-card {
+		border-left-color: #22c55e;
+		background: rgba(34, 197, 94, 0.02);
+	}
+
+	.request-card.rejected-card {
+		border-left-color: #ef4444;
+		background: rgba(239, 68, 68, 0.02);
+	}
+
+	.request-card:hover {
+		transform: translateY(-2px);
+		border-color: rgba(255, 255, 255, 0.12);
+		box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.3);
+	}
+
+	.request-card-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+
+	.request-user-info {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.request-avatar {
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #ffffff;
+		font-weight: 700;
+		font-size: 0.9rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.request-name {
+		margin: 0;
+		font-size: 1rem;
+		color: #ffffff;
+		font-weight: 700;
+	}
+
+	.request-email {
+		margin: 0.15rem 0 0 0;
+		font-size: 0.85rem;
+		color: #94a3b8;
+	}
+
+	.status-badge {
+		font-size: 0.75rem;
+		font-weight: 700;
+		padding: 0.25rem 0.65rem;
+		border-radius: 999px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.status-badge.pending {
+		background: rgba(245, 158, 11, 0.12);
+		color: #f59e0b;
+		border: 1px solid rgba(245, 158, 11, 0.2);
+	}
+
+	.status-badge.approved {
+		background: rgba(34, 197, 94, 0.12);
+		color: #4ade80;
+		border: 1px solid rgba(34, 197, 94, 0.2);
+	}
+
+	.status-badge.rejected {
+		background: rgba(239, 68, 68, 0.12);
+		color: #fca5a5;
+		border: 1px solid rgba(239, 68, 68, 0.2);
+	}
+
+	.request-card-body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.request-detail {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.9rem;
+	}
+
+	.detail-label {
+		color: #94a3b8;
+		font-weight: 500;
+	}
+
+	.role-badge-small {
+		font-size: 0.78rem;
+		font-weight: 700;
+		padding: 0.15rem 0.6rem;
+		border-radius: 6px;
+		background: var(--role-bg-color);
+		color: var(--role-text-color);
+	}
+
+	.request-justification {
+		background: rgba(0, 0, 0, 0.2);
+		border: 1px solid rgba(255, 255, 255, 0.04);
+		border-radius: 0.5rem;
+		padding: 0.85rem 1rem;
+	}
+
+	.request-justification h5 {
+		margin: 0 0 0.35rem 0;
+		font-size: 0.78rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #64748b;
+	}
+
+	.request-justification p {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #cbd5e1;
+		line-height: 1.5;
+	}
+
+	.request-meta {
+		font-size: 0.75rem;
+		color: #475569;
+	}
+
+	.request-actions {
+		display: flex;
+		gap: 0.75rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
+		padding-top: 1rem;
+	}
+
+	.inline-form {
+		display: inline-block;
+		margin: 0;
+	}
+
+	.approve-btn {
+		background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+		border: none;
+		color: #ffffff;
+		font-size: 0.85rem;
+		font-weight: 700;
+		padding: 0.55rem 1.25rem;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+	}
+
+	.approve-btn:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35);
+		filter: brightness(1.1);
+	}
+
+	.approve-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		transform: none;
+	}
+
+	.reject-btn {
+		background: transparent;
+		border: 1px solid rgba(239, 68, 68, 0.3);
+		color: #fca5a5;
+		font-size: 0.85rem;
+		font-weight: 600;
+		padding: 0.55rem 1.25rem;
+		border-radius: 0.5rem;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.reject-btn:hover {
+		background: rgba(239, 68, 68, 0.08);
+		border-color: #ef4444;
+		color: #ffffff;
+	}
+
+	.reject-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 </style>
