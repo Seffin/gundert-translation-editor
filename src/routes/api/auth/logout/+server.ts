@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
 
 		if (sessionCookie) {
 			const delStmt = db.prepare('DELETE FROM sessions WHERE id = ?');
-			delStmt.run(sessionCookie);
+			await delStmt.run(sessionCookie);
 		}
 
 		// Clear secure session cookie

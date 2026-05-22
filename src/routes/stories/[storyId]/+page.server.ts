@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		// 2. Resolve collaborative editing lock status
 		// Clean up expired locks first
 		try {
-			db.prepare('DELETE FROM editing_locks WHERE expires_at < ?').run(Date.now());
+			await db.prepare('DELETE FROM editing_locks WHERE expires_at < ?').run(Date.now());
 		} catch (e) {
 			console.error('Failed to prune expired locks in story load:', e);
 		}
@@ -34,7 +34,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			JOIN users u ON l.user_id = u.id
 			WHERE l.story_id = ?
 		`);
-		const activeLock = lockStmt.get(storyId) as { story_id: string; user_id: number; username: string } | undefined;
+		const activeLock = await lockStmt.get(storyId) as { story_id: string; user_id: number; username: string } | undefined;
 
 		const lockedInfo = activeLock
 			? {
@@ -55,7 +55,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			JOIN users u ON d.saved_by_user_id = u.id
 			WHERE d.story_id = ?
 		`);
-		const draftRows = draftStmt.all(storyId) as any[];
+		const draftRows = await draftStmt.all(storyId) as any[];
 
 		let sqliteDraft = null;
 		if (draftRows.length > 0) {

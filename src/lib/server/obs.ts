@@ -91,6 +91,11 @@ export function parseObsStoryMarkdown(markdown: string, storyNumber: number): Ob
 	};
 }
 
+export function getSourceFileUrl(storyId: string): string {
+	const template = process.env.SOURCE_FILE_URL_TEMPLATE || 'https://git.door43.org/unfoldingWord/en_obs/raw/branch/master/content/{storyId}.md';
+	return template.replace('{storyId}', storyId);
+}
+
 export async function parseObsStoryFile(filePath: string): Promise<ObsStory> {
 	const fileName = filePath.split(/[\\/]/).pop() ?? '';
 	const match = fileName.match(STORY_FILE_RE);
@@ -99,7 +104,25 @@ export async function parseObsStoryFile(filePath: string): Promise<ObsStory> {
 	}
 
 	const storyNumber = Number(match[1]);
-	const markdown = await readFile(filePath, 'utf8');
+	const storyId = String(storyNumber).padStart(2, '0');
+	let markdown: string;
+
+	try {
+		markdown = await readFile(filePath, 'utf8');
+	} catch (err: any) {
+		if (err.code === 'ENOENT') {
+			const url = getSourceFileUrl(storyId);
+			console.log(`Local story file ${filePath} not found. Fetching dynamically from remote URL: ${url}`);
+			const res = await fetch(url);
+			if (!res.ok) {
+				throw new Error(`Failed to fetch original story ${storyId} from remote: ${res.statusText}`);
+			}
+			markdown = await res.text();
+		} else {
+			throw err;
+		}
+	}
+
 	const story = parseObsStoryMarkdown(markdown, storyNumber);
 
 	return {
@@ -109,10 +132,20 @@ export async function parseObsStoryFile(filePath: string): Promise<ObsStory> {
 }
 
 export async function parseObsContentDirectory(contentDirPath: string): Promise<ObsStory[]> {
-	const entries = await readdir(contentDirPath, { withFileTypes: true });
-	const storyFiles = entries
-		.filter((entry) => entry.isFile() && STORY_FILE_RE.test(entry.name))
-		.map((entry) => entry.name);
+	let storyFiles: string[] = [];
+	try {
+		const entries = await readdir(contentDirPath, { withFileTypes: true });
+		storyFiles = entries
+			.filter((entry) => entry.isFile() && STORY_FILE_RE.test(entry.name))
+			.map((entry) => entry.name);
+	} catch (err: any) {
+		if (err.code === 'ENOENT') {
+			console.log(`Local content directory ${contentDirPath} not found. Generating story file list 01-50 dynamically.`);
+			storyFiles = Array.from({ length: 50 }, (_, i) => `${String(i + 1).padStart(2, '0')}.md`);
+		} else {
+			throw err;
+		}
+	}
 
 	const sorted = sortStoryFileNames(storyFiles);
 	const stories: ObsStory[] = [];
@@ -186,11 +219,25 @@ export async function publishStory(
 	let footerLine = '_A Bible story from: Scripture_';
 	if (story.sourcePath) {
 		try {
-			const rawEn = await readFile(story.sourcePath, 'utf8');
-			const rawLines = rawEn.split(/\r?\n/);
-			const found = rawLines.find((line) => line.trim().startsWith('_A Bible story from:'));
-			if (found) {
-				footerLine = found.trim();
+			let rawEn: string;
+			try {
+				rawEn = await readFile(story.sourcePath, 'utf8');
+			} catch (err: any) {
+				if (err.code === 'ENOENT') {
+					// Fallback if original file path was local but missing (e.g. Vercel)
+					const url = getSourceFileUrl(normalizedId);
+					const res = await fetch(url);
+					rawEn = res.ok ? await res.text() : '';
+				} else {
+					throw err;
+				}
+			}
+			if (rawEn) {
+				const rawLines = rawEn.split(/\r?\n/);
+				const found = rawLines.find((line) => line.trim().startsWith('_A Bible story from:'));
+				if (found) {
+					footerLine = found.trim();
+				}
 			}
 		} catch (e) {
 			console.error('Failed to read English footer line:', e);
@@ -204,10 +251,73 @@ export async function publishStory(
 	) || 'Malayalam';
 	const langPrefix = LANGUAGE_CODE_MAP[langKey] || 'ml';
 
-	// Write target file recursively
+	const content = lines.join('\n');
+
+	// Write target file recursively (local fallback)
 	const targetPath = join(process.cwd(), `${langPrefix}_obs`, 'content', `${normalizedId}.md`);
 	await mkdir(dirname(targetPath), { recursive: true });
-	await writeFile(targetPath, lines.join('\n'), 'utf8');
+	await writeFile(targetPath, content, 'utf8');
+
+	// GitHub Integration: If GITHUB_PAT, GITHUB_REPO_OWNER and GITHUB_REPO_NAME are configured, push automatically!
+	const githubPat = process.env.GITHUB_PAT;
+	const githubOwner = process.env.GITHUB_REPO_OWNER;
+	const githubRepo = process.env.GITHUB_REPO_NAME;
+
+	if (githubPat && githubOwner && githubRepo) {
+		const relativePath = `${langPrefix}_obs/content/${normalizedId}.md`;
+		const githubUrl = `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${relativePath}`;
+		
+		console.log(`Publishing Story ${normalizedId} to GitHub repository: ${githubOwner}/${githubRepo}/${relativePath}`);
+		
+		let sha: string | undefined = undefined;
+
+		// 1. Check if file already exists on GitHub to obtain its SHA
+		try {
+			const getRes = await fetch(githubUrl, {
+				headers: {
+					Authorization: `Bearer ${githubPat}`,
+					Accept: 'application/vnd.github+json',
+					'X-GitHub-Api-Version': '2022-11-28',
+					'User-Agent': 'Gundert-Translation-Editor'
+				}
+			});
+			if (getRes.ok) {
+				const body = await getRes.json();
+				sha = body.sha;
+				console.log(`Found existing file on GitHub with SHA: ${sha}`);
+			}
+		} catch (e) {
+			console.error('Error fetching file SHA from GitHub:', e);
+		}
+
+		// 2. Commit the file using PUT contents API
+		try {
+			const putRes = await fetch(githubUrl, {
+				method: 'PUT',
+				headers: {
+					Authorization: `Bearer ${githubPat}`,
+					Accept: 'application/vnd.github+json',
+					'X-GitHub-Api-Version': '2022-11-28',
+					'User-Agent': 'Gundert-Translation-Editor',
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					message: `Publish Malayalam OBS Story ${normalizedId}`,
+					content: Buffer.from(content, 'utf8').toString('base64'),
+					sha
+				})
+			});
+
+			if (!putRes.ok) {
+				const errBody = await putRes.text();
+				throw new Error(`GitHub API returned ${putRes.status}: ${errBody}`);
+			}
+			console.log(`Successfully committed Story ${normalizedId} to GitHub!`);
+		} catch (e) {
+			console.error('Failed to commit to GitHub via Contents API:', e);
+			throw new Error(`Failed to commit approved story to GitHub: ${e instanceof Error ? e.message : String(e)}`);
+		}
+	}
 }
 
 export async function publishMalayalamStory(

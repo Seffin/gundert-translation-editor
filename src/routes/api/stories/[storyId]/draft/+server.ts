@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			JOIN users u ON d.saved_by_user_id = u.id 
 			WHERE d.story_id = ?
 		`);
-		const rows = stmt.all(storyId) as any[];
+		const rows = await stmt.all(storyId) as any[];
 
 		if (rows.length === 0) {
 			return json({ draft: null });
@@ -77,14 +77,14 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			VALUES (?, ?, ?, ?, ?)
 		`);
 
-		db.run('BEGIN TRANSACTION');
+		await db.run('BEGIN TRANSACTION');
 		try {
 			for (const [segmentId, seg] of Object.entries(draft.segments)) {
-				insertDraft.run(storyId, segmentId, (seg as any).targetText, userId, Date.now());
+				await insertDraft.run(storyId, segmentId, (seg as any).targetText, userId, Date.now());
 			}
-			db.run('COMMIT');
+			await db.run('COMMIT');
 		} catch (e) {
-			db.run('ROLLBACK');
+			await db.run('ROLLBACK');
 			throw e;
 		}
 

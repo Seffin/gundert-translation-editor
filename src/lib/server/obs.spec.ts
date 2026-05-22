@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
 	parseObsContentDirectory,
+	parseObsStoryFile,
 	parseObsStoryMarkdown,
 	sortStoryFileNames
 } from '$lib/server/obs';
@@ -65,5 +66,14 @@ describe('OBS parser', () => {
 		const story = parseObsStoryMarkdown(SAMPLE_STORY, 29);
 		expect(story.segments[0].imageUrl).toBe('https://cdn.door43.org/obs/jpg/360px/obs-en-29-01.jpg');
 		expect(story.segments[1].imageUrl).toBe('https://cdn.door43.org/obs/jpg/360px/obs-en-29-02.jpg');
+	});
+
+	it('falls back to fetching from remote Door43 if local file does not exist', async () => {
+		const story = await parseObsStoryFile('non_existent_directory/01.md');
+		expect(story).toBeDefined();
+		expect(story.storyNumber).toBe(1);
+		expect(story.title).toBe('The Creation');
+		expect(story.segments.length).toBeGreaterThan(0);
+		expect(story.segments[0].text).toContain('in the beginning');
 	});
 });

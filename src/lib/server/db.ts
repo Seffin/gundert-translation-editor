@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { createHash, randomBytes } from 'node:crypto';
+import { createClient } from '@libsql/client';
 
 // Setup database directory and path
 const DB_DIR = join(process.cwd(), 'data');
@@ -54,7 +55,7 @@ class MockDatabase {
 		}
 	}
 
-	run(sql: string, ...params: any[]) {
+	async run(sql: string, ...params: any[]) {
 		this.load();
 		const cleanSql = sql.trim().replace(/\s+/g, ' ');
 		
@@ -93,7 +94,7 @@ class MockDatabase {
 
 		if (changed) {
 			this.save();
-			return { changes: 1 };
+			return { changes: 1, lastInsertRowid: 0 };
 		}
 		return { changes: 0, lastInsertRowid: 0 };
 	}
@@ -103,7 +104,7 @@ class MockDatabase {
 		const cleanSql = sql.trim().replace(/\s+/g, ' ');
 
 		return {
-			run(paramsOrObj?: any, ...args: any[]) {
+			async run(paramsOrObj?: any, ...args: any[]) {
 				self.load();
 				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
 					? paramsOrObj
@@ -173,10 +174,10 @@ class MockDatabase {
 					self.save();
 					return { changes: 1, lastInsertRowid };
 				}
-				return { changes: 0 };
+				return { changes: 0, lastInsertRowid };
 			},
 
-			get(paramsOrObj?: any, ...args: any[]) {
+			async get(paramsOrObj?: any, ...args: any[]) {
 				self.load();
 				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
 					? paramsOrObj
@@ -218,7 +219,7 @@ class MockDatabase {
 				return undefined;
 			},
 
-			all(paramsOrObj?: any, ...args: any[]) {
+			async all(paramsOrObj?: any, ...args: any[]) {
 				self.load();
 				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
 					? paramsOrObj
@@ -243,29 +244,140 @@ class MockDatabase {
 	}
 }
 
+class LibSQLDatabase {
+	private client: any;
+
+	constructor(client: any) {
+		this.client = client;
+	}
+
+	async run(sql: string, ...params: any[]) {
+		const args = params.length === 1 && typeof params[0] === 'object' && params[0] !== null ? params[0] : params;
+		const res = await this.client.execute({ sql, args });
+		return {
+			changes: res.rowsAffected,
+			lastInsertRowid: res.lastInsertRowid !== undefined ? Number(res.lastInsertRowid) : 0
+		};
+	}
+
+	prepare(sql: string) {
+		const self = this;
+		return {
+			async run(paramsOrObj?: any, ...args: any[]) {
+				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
+					? paramsOrObj
+					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
+				const res = await self.client.execute({ sql, args: mergedParams });
+				return {
+					changes: res.rowsAffected,
+					lastInsertRowid: res.lastInsertRowid !== undefined ? Number(res.lastInsertRowid) : 0
+				};
+			},
+
+			async get(paramsOrObj?: any, ...args: any[]) {
+				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
+					? paramsOrObj
+					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
+				const res = await self.client.execute({ sql, args: mergedParams });
+				if (res.rows.length === 0) return undefined;
+				return { ...res.rows[0] };
+			},
+
+			async all(paramsOrObj?: any, ...args: any[]) {
+				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
+					? paramsOrObj
+					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
+				const res = await self.client.execute({ sql, args: mergedParams });
+				return res.rows.map(row => ({ ...row }));
+			}
+		};
+	}
+}
+
+class BunSQLDatabase {
+	private innerDb: any;
+
+	constructor(innerDb: any) {
+		this.innerDb = innerDb;
+	}
+
+	async run(sql: string, ...params: any[]) {
+		const res = this.innerDb.run(sql, ...params);
+		return {
+			changes: res.changes,
+			lastInsertRowid: res.lastInsertRowid !== undefined ? Number(res.lastInsertRowid) : 0
+		};
+	}
+
+	prepare(sql: string) {
+		const stmt = this.innerDb.prepare(sql);
+		return {
+			async run(paramsOrObj?: any, ...args: any[]) {
+				const res = paramsOrObj !== undefined
+					? (typeof paramsOrObj === 'object' && paramsOrObj !== null ? stmt.run(paramsOrObj) : stmt.run(paramsOrObj, ...args))
+					: stmt.run();
+				return {
+					changes: res.changes,
+					lastInsertRowid: res.lastInsertRowid !== undefined ? Number(res.lastInsertRowid) : 0
+				};
+			},
+
+			async get(paramsOrObj?: any, ...args: any[]) {
+				const res = paramsOrObj !== undefined
+					? (typeof paramsOrObj === 'object' && paramsOrObj !== null ? stmt.get(paramsOrObj) : stmt.get(paramsOrObj, ...args))
+					: stmt.get();
+				return res || undefined;
+			},
+
+			async all(paramsOrObj?: any, ...args: any[]) {
+				const res = paramsOrObj !== undefined
+					? (typeof paramsOrObj === 'object' && paramsOrObj !== null ? stmt.all(paramsOrObj) : stmt.all(paramsOrObj, ...args))
+					: stmt.all();
+				return res || [];
+			}
+		};
+	}
+}
+
 // Instantiate Database
 let activeDb: any;
 let isMock = false;
 
-try {
-	if (typeof Bun !== 'undefined') {
-		const bunSqlite = require('bun:sqlite');
-		activeDb = new bunSqlite.Database(DB_PATH);
-	} else {
-		throw new Error('Not running in Bun');
+const tursoUrl = process.env.TURSO_DB_URL;
+const tursoToken = process.env.TURSO_DB_TOKEN;
+
+if (tursoUrl) {
+	const libsqlClient = createClient({
+		url: tursoUrl,
+		authToken: tursoToken
+	});
+	activeDb = new LibSQLDatabase(libsqlClient);
+} else {
+	try {
+		if (typeof Bun !== 'undefined') {
+			const bunSqlite = require('bun:sqlite');
+			const rawDb = new bunSqlite.Database(DB_PATH);
+			activeDb = new BunSQLDatabase(rawDb);
+		} else {
+			throw new Error('Not running in Bun');
+		}
+	} catch (e) {
+		isMock = true;
+		activeDb = new MockDatabase(DB_PATH);
 	}
-} catch (e) {
-	isMock = true;
-	activeDb = new MockDatabase(DB_PATH);
 }
 
 export const db = activeDb;
 
-// Initialize tables in actual SQLite if it is not mock
-if (!isMock) {
-	db.run('PRAGMA foreign_keys = ON;');
+// Initialize tables asynchronously
+export async function initializeDatabase() {
+	if (isMock) {
+		return;
+	}
 
-	db.run(`
+	await db.run('PRAGMA foreign_keys = ON;').catch(() => {});
+
+	await db.run(`
 		CREATE TABLE IF NOT EXISTS users (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			username TEXT UNIQUE NOT NULL,
@@ -275,7 +387,7 @@ if (!isMock) {
 		);
 	`);
 
-	db.run(`
+	await db.run(`
 		CREATE TABLE IF NOT EXISTS sessions (
 			id TEXT PRIMARY KEY,
 			user_id INTEGER NOT NULL,
@@ -284,7 +396,7 @@ if (!isMock) {
 		);
 	`);
 
-	db.run(`
+	await db.run(`
 		CREATE TABLE IF NOT EXISTS story_assignments (
 			story_id TEXT PRIMARY KEY,
 			translator_id INTEGER,
@@ -293,7 +405,7 @@ if (!isMock) {
 		);
 	`);
 
-	db.run(`
+	await db.run(`
 		CREATE TABLE IF NOT EXISTS story_drafts (
 			story_id TEXT NOT NULL,
 			segment_id TEXT NOT NULL,
@@ -305,7 +417,7 @@ if (!isMock) {
 		);
 	`);
 
-	db.run(`
+	await db.run(`
 		CREATE TABLE IF NOT EXISTS editing_locks (
 			story_id TEXT PRIMARY KEY,
 			user_id INTEGER NOT NULL,
@@ -314,6 +426,36 @@ if (!isMock) {
 			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 		);
 	`);
+
+	// Seeding Default Credentials
+	const checkUsers = db.prepare('SELECT COUNT(*) as count FROM users');
+	const userCountResult = await checkUsers.get() as { count: number } | undefined;
+	const count = userCountResult?.count ?? 0;
+
+	if (count === 0) {
+		const seedUsers = [
+			{ username: 'translator.demo', password: 'translator123', role: 'Translator' },
+			{ username: 'reviewer.demo', password: 'reviewer123', role: 'Reviewer' },
+			{ username: 'lead.demo', password: 'lead123', role: 'Lead' }
+		];
+
+		const insertUser = db.prepare(`
+			INSERT INTO users (username, password_hash, salt, role)
+			VALUES ($username, $password_hash, $salt, $role)
+		`);
+
+		for (const u of seedUsers) {
+			const salt = generateSalt();
+			const password_hash = hashPassword(u.password, salt);
+			await insertUser.run({
+				$username: u.username,
+				$password_hash: password_hash,
+				$salt: salt,
+				$role: u.role
+			});
+		}
+		console.log('Successfully seeded default mock users: translator.demo, reviewer.demo, lead.demo');
+	}
 }
 
 // Encryption Helpers
@@ -323,36 +465,6 @@ export function generateSalt(): string {
 
 export function hashPassword(password: string, salt: string): string {
 	return createHash('sha256').update(password + salt).digest('hex');
-}
-
-// Seeding Default Credentials
-const checkUsers = db.prepare('SELECT COUNT(*) as count FROM users');
-const userCountResult = checkUsers.get() as { count: number } | undefined;
-const count = userCountResult?.count ?? 0;
-
-if (count === 0) {
-	const seedUsers = [
-		{ username: 'translator.demo', password: 'translator123', role: 'Translator' },
-		{ username: 'reviewer.demo', password: 'reviewer123', role: 'Reviewer' },
-		{ username: 'lead.demo', password: 'lead123', role: 'Lead' }
-	];
-
-	const insertUser = db.prepare(`
-		INSERT INTO users (username, password_hash, salt, role)
-		VALUES ($username, $password_hash, $salt, $role)
-	`);
-
-	for (const u of seedUsers) {
-		const salt = generateSalt();
-		const password_hash = hashPassword(u.password, salt);
-		insertUser.run({
-			$username: u.username,
-			$password_hash: password_hash,
-			$salt: salt,
-			$role: u.role
-		});
-	}
-	console.log('Successfully seeded default mock users: translator.demo, reviewer.demo, lead.demo');
 }
 
 // SQLite Database helper interfaces

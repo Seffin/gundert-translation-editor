@@ -3,10 +3,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 // Helper to clean up expired locks dynamically
-function cleanExpiredLocks() {
+async function cleanExpiredLocks() {
 	try {
 		const delStmt = db.prepare('DELETE FROM editing_locks WHERE expires_at < ?');
-		delStmt.run(Date.now());
+		await delStmt.run(Date.now());
 	} catch (e) {
 		console.error('Failed to clean expired locks:', e);
 	}
@@ -20,7 +20,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			return json({ error: 'Missing storyId parameter' }, { status: 400 });
 		}
 
-		cleanExpiredLocks();
+		await cleanExpiredLocks();
 
 		const stmt = db.prepare(`
 			SELECT l.*, u.username, u.role
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			JOIN users u ON l.user_id = u.id
 			WHERE l.story_id = ?
 		`);
-		const lock = stmt.get(storyId) as { story_id: string; user_id: number; locked_at: number; expires_at: number; username: string } | undefined;
+		const lock = await stmt.get(storyId) as { story_id: string; user_id: number; locked_at: number; expires_at: number; username: string } | undefined;
 
 		if (lock) {
 			const isOwnLock = locals.user ? locals.user.id === lock.user_id : false;
@@ -66,7 +66,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 		// Fallback for tests if not logged in
 		const user = locals.user ?? { id: 1, username: 'translator.demo', role: 'Translator' };
 
-		cleanExpiredLocks();
+		await cleanExpiredLocks();
 
 		// Check if another user holds the lock
 		const checkStmt = db.prepare(`
@@ -75,7 +75,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 			JOIN users u ON l.user_id = u.id
 			WHERE l.story_id = ?
 		`);
-		const currentLock = checkStmt.get(storyId) as { story_id: string; user_id: number; username: string } | undefined;
+		const currentLock = await checkStmt.get(storyId) as { story_id: string; user_id: number; username: string } | undefined;
 
 		if (currentLock && currentLock.user_id !== user.id) {
 			return json({
@@ -91,7 +91,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 			INSERT OR REPLACE INTO editing_locks (story_id, user_id, locked_at, expires_at)
 			VALUES (?, ?, ?, ?)
 		`);
-		insertStmt.run(storyId, user.id, Date.now(), expiresAt);
+		await insertStmt.run(storyId, user.id, Date.now(), expiresAt);
 
 		return json({
 			success: true,
@@ -119,13 +119,13 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		if (!user) {
 			// Unauthenticated: let tests delete locks freely
 			const delStmt = db.prepare('DELETE FROM editing_locks WHERE story_id = ?');
-			delStmt.run(storyId);
+			await delStmt.run(storyId);
 			return json({ success: true });
 		}
 
 		// Check who holds the lock
 		const checkStmt = db.prepare('SELECT user_id FROM editing_locks WHERE story_id = ?');
-		const currentLock = checkStmt.get(storyId) as { user_id: number } | undefined;
+		const currentLock = await checkStmt.get(storyId) as { user_id: number } | undefined;
 
 		if (!currentLock) {
 			return json({ success: true, message: 'No active lock found' });
@@ -134,7 +134,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 		// Allow delete if own lock, or if user is Project Lead (remote revocation override)
 		if (currentLock.user_id === user.id || user.role === 'Lead') {
 			const delStmt = db.prepare('DELETE FROM editing_locks WHERE story_id = ?');
-			delStmt.run(storyId);
+			await delStmt.run(storyId);
 			return json({ success: true, revoked: currentLock.user_id !== user.id });
 		}
 

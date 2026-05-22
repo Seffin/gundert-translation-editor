@@ -1,8 +1,19 @@
-import { db } from '$lib/server/db';
+import { db, initializeDatabase } from '$lib/server/db';
 import { redirect, error } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit';
 
+let dbInitialized = false;
+
 export const handle: Handle = async ({ event, resolve }) => {
+	if (!dbInitialized) {
+		try {
+			await initializeDatabase();
+			dbInitialized = true;
+		} catch (err) {
+			console.error('Failed to initialize database:', err);
+		}
+	}
+
 	const sessionCookie = event.cookies.get('gundert_session');
 	event.locals.user = null;
 
@@ -14,7 +25,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 				JOIN users u ON s.user_id = u.id
 				WHERE s.id = ?
 			`);
-			const session = stmt.get(sessionCookie) as { id: string; expires_at: number; user_id: number; username: string; role: string } | undefined;
+			const session = await stmt.get(sessionCookie) as { id: string; expires_at: number; user_id: number; username: string; role: string } | undefined;
 
 			if (session) {
 				if (session.expires_at > Date.now()) {
@@ -26,7 +37,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 				} else {
 					// Session expired
 					const delStmt = db.prepare('DELETE FROM sessions WHERE id = ?');
-					delStmt.run(sessionCookie);
+					await delStmt.run(sessionCookie);
 					event.cookies.delete('gundert_session', { path: '/' });
 				}
 			}
