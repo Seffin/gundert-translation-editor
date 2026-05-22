@@ -8,10 +8,11 @@ import { publishStory } from '$lib/server/obs';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		const body = await request.json();
-		const { action, actorId, storyId, segmentId, draftScope, decision, translations, targetLanguage } = body;
+		const { action, storyId, segmentId, draftScope, decision, translations, targetLanguage } = body;
+		const actorId = body.actorId || locals.user?.username;
 
 		if (!action || !actorId || !storyId) {
 			return json({ error: 'Missing required fields: action, actorId, storyId' }, { status: 400 });

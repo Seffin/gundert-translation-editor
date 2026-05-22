@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import {
 		applyPersistedStoryDraft,
 		buildPersistedStoryDraft,
 		hasUnsavedChanges,
 		loadPersistedStoryDraft,
 		savePersistedStoryDraft,
-		type PersistedStoryDraft
+		type PersistedStoryDraft,
+		type PersistedDraftSegment
 	} from '$lib/client/story-editor-draft';
 	import { confirmDiscardChanges } from '$lib/client/route-leave-guard';
 	import {
@@ -28,7 +30,6 @@
 	import type { EditorSegment, StoryEditorModel } from '$lib/server/editor';
 	import type { ReviewerComment } from '$lib/server/reviewer-comments';
 
-	const ACTOR_ID = 'translator.demo';
 	const STORY_COMMENTS_KEY = '__story__';
 
 	type TerminologyWarningItem = {
@@ -59,8 +60,19 @@
 	let {
 		story,
 		glossaryTerms = [],
-		apiKey = null
-	} = $props<{ story: StoryEditorModel; glossaryTerms?: GlossaryTerm[]; apiKey?: string | null }>();
+		apiKey = null,
+		serverLockedInfo = { locked: false, lockedBy: null, isOwnLock: false },
+		serverDraft = null
+	} = $props<{
+		story: StoryEditorModel;
+		glossaryTerms?: GlossaryTerm[];
+		apiKey?: string | null;
+		serverLockedInfo?: { locked: boolean; lockedBy: string | null; isOwnLock: boolean };
+		serverDraft?: PersistedStoryDraft | null;
+	}>();
+
+	const ACTOR_ID = $derived($page?.data?.user?.username ?? 'translator.demo');
+	const isLead = $derived($page?.data?.user?.role === 'Lead');
 
 	function createInitialSegments() {
 		return story.segments.map((segment) => ({ ...segment }));
@@ -82,6 +94,140 @@
 	let saving = $state(false);
 	let lastSavedDraft = $state<PersistedStoryDraft | undefined>(undefined);
 	let selection = $state<SegmentSelectionModel>(buildSegmentSelectionModel(initialSegments));
+
+	let lockState = $state({
+		locked: false,
+		lockedBy: null as string | null,
+		isOwnLock: false
+	});
+
+	$effect(() => {
+		lockState.locked = serverLockedInfo?.locked ?? false;
+		lockState.lockedBy = serverLockedInfo?.lockedBy ?? null;
+		lockState.isOwnLock = serverLockedInfo?.isOwnLock ?? false;
+	});
+
+	async function checkOrRefreshLock(): Promise<void> {
+		try {
+			if (lockState.locked && !lockState.isOwnLock) {
+				const res = await fetch(`/api/stories/${story.storyId}/lock`);
+				if (res.ok) {
+					const data = await res.json();
+					lockState.locked = data.locked;
+					lockState.lockedBy = data.lockedBy;
+					lockState.isOwnLock = data.isOwnLock;
+				}
+				return;
+			}
+
+			const res = await fetch(`/api/stories/${story.storyId}/lock`, {
+				method: 'POST'
+			});
+
+			if (res.status === 409) {
+				const data = await res.json();
+				lockState.locked = true;
+				lockState.lockedBy = data.lockedBy;
+				lockState.isOwnLock = false;
+			} else if (res.ok) {
+				const data = await res.json();
+				if (data.success) {
+					lockState.locked = true;
+					lockState.lockedBy = ACTOR_ID;
+					lockState.isOwnLock = true;
+				} else {
+					lockState.locked = false;
+					lockState.lockedBy = null;
+					lockState.isOwnLock = false;
+				}
+			} else {
+				lockState.locked = false;
+				lockState.lockedBy = null;
+				lockState.isOwnLock = false;
+			}
+		} catch (err) {
+			console.error('Failed to heartbeat/refresh lock:', err);
+		}
+	}
+
+	async function releaseLock(): Promise<void> {
+		if (!lockState.isOwnLock) return;
+		try {
+			await fetch(`/api/stories/${story.storyId}/lock`, {
+				method: 'DELETE'
+			});
+		} catch (err) {
+			console.error('Failed to release lock:', err);
+		}
+	}
+
+	async function handleRevokeLock(): Promise<void> {
+		try {
+			const res = await fetch(`/api/stories/${story.storyId}/lock`, {
+				method: 'DELETE'
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				if (data.success) {
+					void checkOrRefreshLock();
+				}
+			}
+		} catch (err) {
+			console.error('Failed to revoke lock:', err);
+		}
+	}
+
+	function mergeDrafts(local: PersistedStoryDraft | undefined, server: PersistedStoryDraft | null): PersistedStoryDraft | undefined {
+		if (!local && !server) return undefined;
+		if (!local) return server ?? undefined;
+		if (!server) return local;
+
+		const mergedSegments: Record<string, PersistedDraftSegment> = {};
+		
+		const allSegmentKeys = new Set([
+			...Object.keys(local.segments),
+			...Object.keys(server.segments)
+		]);
+
+		let overallLatestTime = 0;
+		let overallLatestActor = local.savedByActorId;
+		let overallLatestIso = local.savedAtIso;
+
+		for (const key of allSegmentKeys) {
+			const localSeg = local.segments[key];
+			const serverSeg = server.segments[key];
+
+			if (localSeg && serverSeg) {
+				const localTime = localSeg.savedAtIso ? new Date(localSeg.savedAtIso).getTime() : 0;
+				const serverTime = serverSeg.savedAtIso ? new Date(serverSeg.savedAtIso).getTime() : 0;
+
+				if (localTime >= serverTime) {
+					mergedSegments[key] = localSeg;
+				} else {
+					mergedSegments[key] = serverSeg;
+				}
+			} else if (localSeg) {
+				mergedSegments[key] = localSeg;
+			} else if (serverSeg) {
+				mergedSegments[key] = serverSeg;
+			}
+
+			const segTime = mergedSegments[key]?.savedAtIso ? new Date(mergedSegments[key].savedAtIso).getTime() : 0;
+			if (segTime > overallLatestTime) {
+				overallLatestTime = segTime;
+				overallLatestActor = mergedSegments[key].savedByActorId;
+				overallLatestIso = mergedSegments[key].savedAtIso;
+			}
+		}
+
+		return {
+			storyId: local.storyId,
+			savedByActorId: overallLatestActor,
+			savedAtIso: overallLatestIso,
+			segments: mergedSegments
+		};
+	}
 	let activeSegmentId = $state<string | null>(initialSegments[0]?.id ?? null);
 	let drafting = $state(false);
 	let draftingSegmentIds = $state<string[]>([]);
@@ -111,16 +257,17 @@
 		validatedConsistencyIssues.filter((issue) => issue.validated !== false).length
 	);
 
-	$effect(async () => {
+	$effect(() => {
 		if (consistencyIssues.length > 0 && apiKey) {
 			llmValidating = true;
-			const validated = await validateConsistencyIssuesWithLLM(
+			void validateConsistencyIssuesWithLLM(
 				consistencyIssues,
 				selectedLanguage,
 				apiKey
-			);
-			validatedConsistencyIssues = validated;
-			llmValidating = false;
+			).then((validated) => {
+				validatedConsistencyIssues = validated;
+				llmValidating = false;
+			});
 		} else {
 			validatedConsistencyIssues = consistencyIssues;
 		}
@@ -153,14 +300,20 @@
 		}));
 
 		const persisted = loadPersistedStoryDraft(story.storyId);
-		if (persisted) {
-			editorSegments = applyPersistedStoryDraft(editorSegments, persisted);
-			lastSavedDraft = persisted;
-			saveMessage = `Saved by ${persisted.savedByActorId} at ${persisted.savedAtIso}`;
+		const merged = mergeDrafts(persisted, serverDraft);
+		if (merged) {
+			editorSegments = applyPersistedStoryDraft(editorSegments, merged);
+			lastSavedDraft = merged;
+			saveMessage = `Loaded draft by ${merged.savedByActorId} at ${formatTimestamp(merged.savedAtIso)}`;
 			isDirty = false;
+			savePersistedStoryDraft(merged);
 		}
 
 		void fetchReviewerComments();
+
+		// Start heartbeat lock checks
+		void checkOrRefreshLock();
+		const lockInterval = setInterval(checkOrRefreshLock, 10000);
 
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
 			if (isDirty && hasUnsavedChanges(editorSegments, lastSavedDraft)) {
@@ -173,6 +326,8 @@
 
 		return () => {
 			window.removeEventListener('beforeunload', handleBeforeUnload);
+			clearInterval(lockInterval);
+			void releaseLock();
 		};
 	});
 
@@ -433,22 +588,38 @@
 		}
 	}
 
-	function saveChanges(): void {
+	async function saveChanges(): Promise<void> {
 		saving = true;
+		saveMessage = '';
 		const nowIso = new Date().toISOString();
 		const draft = buildPersistedStoryDraft(story.storyId, ACTOR_ID, editorSegments, nowIso);
+		
 		savePersistedStoryDraft(draft);
 
-		editorSegments = editorSegments.map((segment) => ({
-			...segment,
-			lastSavedByActorId: ACTOR_ID,
-			lastSavedAtIso: nowIso
-		}));
+		try {
+			const response = await fetch(`/api/stories/${story.storyId}/draft`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ draft })
+			});
 
-		lastSavedDraft = draft;
-		isDirty = false;
-		saveMessage = `Saved by ${ACTOR_ID} at ${nowIso}`;
-		saving = false;
+			if (!response.ok) throw new Error('Failed to save to database');
+
+			editorSegments = editorSegments.map((segment) => ({
+				...segment,
+				lastSavedByActorId: ACTOR_ID,
+				lastSavedAtIso: nowIso
+			}));
+
+			lastSavedDraft = draft;
+			isDirty = false;
+			saveMessage = `Saved by ${ACTOR_ID} at ${nowIso}`;
+		} catch (err) {
+			console.error('Error syncing draft:', err);
+			saveMessage = `Saved locally, but server sync failed: ${err instanceof Error ? err.message : 'Unknown error'}`;
+		} finally {
+			saving = false;
+		}
 	}
 </script>
 
@@ -491,13 +662,13 @@
 						? 'Deselect All'
 						: 'Select All'}
 				</button>
-				<button onclick={saveChanges} disabled={!isDirty || saving}>
+				<button onclick={saveChanges} disabled={!isDirty || saving || (lockState.locked && !lockState.isOwnLock)}>
 					{saving ? 'Saving...' : 'Save Changes'}
 				</button>
 				<button
 					class="draft-btn"
 					onclick={draftSelected}
-					disabled={selection.count === 0 || drafting}
+					disabled={selection.count === 0 || drafting || (lockState.locked && !lockState.isOwnLock)}
 					data-testid="draft-selected-btn"
 				>
 					{drafting ? 'Drafting…' : `Draft Selected (${selection.count})`}
@@ -605,6 +776,7 @@
 								<button
 									type="button"
 									class="segment-action segment-action--primary"
+									disabled={(lockState.locked && !lockState.isOwnLock) || drafting}
 									onclick={(event) => {
 										event.stopPropagation();
 										void regenerateSegment(segment.id);
@@ -651,6 +823,7 @@
 								onfocus={() => setActiveSegment(segment.id)}
 								oninput={() => handleTargetInput(segment.id)}
 								aria-label={`target-${segment.id}`}
+								disabled={lockState.locked && !lockState.isOwnLock}
 							></textarea>
 						{/if}
 
@@ -733,9 +906,87 @@
 			{/each}
 		</section>
 	</section>
+
+	{#if lockState.locked && !lockState.isOwnLock}
+		<div class="readonly-banner" role="alert" data-testid="readonly-banner">
+			<span class="banner-icon">⚠️</span>
+			<div class="banner-text">
+				<strong>Read-Only Mode:</strong> Story is currently locked by <span class="username-highlight">{lockState.lockedBy}</span>
+			</div>
+			{#if isLead}
+				<button 
+					type="button" 
+					class="revoke-btn" 
+					onclick={handleRevokeLock}
+					data-testid="revoke-lock-btn"
+				>
+					Revoke Lock
+				</button>
+			{/if}
+		</div>
+	{/if}
 </main>
 
 <style>
+	.readonly-banner {
+		position: fixed;
+		bottom: 1.5rem;
+		right: 1.5rem;
+		z-index: 1000;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem 1.5rem;
+		background: rgba(220, 38, 38, 0.9);
+		color: #ffffff;
+		border-radius: 1rem;
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 
+		            0 8px 10px -6px rgba(0, 0, 0, 0.3),
+		            inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		font-weight: 600;
+		font-size: 0.95rem;
+		animation: slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	@keyframes slide-in {
+		from {
+			transform: translateY(100px) scale(0.95);
+			opacity: 0;
+		}
+		to {
+			transform: translateY(0) scale(1);
+			opacity: 1;
+		}
+	}
+
+	.revoke-btn {
+		margin-left: 1rem;
+		padding: 0.5rem 1rem;
+		border-radius: 0.5rem;
+		background: #ffffff;
+		color: #dc2626;
+		font-weight: 700;
+		font-size: 0.8rem;
+		border: none;
+		cursor: pointer;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		transition: all 0.2s ease;
+	}
+
+	.revoke-btn:hover {
+		background: #f3f4f6;
+		transform: translateY(-1px);
+	}
+
+	.username-highlight {
+		background: rgba(255, 255, 255, 0.2);
+		padding: 0.1rem 0.4rem;
+		border-radius: 0.25rem;
+		font-family: monospace;
+	}
+
 	.editor {
 		display: flex;
 		height: auto;

@@ -5,21 +5,55 @@
 
 	let mobileMenuOpen = $state(false);
 
-	const navigationItems = [
-		{ path: '/', label: 'Workspace', icon: '🏠' },
-		{ path: '/stories', label: 'Stories', icon: '📖' },
-		{ path: '/reviewer', label: 'Reviewer', icon: '👀' },
-		{ path: '/lead', label: 'Approval', icon: '✓' },
-		{ path: '/glossary', label: 'Glossary', icon: '📚' },
-		{ path: '/activity', label: 'Activity', icon: '📋' },
-		{ path: '/demo', label: 'Demo', icon: '🧪' }
-	];
+	// Reactive global session state from layout load
+	const user = $derived($page.data.user);
+
+	// Dynamically filter navigation items based on active user role
+	const navigationItems = $derived.by(() => {
+		if (!user) {
+			return [{ path: '/demo', label: 'Demo', icon: '🧪' }];
+		}
+
+		const role = user.role;
+		const items = [];
+
+		if (role === 'Translator') {
+			items.push(
+				{ path: '/stories', label: 'Stories', icon: '📖' },
+				{ path: '/glossary', label: 'Glossary', icon: '📚' }
+			);
+		} else if (role === 'Reviewer') {
+			items.push(
+				{ path: '/reviewer', label: 'Reviewer', icon: '👀' }
+			);
+		} else if (role === 'Lead') {
+			items.push(
+				{ path: '/lead', label: 'Approval', icon: '✓' },
+				{ path: '/activity', label: 'Activity', icon: '📋' }
+			);
+		}
+
+		// All authenticated roles can access demo showcase
+		items.push({ path: '/demo', label: 'Demo', icon: '🧪' });
+		return items;
+	});
 
 	function isActive(path: string): boolean {
 		if (path === '/') {
 			return $page.url.pathname === '/';
 		}
 		return $page.url.pathname.startsWith(path);
+	}
+
+	async function handleLogout() {
+		try {
+			const res = await fetch('/api/auth/logout', { method: 'POST' });
+			if (res.ok) {
+				window.location.href = '/login';
+			}
+		} catch (err) {
+			console.error('Logout failed:', err);
+		}
 	}
 </script>
 
@@ -62,19 +96,42 @@
 					</a>
 				</li>
 			{/each}
-			<li class="mobile-settings">
-				<a href="/settings" class="nav-link" title="Settings">
-					<span class="icon">⚙️</span>
-					<span class="label">Settings</span>
-				</a>
-			</li>
+			
+			{#if user}
+				<li class="mobile-settings">
+					<button onclick={handleLogout} class="nav-link logout-mobile-btn">
+						<span class="icon">🚪</span>
+						<span class="label">Logout</span>
+					</button>
+				</li>
+			{/if}
 		</ul>
 
+		<!-- User session badge and logout -->
 		<div class="nav-settings">
-			<a href="/settings" class="nav-link settings-btn" title="Settings">
-				<span class="icon">⚙️</span>
-				<span class="label">Settings</span>
-			</a>
+			{#if user}
+				<div class="user-profile-badge">
+					<div class="user-avatar" style:--avatar-color={
+						user.role === 'Lead' ? '#f59e0b' : user.role === 'Reviewer' ? '#a855f7' : '#3b82f6'
+					}>
+						{user.username.slice(0, 2).toUpperCase()}
+					</div>
+					<div class="user-info">
+						<span class="username">{user.username}</span>
+						<span class="role-tag" style:--role-color={
+							user.role === 'Lead' ? '#f59e0b' : user.role === 'Reviewer' ? '#a855f7' : '#3b82f6'
+						}>{user.role}</span>
+					</div>
+					<button class="logout-btn" onclick={handleLogout} title="Sign Out">
+						🚪
+					</button>
+				</div>
+			{:else}
+				<a href="/login" class="nav-link login-btn">
+					<span class="icon">🔑</span>
+					<span class="label">Login</span>
+				</a>
+			{/if}
 		</div>
 	</div>
 </nav>
@@ -147,6 +204,10 @@
 		border-radius: 999px;
 		transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
 		opacity: 0.95;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		width: auto;
 	}
 
 	.nav-link:hover {
@@ -168,6 +229,8 @@
 
 	.nav-settings {
 		position: relative;
+		display: flex;
+		align-items: center;
 	}
 
 	.mobile-settings {
@@ -218,12 +281,91 @@
 		display: flex;
 	}
 
-	.settings-btn {
+	.login-btn {
 		background: var(--color-surface);
 		border: 1px solid rgba(79, 70, 229, 0.18);
 		color: var(--color-on-background);
 		border-radius: 999px;
-		padding: 0.8rem 1rem;
+		padding: 0.8rem 1.2rem;
+	}
+
+	/* User Profile Badge */
+	.user-profile-badge {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid var(--color-outline-variant);
+		padding: 0.4rem 0.6rem 0.4rem 0.4rem;
+		border-radius: 999px;
+		box-shadow: var(--shadow-subtle);
+		backdrop-filter: blur(10px);
+	}
+
+	.user-avatar {
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 50%;
+		background: var(--avatar-color);
+		color: #ffffff;
+		font-weight: 700;
+		font-size: 0.85rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	.user-info {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		max-width: 120px;
+	}
+
+	.user-info .username {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--color-on-background);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.user-info .role-tag {
+		font-size: 0.65rem;
+		font-weight: 700;
+		color: var(--role-color);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.logout-btn {
+		background: transparent;
+		border: none;
+		font-size: 1.1rem;
+		cursor: pointer;
+		padding: 0.4rem;
+		border-radius: 50%;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.logout-btn:hover {
+		background: rgba(239, 68, 68, 0.1);
+		transform: scale(1.05);
+	}
+
+	.logout-mobile-btn {
+		width: 100%;
+		justify-content: center;
+		color: #ef4444;
+	}
+
+	.logout-mobile-btn:hover {
+		background-color: rgba(239, 68, 68, 0.1) !important;
 	}
 
 	@media (max-width: 768px) {
@@ -334,7 +476,7 @@
 			display: inline-flex;
 		}
 		.nav-settings {
-			display: block;
+			display: flex;
 		}
 	}
 </style>

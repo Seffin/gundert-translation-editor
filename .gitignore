@@ -1,4 +1,4 @@
-﻿# dependencies
+# dependencies
 /node_modules
 /.pnp
 .pnp.*
@@ -51,3 +51,7 @@ test-results
 build_output.log
 en_obs
 .svelte-kit
+
+# local database files
+/data/*.db
+/data/*.json

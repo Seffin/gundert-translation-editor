@@ -5,6 +5,33 @@ import StoryEditorBaseline from '$lib/components/StoryEditorBaseline.svelte';
 import type { GlossaryTerm } from '$lib/glossary';
 import type { StoryEditorModel } from '$lib/server/editor';
 import type { ReviewerComment } from '$lib/server/reviewer-comments';
+const { mockPage } = vi.hoisted(() => {
+	let value = { data: { user: null as any } };
+	const subscribers = new Set<(val: any) => void>();
+	const store = {
+		subscribe(run: (val: any) => void) {
+			subscribers.add(run);
+			run(value);
+			return () => subscribers.delete(run);
+		},
+		set(newValue: any) {
+			value = newValue;
+			for (const run of subscribers) {
+				run(value);
+			}
+		},
+		update(fn: (val: any) => any) {
+			this.set(fn(value));
+		}
+	};
+	return { mockPage: store };
+});
+
+vi.mock('$app/stores', () => {
+	return {
+		page: mockPage
+	};
+});
 
 const STORY: StoryEditorModel = {
 	storyId: '01',
@@ -82,6 +109,7 @@ describe('StoryEditorBaseline', () => {
 	});
 
 	afterEach(() => {
+		mockPage.set({ data: { user: null } });
 		vi.unstubAllGlobals();
 	});
 
@@ -235,5 +263,39 @@ describe('StoryEditorBaseline', () => {
 		await expect
 			.element(page.getByTestId('segment-card-01:01').getByTestId('segment-warning-01:01'))
 			.not.toBeInTheDocument();
+	});
+
+	it('disables inputs and displays read-only banner when locked by another user', async () => {
+		render(StoryEditorBaseline, {
+			story: STORY,
+			serverLockedInfo: { locked: true, lockedBy: 'reviewer.demo', isOwnLock: false }
+		});
+
+		await expect.element(page.getByTestId('readonly-banner')).toBeInTheDocument();
+		await expect
+			.element(page.getByTestId('readonly-banner'))
+			.toHaveTextContent(/Read-Only Mode: Story is currently locked by reviewer\.demo/);
+
+		const firstTarget = page.getByRole('textbox').first();
+		await expect.element(firstTarget).toBeDisabled();
+
+		const saveBtn = page.getByRole('button', { name: 'Save Changes' });
+		await expect.element(saveBtn).toBeDisabled();
+	});
+
+	it('displays revoke lock button for Project Lead', async () => {
+		mockPage.set({
+			data: {
+				user: { username: 'lead.demo', role: 'Lead' }
+			}
+		} as any);
+
+		render(StoryEditorBaseline, {
+			story: STORY,
+			serverLockedInfo: { locked: true, lockedBy: 'translator.demo', isOwnLock: false }
+		});
+
+		await expect.element(page.getByTestId('readonly-banner')).toBeInTheDocument();
+		await expect.element(page.getByTestId('revoke-lock-btn')).toBeInTheDocument();
 	});
 });
