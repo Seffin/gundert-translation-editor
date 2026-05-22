@@ -72,7 +72,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		// Prevent accessing login if already authenticated
 		if (isLogin) {
-			if (role === 'Lead') {
+			if (role === 'SuperAdmin') {
+				throw redirect(303, '/admin');
+			} else if (role === 'Lead') {
 				throw redirect(303, '/lead');
 			} else if (role === 'Reviewer') {
 				throw redirect(303, '/reviewer');
@@ -82,20 +84,26 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 
 		// Enforce Role Gates
-		if (path.startsWith('/lead') && role !== 'Lead') {
+		if (path.startsWith('/admin') && role !== 'SuperAdmin') {
+			throw error(403, 'Access Denied: Super Admin role required.');
+		}
+
+		if (path.startsWith('/lead') && role !== 'Lead' && role !== 'SuperAdmin') {
 			throw error(403, 'Access Denied: Project Lead role required.');
 		}
 
-		if (path.startsWith('/reviewer') && role !== 'Reviewer') {
+		if (path.startsWith('/reviewer') && role !== 'Reviewer' && role !== 'SuperAdmin') {
 			throw error(403, 'Access Denied: Reviewer role required.');
 		}
 
 		// Translators can access '/', '/stories', '/glossary', '/settings'
-		if ((path === '/' || path.startsWith('/stories') || path.startsWith('/glossary')) && role !== 'Translator') {
+		if ((path === '/' || path.startsWith('/stories') || path.startsWith('/glossary')) && role !== 'Translator' && role !== 'SuperAdmin') {
 			if (role === 'Lead') {
 				throw redirect(303, '/lead');
 			} else if (role === 'Reviewer') {
 				throw redirect(303, '/reviewer');
+			} else if (role === 'SuperAdmin') {
+				throw redirect(303, '/admin');
 			}
 		}
 	}

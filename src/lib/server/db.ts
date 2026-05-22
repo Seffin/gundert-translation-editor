@@ -371,80 +371,78 @@ export const db = activeDb;
 
 // Initialize tables asynchronously
 export async function initializeDatabase() {
-	if (isMock) {
-		return;
-	}
+	if (!isMock) {
+		await db.run('PRAGMA foreign_keys = ON;').catch(() => {});
 
-	await db.run('PRAGMA foreign_keys = ON;').catch(() => {});
-
-	await db.run(`
-		CREATE TABLE IF NOT EXISTS users (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			username TEXT UNIQUE NOT NULL,
-			password_hash TEXT NOT NULL,
-			salt TEXT NOT NULL,
-			role TEXT NOT NULL
-		);
-	`);
-
-	await db.run(`
-		CREATE TABLE IF NOT EXISTS sessions (
-			id TEXT PRIMARY KEY,
-			user_id INTEGER NOT NULL,
-			expires_at INTEGER NOT NULL,
-			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-		);
-	`);
-
-	await db.run(`
-		CREATE TABLE IF NOT EXISTS story_assignments (
-			story_id TEXT PRIMARY KEY,
-			translator_id INTEGER,
-			assigned_at INTEGER,
-			FOREIGN KEY (translator_id) REFERENCES users(id) ON DELETE SET NULL
-		);
-	`);
-
-	await db.run(`
-		CREATE TABLE IF NOT EXISTS story_drafts (
-			story_id TEXT NOT NULL,
-			segment_id TEXT NOT NULL,
-			target_text TEXT NOT NULL,
-			saved_by_user_id INTEGER NOT NULL,
-			saved_at INTEGER NOT NULL,
-			PRIMARY KEY (story_id, segment_id),
-			FOREIGN KEY (saved_by_user_id) REFERENCES users(id) ON DELETE CASCADE
-		);
-	`);
-
-	await db.run(`
-		CREATE TABLE IF NOT EXISTS editing_locks (
-			story_id TEXT PRIMARY KEY,
-			user_id INTEGER NOT NULL,
-			locked_at INTEGER NOT NULL,
-			expires_at INTEGER NOT NULL,
-			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-		);
-	`);
-
-	// Seeding Default Credentials
-	const checkUsers = db.prepare('SELECT COUNT(*) as count FROM users');
-	const userCountResult = await checkUsers.get() as { count: number } | undefined;
-	const count = userCountResult?.count ?? 0;
-
-	if (count === 0) {
-		const seedUsers = [
-			{ username: 'translator.demo', password: 'translator123', role: 'Translator' },
-			{ username: 'reviewer.demo', password: 'reviewer123', role: 'Reviewer' },
-			{ username: 'lead.demo', password: 'lead123', role: 'Lead' }
-		];
-
-		const insertUser = db.prepare(`
-			INSERT INTO users (username, password_hash, salt, role)
-			VALUES ($username, $password_hash, $salt, $role)
+		await db.run(`
+			CREATE TABLE IF NOT EXISTS users (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				username TEXT UNIQUE NOT NULL,
+				password_hash TEXT NOT NULL,
+				salt TEXT NOT NULL,
+				role TEXT NOT NULL
+			);
 		`);
 
-		for (const u of seedUsers) {
+		await db.run(`
+			CREATE TABLE IF NOT EXISTS sessions (
+				id TEXT PRIMARY KEY,
+				user_id INTEGER NOT NULL,
+				expires_at INTEGER NOT NULL,
+				FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+			);
+		`);
+
+		await db.run(`
+			CREATE TABLE IF NOT EXISTS story_assignments (
+				story_id TEXT PRIMARY KEY,
+				translator_id INTEGER,
+				assigned_at INTEGER,
+				FOREIGN KEY (translator_id) REFERENCES users(id) ON DELETE SET NULL
+			);
+		`);
+
+		await db.run(`
+			CREATE TABLE IF NOT EXISTS story_drafts (
+				story_id TEXT NOT NULL,
+				segment_id TEXT NOT NULL,
+				target_text TEXT NOT NULL,
+				saved_by_user_id INTEGER NOT NULL,
+				saved_at INTEGER NOT NULL,
+				PRIMARY KEY (story_id, segment_id),
+				FOREIGN KEY (saved_by_user_id) REFERENCES users(id) ON DELETE CASCADE
+			);
+		`);
+
+		await db.run(`
+			CREATE TABLE IF NOT EXISTS editing_locks (
+				story_id TEXT PRIMARY KEY,
+				user_id INTEGER NOT NULL,
+				locked_at INTEGER NOT NULL,
+				expires_at INTEGER NOT NULL,
+				FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+			);
+		`);
+	}
+
+	// Seeding Default Credentials (runs for both Mock and Real databases)
+	const seedUsers = [
+		{ username: 'translator.demo', password: 'translator123', role: 'Translator' },
+		{ username: 'reviewer.demo', password: 'reviewer123', role: 'Reviewer' },
+		{ username: 'lead.demo', password: 'lead123', role: 'Lead' },
+		{ username: 'admin.demo', password: 'admin123', role: 'SuperAdmin' }
+	];
+
+	const checkUser = db.prepare('SELECT id FROM users WHERE username = ?');
+	const insertUser = db.prepare(`
+		INSERT INTO users (username, password_hash, salt, role)
+		VALUES ($username, $password_hash, $salt, $role)
+	`);
+
+	let seededAny = false;
+	for (const u of seedUsers) {
+		const existing = await checkUser.get(u.username) as { id: number } | undefined;
+		if (!existing) {
 			const salt = generateSalt();
 			const password_hash = hashPassword(u.password, salt);
 			await insertUser.run({
@@ -453,8 +451,13 @@ export async function initializeDatabase() {
 				$salt: salt,
 				$role: u.role
 			});
+			seededAny = true;
+			console.log(`Successfully seeded default user: ${u.username}`);
 		}
-		console.log('Successfully seeded default mock users: translator.demo, reviewer.demo, lead.demo');
+	}
+
+	if (seededAny) {
+		console.log('Finished seeding missing default users.');
 	}
 }
 

@@ -34,6 +34,15 @@
 			icon: '👑',
 			desc: 'Resolve blockages, compile targets, and publish OBS.',
 			color: '#f59e0b'
+		},
+		{
+			id: 'admin',
+			name: 'Super Admin',
+			user: 'admin.demo',
+			pass: 'admin123',
+			icon: '🛠️',
+			desc: 'Universal bypass. Map users, modify roles, and oversee all flows.',
+			color: '#ef4444'
 		}
 	];
 
@@ -61,7 +70,9 @@
 			} else {
 				// Refresh page to trigger hooks redirect or manually route
 				const role = data.user.role;
-				if (role === 'Lead') {
+				if (role === 'SuperAdmin') {
+					await goto('/admin');
+				} else if (role === 'Lead') {
 					await goto('/lead');
 				} else if (role === 'Reviewer') {
 					await goto('/reviewer');

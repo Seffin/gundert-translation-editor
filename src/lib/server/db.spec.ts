@@ -11,13 +11,15 @@ describe('SQLite Database client & schemas', () => {
 		const stmt = db.prepare('SELECT * FROM users ORDER BY username ASC');
 		const users = await stmt.all() as DBUser[];
 
-		expect(users.length).toBeGreaterThanOrEqual(3);
-		expect(users[0].username).toBe('lead.demo');
-		expect(users[0].role).toBe('Lead');
-		expect(users[1].username).toBe('reviewer.demo');
-		expect(users[1].role).toBe('Reviewer');
-		expect(users[2].username).toBe('translator.demo');
-		expect(users[2].role).toBe('Translator');
+		expect(users.length).toBeGreaterThanOrEqual(4);
+		expect(users[0].username).toBe('admin.demo');
+		expect(users[0].role).toBe('SuperAdmin');
+		expect(users[1].username).toBe('lead.demo');
+		expect(users[1].role).toBe('Lead');
+		expect(users[2].username).toBe('reviewer.demo');
+		expect(users[2].role).toBe('Reviewer');
+		expect(users[3].username).toBe('translator.demo');
+		expect(users[3].role).toBe('Translator');
 	});
 
 	it('should verify password hashing behaves deterministically', () => {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
 	import Navigation from '$lib/components/Navigation.svelte';
+	import { page } from '$app/stores';
 	import '$lib/../app.css';
 
 	let { children, data } = $props();
@@ -25,8 +26,10 @@
 </svelte:head>
 
 <div class="app-container">
-	<Navigation />
-	<main class="app-main">
+	{#if $page.url.pathname !== '/login'}
+		<Navigation />
+	{/if}
+	<main class="app-main" class:login-main={$page.url.pathname === '/login'}>
 		{@render children()}
 	</main>
 </div>
@@ -53,7 +56,7 @@
 	}
 
 	@media (max-width: 768px) {
-		.app-main {
+		.app-main:not(.login-main) {
 			padding: 0 0 70px 0;
 			overflow-y: auto;
 		}

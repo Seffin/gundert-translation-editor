@@ -17,7 +17,16 @@
 		const role = user.role;
 		const items = [];
 
-		if (role === 'Translator') {
+		if (role === 'SuperAdmin') {
+			items.push(
+				{ path: '/admin', label: 'Admin', icon: '🛠️' },
+				{ path: '/stories', label: 'Stories', icon: '📖' },
+				{ path: '/glossary', label: 'Glossary', icon: '📚' },
+				{ path: '/reviewer', label: 'Reviewer', icon: '👀' },
+				{ path: '/lead', label: 'Approval', icon: '✓' },
+				{ path: '/activity', label: 'Activity', icon: '📋' }
+			);
+		} else if (role === 'Translator') {
 			items.push(
 				{ path: '/stories', label: 'Stories', icon: '📖' },
 				{ path: '/glossary', label: 'Glossary', icon: '📚' }
