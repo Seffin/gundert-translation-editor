@@ -20,19 +20,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (sessionCookie) {
 		try {
 			const stmt = db.prepare(`
-				SELECT s.id, s.expires_at, u.id as user_id, u.username, u.role
+				SELECT s.id, s.expires_at, u.id as user_id, u.username, u.role, u.target_language
 				FROM sessions s
 				JOIN users u ON s.user_id = u.id
 				WHERE s.id = ?
 			`);
-			const session = await stmt.get(sessionCookie) as { id: string; expires_at: number; user_id: number; username: string; role: string } | undefined;
+			const session = await stmt.get(sessionCookie) as { id: string; expires_at: number; user_id: number; username: string; role: string; target_language?: string | null } | undefined;
 
 			if (session) {
 				if (session.expires_at > Date.now()) {
 					event.locals.user = {
 						id: session.user_id,
 						username: session.username,
-						role: session.role
+						role: session.role,
+						targetLanguage: session.target_language ?? null
 					};
 				} else {
 					// Session expired

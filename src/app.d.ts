@@ -8,6 +8,7 @@ declare global {
 				id: number;
 				username: string;
 				role: string;
+				targetLanguage?: string | null;
 			} | null;
 		}
 		// interface PageData {}

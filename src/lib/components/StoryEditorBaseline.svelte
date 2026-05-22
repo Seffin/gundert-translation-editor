@@ -431,10 +431,25 @@
 		}
 	}
 
-	function handleLanguageChange(lang: string): void {
+	async function handleLanguageChange(lang: string): Promise<void> {
 		selectedLanguage = lang;
 		saveTargetLanguage(story.storyId, lang);
 		editorSegments = editorSegments.map((s) => ({ ...s, targetLanguage: lang }));
+
+		if ($page?.data?.user) {
+			try {
+				const response = await fetch('/api/users/settings', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ targetLanguage: lang })
+				});
+				if (response.ok) {
+					$page.data.user.targetLanguage = lang;
+				}
+			} catch (err) {
+				console.error('Failed to sync language choice to user profile:', err);
+			}
+		}
 	}
 
 	function handleTargetInput(segmentId: string): void {

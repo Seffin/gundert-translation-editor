@@ -126,8 +126,9 @@ class MockDatabase {
 					const password_hash = u.$password_hash ?? u[1];
 					const salt = u.$salt ?? u[2];
 					const role = u.$role ?? u[3];
+					const target_language = u.$target_language ?? u[4] ?? null;
 					const id = self.nextUserId++;
-					self.tables.users.push({ id, username, password_hash, salt, role });
+					self.tables.users.push({ id, username, password_hash, salt, role, target_language });
 					changed = true;
 					lastInsertRowid = id;
 				}
@@ -207,6 +208,33 @@ class MockDatabase {
 					changed = self.tables.pre_registrations.length !== lengthBefore;
 				}
 
+				else if (cleanSql.toUpperCase().includes('UPDATE USERS SET TARGET_LANGUAGE =')) {
+					const setsNull = cleanSql.toUpperCase().includes('TARGET_LANGUAGE = NULL');
+					let target_language: any = null;
+					let id: any = undefined;
+
+					if (setsNull) {
+						target_language = null;
+						id = mergedParams.$id ?? mergedParams[0];
+					} else {
+						target_language = mergedParams.$target_language ?? mergedParams[0];
+						id = mergedParams.$id ?? mergedParams[1];
+					}
+
+					if (!cleanSql.toUpperCase().includes('WHERE ID =') && !cleanSql.toUpperCase().includes('WHERE ID=')) {
+						for (const u of self.tables.users) {
+							u.target_language = target_language;
+							changed = true;
+						}
+					} else {
+						const u = self.tables.users.find(x => x.id === id);
+						if (u) {
+							u.target_language = target_language;
+							changed = true;
+						}
+					}
+				}
+
 				if (changed) {
 					self.save();
 					return { changes: 1, lastInsertRowid };
@@ -232,7 +260,18 @@ class MockDatabase {
 
 				if (cleanSql.toUpperCase().includes('SELECT * FROM USERS WHERE USERNAME =')) {
 					const username = mergedParams[0];
-					return self.tables.users.find(x => x.username === username);
+					const u = self.tables.users.find(x => x.username === username);
+					return u ? { ...u, target_language: u.target_language ?? null } : undefined;
+				}
+
+				if (cleanSql.toUpperCase().includes('FROM USERS WHERE ID =')) {
+					const id = mergedParams[0];
+					const u = self.tables.users.find(x => x.id === id);
+					if (!u) return undefined;
+					if (cleanSql.toUpperCase().includes('TARGET_LANGUAGE')) {
+						return { target_language: u.target_language ?? null };
+					}
+					return { ...u, target_language: u.target_language ?? null };
 				}
 
 				if (cleanSql.toUpperCase().includes('SELECT S.ID, S.EXPIRES_AT')) {
@@ -241,7 +280,7 @@ class MockDatabase {
 					if (!s) return undefined;
 					const u = self.tables.users.find(x => x.id === s.user_id);
 					if (!u) return undefined;
-					return { id: s.id, expires_at: s.expires_at, username: u.username, role: u.role, user_id: u.id };
+					return { id: s.id, expires_at: s.expires_at, username: u.username, role: u.role, user_id: u.id, target_language: u.target_language ?? null };
 				}
 
 				if (cleanSql.toUpperCase().includes('SELECT L.STORY_ID, L.LOCKED_AT')) {
@@ -276,7 +315,7 @@ class MockDatabase {
 					: [paramsOrObj, ...args];
 
 				if (cleanSql.toUpperCase().includes('SELECT * FROM USERS')) {
-					const sorted = [...self.tables.users];
+					const sorted = self.tables.users.map(u => ({ ...u, target_language: u.target_language ?? null }));
 					if (cleanSql.toUpperCase().includes('ORDER BY USERNAME ASC')) {
 						sorted.sort((a, b) => a.username.localeCompare(b.username));
 					}
@@ -438,9 +477,18 @@ export async function initializeDatabase() {
 				username TEXT UNIQUE NOT NULL,
 				password_hash TEXT NOT NULL,
 				salt TEXT NOT NULL,
-				role TEXT NOT NULL
+				role TEXT NOT NULL,
+				target_language TEXT DEFAULT NULL
 			);
 		`);
+
+		// Migration: Add target_language column if it does not exist
+		try {
+			await db.run('ALTER TABLE users ADD COLUMN target_language TEXT DEFAULT NULL;');
+			console.log('Successfully applied target_language migration to users table');
+		} catch (err) {
+			// Ignore if column already exists
+		}
 
 		await db.run(`
 			CREATE TABLE IF NOT EXISTS sessions (
@@ -547,6 +595,7 @@ export interface DBUser {
 	password_hash: string;
 	salt: string;
 	role: string;
+	target_language?: string | null;
 }
 
 export interface DBSession {

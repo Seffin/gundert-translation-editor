@@ -12,6 +12,8 @@
 	} from '$lib/client/settings';
 	import { SUPPORTED_LANGUAGES, isValidLanguage } from '$lib/client/target-language';
 
+	let { data } = $props<{ data: any }>();
+
 	let targetLanguage = $state('Hindi');
 	let theme = $state<Theme>('system');
 	let apiKey = $state('');
@@ -21,7 +23,15 @@
 
 	onMount(() => {
 		try {
-			targetLanguage = loadGlobalTargetLanguage();
+			// Synchronize target language preference with database if logged in
+			const dbTargetLang = data.user?.targetLanguage;
+			if (dbTargetLang && isValidLanguage(dbTargetLang)) {
+				targetLanguage = dbTargetLang;
+				saveGlobalTargetLanguage(dbTargetLang);
+			} else {
+				targetLanguage = loadGlobalTargetLanguage();
+			}
+
 			theme = loadTheme();
 			apiKey = loadApiKey();
 			apiKeySaved = apiKey.length > 0;
@@ -31,7 +41,7 @@
 		}
 	});
 
-	function updateTarget(lang: string) {
+	async function updateTarget(lang: string) {
 		if (!isValidLanguage(lang)) {
 			showMessage('Invalid language selected', 'error');
 			return;
@@ -39,6 +49,19 @@
 		try {
 			targetLanguage = lang;
 			saveGlobalTargetLanguage(lang);
+
+			if (data.user) {
+				const response = await fetch('/api/users/settings', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ targetLanguage: lang })
+				});
+				if (!response.ok) {
+					throw new Error('Failed to save language preference to server');
+				}
+				data.user.targetLanguage = lang;
+			}
+
 			showMessage('Language preference saved', 'success');
 		} catch (error) {
 			console.error('Failed to save language:', error);

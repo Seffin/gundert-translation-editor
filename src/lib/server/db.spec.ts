@@ -5,6 +5,11 @@ import type { DBUser, DBSession, DBDraft, DBEditingLock } from './db';
 describe('SQLite Database client & schemas', () => {
 	beforeAll(async () => {
 		await initializeDatabase();
+		try {
+			await db.prepare('UPDATE users SET target_language = NULL').run();
+		} catch (err) {
+			// Ignore if db is uninitialized
+		}
 	});
 
 	it('should successfully seed default demo users', async () => {
@@ -28,6 +33,47 @@ describe('SQLite Database client & schemas', () => {
 		const translator = users.find(u => u.username === 'translator.demo');
 		expect(translator).toBeDefined();
 		expect(translator!.role).toBe('Translator');
+	});
+
+	it('should successfully save and query user target language settings', async () => {
+		const getUser = db.prepare('SELECT * FROM users WHERE username = ?');
+		const user = await getUser.get('translator.demo') as DBUser;
+		expect(user).toBeDefined();
+
+		// Default should be null
+		expect(user.target_language).toBeNull();
+
+		// Update target language preference
+		const updateTarget = db.prepare('UPDATE users SET target_language = ? WHERE id = ?');
+		await updateTarget.run('Malayalam', user.id);
+
+		// Re-fetch to verify it persisted
+		const updatedUser = await getUser.get('translator.demo') as DBUser;
+		expect(updatedUser).toBeDefined();
+		expect(updatedUser.target_language).toBe('Malayalam');
+
+		// Query session should also contain target_language
+		const sessionId = 'test-session-target-lang';
+		const expiresAt = Date.now() + 1000 * 60;
+		const insertSession = db.prepare('INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)');
+		await insertSession.run(sessionId, user.id, expiresAt);
+
+		const querySession = db.prepare(`
+			SELECT s.id, s.expires_at, u.username, u.role, u.target_language
+			FROM sessions s
+			JOIN users u ON s.user_id = u.id
+			WHERE s.id = ?
+		`);
+		const session = await querySession.get(sessionId) as any;
+		expect(session).toBeDefined();
+		expect(session.target_language).toBe('Malayalam');
+
+		// Clean up
+		const deleteSession = db.prepare('DELETE FROM sessions WHERE id = ?');
+		await deleteSession.run(sessionId);
+
+		const clearTarget = db.prepare('UPDATE users SET target_language = NULL WHERE id = ?');
+		await clearTarget.run(user.id);
 	});
 
 	it('should verify password hashing behaves deterministically', () => {
