@@ -5,7 +5,7 @@ import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 import { randomBytes } from 'node:crypto';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, url }) => {
 	try {
 		const { username, password } = await request.json();
 
@@ -38,11 +38,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		`);
 		insertSession.run(sessionId, user.id, expiresAt);
 
+		const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+
 		// Set httpOnly session cookie
 		cookies.set('gundert_session', sessionId, {
 			path: '/',
 			httpOnly: true,
-			secure: !dev,
+			secure: !dev && !isLocalhost,
 			sameSite: 'lax',
 			maxAge: 60 * 60 * 24 // 24 hours in seconds
 		});
