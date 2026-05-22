@@ -260,10 +260,24 @@ export async function publishStory(
 
 	// GitHub Integration: If GITHUB_PAT, GITHUB_REPO_OWNER and GITHUB_REPO_NAME are configured, push automatically!
 	const githubPat = process.env.GITHUB_PAT;
-	const githubOwner = process.env.GITHUB_REPO_OWNER;
-	const githubRepo = process.env.GITHUB_REPO_NAME;
+	let githubOwner = process.env.GITHUB_REPO_OWNER;
+	let githubRepo = process.env.GITHUB_REPO_NAME;
 
 	if (githubPat && githubOwner && githubRepo) {
+		// Clean up potential full URLs in env variables
+		if (githubOwner.includes('github.com/')) {
+			githubOwner = githubOwner.split('github.com/').pop()?.split('/')[0] || githubOwner;
+		} else if (githubOwner.includes('/')) {
+			githubOwner = githubOwner.split('/').filter(Boolean).pop() || githubOwner;
+		}
+
+		if (githubRepo.includes('github.com/')) {
+			const parts = githubRepo.split('github.com/').pop()?.split('/') || [];
+			githubRepo = parts[1] || parts[0] || githubRepo;
+		} else if (githubRepo.includes('/')) {
+			githubRepo = githubRepo.split('/').filter(Boolean).pop() || githubRepo;
+		}
+
 		const relativePath = `${langPrefix}_obs/content/${normalizedId}.md`;
 		const githubUrl = `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${relativePath}`;
 		
