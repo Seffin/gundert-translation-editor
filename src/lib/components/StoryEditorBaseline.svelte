@@ -73,6 +73,7 @@
 
 	const ACTOR_ID = $derived($page?.data?.user?.username ?? 'translator.demo');
 	const isLead = $derived($page?.data?.user?.role === 'Lead');
+	const isTranslator = $derived($page?.data?.user ? $page.data.user.role === 'Translator' : true);
 
 	function createInitialSegments() {
 		return story.segments.map((segment) => ({ ...segment }));
@@ -178,13 +179,16 @@
 		}
 	}
 
-	function mergeDrafts(local: PersistedStoryDraft | undefined, server: PersistedStoryDraft | null): PersistedStoryDraft | undefined {
+	function mergeDrafts(
+		local: PersistedStoryDraft | undefined,
+		server: PersistedStoryDraft | null
+	): PersistedStoryDraft | undefined {
 		if (!local && !server) return undefined;
 		if (!local) return server ?? undefined;
 		if (!server) return local;
 
 		const mergedSegments: Record<string, PersistedDraftSegment> = {};
-		
+
 		const allSegmentKeys = new Set([
 			...Object.keys(local.segments),
 			...Object.keys(server.segments)
@@ -213,7 +217,9 @@
 				mergedSegments[key] = serverSeg;
 			}
 
-			const segTime = mergedSegments[key]?.savedAtIso ? new Date(mergedSegments[key].savedAtIso).getTime() : 0;
+			const segTime = mergedSegments[key]?.savedAtIso
+				? new Date(mergedSegments[key].savedAtIso).getTime()
+				: 0;
 			if (segTime > overallLatestTime) {
 				overallLatestTime = segTime;
 				overallLatestActor = mergedSegments[key].savedByActorId;
@@ -260,14 +266,12 @@
 	$effect(() => {
 		if (consistencyIssues.length > 0 && apiKey) {
 			llmValidating = true;
-			void validateConsistencyIssuesWithLLM(
-				consistencyIssues,
-				selectedLanguage,
-				apiKey
-			).then((validated) => {
-				validatedConsistencyIssues = validated;
-				llmValidating = false;
-			});
+			void validateConsistencyIssuesWithLLM(consistencyIssues, selectedLanguage, apiKey).then(
+				(validated) => {
+					validatedConsistencyIssues = validated;
+					llmValidating = false;
+				}
+			);
 		} else {
 			validatedConsistencyIssues = consistencyIssues;
 		}
@@ -477,6 +481,11 @@
 
 		if (selectedIds.length === 0 || drafting) return;
 
+		if (!isTranslator) {
+			draftError = 'Unauthorized: Only translators can generate AI drafts';
+			return;
+		}
+
 		drafting = true;
 		draftingSegmentIds = selectedIds;
 		draftError = '';
@@ -593,7 +602,7 @@
 		saveMessage = '';
 		const nowIso = new Date().toISOString();
 		const draft = buildPersistedStoryDraft(story.storyId, ACTOR_ID, editorSegments, nowIso);
-		
+
 		savePersistedStoryDraft(draft);
 
 		try {
@@ -662,17 +671,24 @@
 						? 'Deselect All'
 						: 'Select All'}
 				</button>
-				<button onclick={saveChanges} disabled={!isDirty || saving || (lockState.locked && !lockState.isOwnLock)}>
+				<button
+					onclick={saveChanges}
+					disabled={!isDirty || saving || (lockState.locked && !lockState.isOwnLock)}
+				>
 					{saving ? 'Saving...' : 'Save Changes'}
 				</button>
-				<button
-					class="draft-btn"
-					onclick={draftSelected}
-					disabled={selection.count === 0 || drafting || (lockState.locked && !lockState.isOwnLock)}
-					data-testid="draft-selected-btn"
-				>
-					{drafting ? 'Drafting…' : `Draft Selected (${selection.count})`}
-				</button>
+				{#if isTranslator}
+					<button
+						class="draft-btn"
+						onclick={draftSelected}
+						disabled={selection.count === 0 ||
+							drafting ||
+							(lockState.locked && !lockState.isOwnLock)}
+						data-testid="draft-selected-btn"
+					>
+						{drafting ? 'Drafting…' : `Draft Selected (${selection.count})`}
+					</button>
+				{/if}
 				{#if isDirty}
 					<span class="dirty-indicator">Unsaved changes</span>
 				{/if}
@@ -773,17 +789,19 @@
 							{/if}
 
 							<div class="segment-actions">
-								<button
-									type="button"
-									class="segment-action segment-action--primary"
-									disabled={(lockState.locked && !lockState.isOwnLock) || drafting}
-									onclick={(event) => {
-										event.stopPropagation();
-										void regenerateSegment(segment.id);
-									}}
-								>
-									Regenerate draft
-								</button>
+								{#if isTranslator}
+									<button
+										type="button"
+										class="segment-action segment-action--primary"
+										disabled={(lockState.locked && !lockState.isOwnLock) || drafting}
+										onclick={(event) => {
+											event.stopPropagation();
+											void regenerateSegment(segment.id);
+										}}
+									>
+										Regenerate draft
+									</button>
+								{/if}
 								<button
 									type="button"
 									class="segment-action segment-action--secondary"
@@ -911,12 +929,13 @@
 		<div class="readonly-banner" role="alert" data-testid="readonly-banner">
 			<span class="banner-icon">⚠️</span>
 			<div class="banner-text">
-				<strong>Read-Only Mode:</strong> Story is currently locked by <span class="username-highlight">{lockState.lockedBy}</span>
+				<strong>Read-Only Mode:</strong> Story is currently locked by
+				<span class="username-highlight">{lockState.lockedBy}</span>
 			</div>
 			{#if isLead}
-				<button 
-					type="button" 
-					class="revoke-btn" 
+				<button
+					type="button"
+					class="revoke-btn"
 					onclick={handleRevokeLock}
 					data-testid="revoke-lock-btn"
 				>
@@ -940,9 +959,10 @@
 		background: rgba(220, 38, 38, 0.9);
 		color: #ffffff;
 		border-radius: 1rem;
-		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 
-		            0 8px 10px -6px rgba(0, 0, 0, 0.3),
-		            inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+		box-shadow:
+			0 10px 25px -5px rgba(0, 0, 0, 0.3),
+			0 8px 10px -6px rgba(0, 0, 0, 0.3),
+			inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 		backdrop-filter: blur(12px);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		font-weight: 600;
@@ -1273,14 +1293,20 @@
 		border-radius: 0.75rem;
 		overflow: hidden;
 		border: 1px solid var(--color-outline-variant);
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		box-shadow:
+			0 4px 6px -1px rgba(0, 0, 0, 0.1),
+			0 2px 4px -1px rgba(0, 0, 0, 0.06);
 		background: var(--color-surface-container-low);
-		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+		transition:
+			transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+			box-shadow 0.3s ease;
 	}
 
 	.segment-image-container:hover {
 		transform: translateY(-2px) scale(1.01);
-		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+		box-shadow:
+			0 10px 15px -3px rgba(0, 0, 0, 0.1),
+			0 4px 6px -2px rgba(0, 0, 0, 0.05);
 	}
 
 	.segment-image {

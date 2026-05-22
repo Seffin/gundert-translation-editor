@@ -298,4 +298,57 @@ describe('StoryEditorBaseline', () => {
 		await expect.element(page.getByTestId('readonly-banner')).toBeInTheDocument();
 		await expect.element(page.getByTestId('revoke-lock-btn')).toBeInTheDocument();
 	});
+
+	it('renders AI draft buttons for Translator', async () => {
+		mockPage.set({
+			data: {
+				user: { username: 'translator.demo', role: 'Translator' }
+			}
+		} as any);
+
+		render(StoryEditorBaseline, {
+			story: STORY,
+			serverLockedInfo: { locked: false, lockedBy: null, isOwnLock: false }
+		});
+
+		const draftSelectedBtn = page.getByTestId('draft-selected-btn');
+		await expect.element(draftSelectedBtn).toBeInTheDocument();
+
+		const firstToolbox = page.getByTestId('segment-card-01:01');
+		await expect.element(firstToolbox.getByText('Regenerate draft')).toBeInTheDocument();
+	});
+
+	it('does NOT render AI draft buttons for Reviewer or Lead', async () => {
+		// Test for Reviewer
+		mockPage.set({
+			data: {
+				user: { username: 'reviewer.demo', role: 'Reviewer' }
+			}
+		} as any);
+
+		const { unmount } = render(StoryEditorBaseline, {
+			story: STORY,
+			serverLockedInfo: { locked: false, lockedBy: null, isOwnLock: false }
+		});
+
+		await expect.element(page.getByTestId('draft-selected-btn')).not.toBeInTheDocument();
+		await expect.element(page.getByText('Regenerate draft')).not.toBeInTheDocument();
+
+		unmount();
+
+		// Test for Lead
+		mockPage.set({
+			data: {
+				user: { username: 'lead.demo', role: 'Lead' }
+			}
+		} as any);
+
+		render(StoryEditorBaseline, {
+			story: STORY,
+			serverLockedInfo: { locked: false, lockedBy: null, isOwnLock: false }
+		});
+
+		await expect.element(page.getByTestId('draft-selected-btn')).not.toBeInTheDocument();
+		await expect.element(page.getByText('Regenerate draft')).not.toBeInTheDocument();
+	});
 });

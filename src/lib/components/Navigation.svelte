@@ -23,15 +23,16 @@
 				{ path: '/glossary', label: 'Glossary', icon: '📚' }
 			);
 		} else if (role === 'Reviewer') {
-			items.push(
-				{ path: '/reviewer', label: 'Reviewer', icon: '👀' }
-			);
+			items.push({ path: '/reviewer', label: 'Reviewer', icon: '👀' });
 		} else if (role === 'Lead') {
 			items.push(
 				{ path: '/lead', label: 'Approval', icon: '✓' },
 				{ path: '/activity', label: 'Activity', icon: '📋' }
 			);
 		}
+
+		// All authenticated roles can access settings
+		items.push({ path: '/settings', label: 'Settings', icon: '⚙️' });
 
 		// All authenticated roles can access demo showcase
 		items.push({ path: '/demo', label: 'Demo', icon: '🧪' });
@@ -96,7 +97,7 @@
 					</a>
 				</li>
 			{/each}
-			
+
 			{#if user}
 				<li class="mobile-settings">
 					<button onclick={handleLogout} class="nav-link logout-mobile-btn">
@@ -111,20 +112,28 @@
 		<div class="nav-settings">
 			{#if user}
 				<div class="user-profile-badge">
-					<div class="user-avatar" style:--avatar-color={
-						user.role === 'Lead' ? '#f59e0b' : user.role === 'Reviewer' ? '#a855f7' : '#3b82f6'
-					}>
+					<div
+						class="user-avatar"
+						style:--avatar-color={user.role === 'Lead'
+							? '#f59e0b'
+							: user.role === 'Reviewer'
+								? '#a855f7'
+								: '#3b82f6'}
+					>
 						{user.username.slice(0, 2).toUpperCase()}
 					</div>
 					<div class="user-info">
 						<span class="username">{user.username}</span>
-						<span class="role-tag" style:--role-color={
-							user.role === 'Lead' ? '#f59e0b' : user.role === 'Reviewer' ? '#a855f7' : '#3b82f6'
-						}>{user.role}</span>
+						<span
+							class="role-tag"
+							style:--role-color={user.role === 'Lead'
+								? '#f59e0b'
+								: user.role === 'Reviewer'
+									? '#a855f7'
+									: '#3b82f6'}>{user.role}</span
+						>
 					</div>
-					<button class="logout-btn" onclick={handleLogout} title="Sign Out">
-						🚪
-					</button>
+					<button class="logout-btn" onclick={handleLogout} title="Sign Out"> 🚪 </button>
 				</div>
 			{:else}
 				<a href="/login" class="nav-link login-btn">
@@ -202,7 +211,11 @@
 		font-size: 0.95rem;
 		font-weight: 600;
 		border-radius: 999px;
-		transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+		transition:
+			background-color 0.2s ease,
+			opacity 0.2s ease,
+			transform 0.2s ease,
+			color 0.2s ease;
 		opacity: 0.95;
 		background: transparent;
 		border: none;
@@ -261,7 +274,9 @@
 		background-color: currentColor;
 		position: absolute;
 		left: 0;
-		transition: transform 0.2s ease, opacity 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			opacity 0.2s ease;
 	}
 
 	.hamburger-inner {
