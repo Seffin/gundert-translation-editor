@@ -59,6 +59,11 @@ class LibSQLDatabase {
 		};
 	}
 
+	async batch(queries: { sql: string; args: any[] }[], mode: "read" | "write" = "write") {
+		const client = this.getClient();
+		return await client.batch(queries, mode);
+	}
+
 	prepare(sql: string) {
 		const self = this;
 		return {

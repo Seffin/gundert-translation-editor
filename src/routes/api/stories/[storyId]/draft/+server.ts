@@ -72,21 +72,13 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		// Fallback user id if unauthenticated (e.g. in tests)
 		const userId = locals.user?.id ?? 1; 
 
-		const insertDraft = db.prepare(`
-			INSERT OR REPLACE INTO story_drafts (story_id, segment_id, target_text, saved_by_user_id, saved_at)
-			VALUES (?, ?, ?, ?, ?)
-		`);
+		const queries = Object.entries(draft.segments).map(([segmentId, seg]) => ({
+			sql: `INSERT OR REPLACE INTO story_drafts (story_id, segment_id, target_text, saved_by_user_id, saved_at)
+			      VALUES (?, ?, ?, ?, ?)`,
+			args: [storyId, segmentId, (seg as any).targetText, userId, Date.now()]
+		}));
 
-		await db.run('BEGIN TRANSACTION');
-		try {
-			for (const [segmentId, seg] of Object.entries(draft.segments)) {
-				await insertDraft.run(storyId, segmentId, (seg as any).targetText, userId, Date.now());
-			}
-			await db.run('COMMIT');
-		} catch (e) {
-			await db.run('ROLLBACK');
-			throw e;
-		}
+		await db.batch(queries, 'write');
 
 		return json({ success: true, storyId });
 	} catch (err) {
