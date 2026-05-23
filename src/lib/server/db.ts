@@ -29,15 +29,30 @@ if (existsSync(envPath)) {
 }
 
 class LibSQLDatabase {
-	private client: any;
+	private _client: any = null;
 
-	constructor(client: any) {
-		this.client = client;
+	private getClient() {
+		if (this._client) return this._client;
+
+		const tursoUrl = process.env.TURSO_DB_URL;
+		const tursoToken = process.env.TURSO_DB_TOKEN;
+
+		if (!tursoUrl) {
+			throw new Error('TURSO_DB_URL environment variable is required. SvelteKit local fallback database is disabled.');
+		}
+
+		this._client = createClient({
+			url: tursoUrl,
+			authToken: tursoToken
+		});
+
+		return this._client;
 	}
 
 	async run(sql: string, ...params: any[]) {
+		const client = this.getClient();
 		const args = params.length === 1 && typeof params[0] === 'object' && params[0] !== null ? params[0] : params;
-		const res = await this.client.execute({ sql, args });
+		const res = await client.execute({ sql, args });
 		return {
 			changes: res.rowsAffected,
 			lastInsertRowid: res.lastInsertRowid !== undefined ? Number(res.lastInsertRowid) : 0
@@ -48,10 +63,11 @@ class LibSQLDatabase {
 		const self = this;
 		return {
 			async run(paramsOrObj?: any, ...args: any[]) {
+				const client = self.getClient();
 				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
 					? paramsOrObj
 					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
-				const res = await self.client.execute({ sql, args: mergedParams });
+				const res = await client.execute({ sql, args: mergedParams });
 				return {
 					changes: res.rowsAffected,
 					lastInsertRowid: res.lastInsertRowid !== undefined ? Number(res.lastInsertRowid) : 0
@@ -59,39 +75,28 @@ class LibSQLDatabase {
 			},
 
 			async get(paramsOrObj?: any, ...args: any[]) {
+				const client = self.getClient();
 				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
 					? paramsOrObj
 					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
-				const res = await self.client.execute({ sql, args: mergedParams });
+				const res = await client.execute({ sql, args: mergedParams });
 				if (res.rows.length === 0) return undefined;
 				return { ...res.rows[0] };
 			},
 
 			async all(paramsOrObj?: any, ...args: any[]) {
+				const client = self.getClient();
 				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
 					? paramsOrObj
 					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
-				const res = await self.client.execute({ sql, args: mergedParams });
+				const res = await client.execute({ sql, args: mergedParams });
 				return res.rows.map(row => ({ ...row }));
 			}
 		};
 	}
 }
 
-// Instantiate Database
-const tursoUrl = process.env.TURSO_DB_URL;
-const tursoToken = process.env.TURSO_DB_TOKEN;
-
-if (!tursoUrl) {
-	throw new Error('TURSO_DB_URL environment variable is required. SvelteKit local fallback database is disabled.');
-}
-
-const libsqlClient = createClient({
-	url: tursoUrl,
-	authToken: tursoToken
-});
-
-export const db = new LibSQLDatabase(libsqlClient);
+export const db = new LibSQLDatabase();
 
 // Initialize tables asynchronously
 export async function initializeDatabase() {
