@@ -6,7 +6,7 @@
  * into your configured Turso Cloud Database.
  * 
  * Usage:
- *   node scripts/migrate-to-cloud.js
+ *   node scripts/migrate-to-cloud.cjs
  */
 
 const fs = require('fs');
@@ -192,8 +192,8 @@ async function migrate() {
 			});
 			if (check.rows.length === 0) {
 				await cloudDb.execute({
-					sql: 'INSERT INTO pre_registrations (id, email, name, requested_role, justification, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-					args: [p.id, p.email, p.name, p.requested_role, p.justification, p.status, p.created_at]
+					sql: 'INSERT INTO pre_registrations (email, name, requested_role, justification, status, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+					args: [p.email, p.name, p.requested_role, p.justification, p.status, p.created_at]
 				});
 				preRegImported++;
 			} else {
