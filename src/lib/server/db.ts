@@ -90,7 +90,7 @@ class LibSQLDatabase {
 					? paramsOrObj
 					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
 				const res = await client.execute({ sql, args: mergedParams });
-				return res.rows.map(row => ({ ...row }));
+				return res.rows.map((row: any) => ({ ...row }));
 			}
 		};
 	}
