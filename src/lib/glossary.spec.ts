@@ -12,14 +12,16 @@ const TERMS: GlossaryTerm[] = [
 		sourceTerm: 'Grace',
 		targetTerm: 'Anugrah',
 		status: 'Approved',
-		rationale: 'Unmerited divine favor'
+		rationale: 'Unmerited divine favor',
+		language: 'Hindi'
 	},
 	{
 		id: 'term-2',
 		sourceTerm: 'Covenant',
 		targetTerm: 'Ahd',
 		status: 'Proposed',
-		rationale: 'Formal agreement'
+		rationale: 'Formal agreement',
+		language: 'Hindi'
 	}
 ];
 
@@ -29,7 +31,8 @@ describe('glossary domain', () => {
 			sourceTerm: '',
 			targetTerm: '',
 			status: 'Proposed',
-			rationale: ''
+			rationale: '',
+			language: 'Malayalam'
 		});
 	});
 
@@ -38,13 +41,15 @@ describe('glossary domain', () => {
 			sourceTerm: 'Messiah',
 			targetTerm: 'Masih',
 			status: 'Approved',
-			rationale: 'Common translation in church context'
+			rationale: 'Common translation in church context',
+			language: 'Hindi'
 		});
 
 		expect(updated).toHaveLength(3);
 		expect(updated[2].sourceTerm).toBe('Messiah');
 		expect(updated[2].targetTerm).toBe('Masih');
 		expect(updated[2].status).toBe('Approved');
+		expect(updated[2].language).toBe('Hindi');
 	});
 
 	it('edits an existing glossary term in place by id', () => {
@@ -52,12 +57,14 @@ describe('glossary domain', () => {
 			sourceTerm: 'Covenant',
 			targetTerm: 'Berith',
 			status: 'Approved',
-			rationale: 'Aligned to translation committee recommendation'
+			rationale: 'Aligned to translation committee recommendation',
+			language: 'Hindi'
 		});
 
 		expect(updated).toHaveLength(2);
 		expect(updated[1].targetTerm).toBe('Berith');
 		expect(updated[1].status).toBe('Approved');
 		expect(updated[1].rationale).toMatch(/committee/i);
+		expect(updated[1].language).toBe('Hindi');
 	});
 });

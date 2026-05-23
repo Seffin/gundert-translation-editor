@@ -6,6 +6,7 @@ export type GlossaryTerm = {
 	targetTerm: string;
 	status: GlossaryStatus;
 	rationale: string;
+	language: string;
 };
 
 export type GlossaryTermDraft = Omit<GlossaryTerm, 'id'>;
@@ -15,7 +16,8 @@ function normalizeDraft(draft: GlossaryTermDraft): GlossaryTermDraft {
 		sourceTerm: draft.sourceTerm.trim(),
 		targetTerm: draft.targetTerm.trim(),
 		status: draft.status,
-		rationale: draft.rationale.trim()
+		rationale: draft.rationale.trim(),
+		language: draft.language.trim()
 	};
 }
 
@@ -23,12 +25,13 @@ function nextGlossaryId(terms: GlossaryTerm[]): string {
 	return `term-${terms.length + 1}`;
 }
 
-export function createGlossaryTermDraft(): GlossaryTermDraft {
+export function createGlossaryTermDraft(defaultLanguage = 'Malayalam'): GlossaryTermDraft {
 	return {
 		sourceTerm: '',
 		targetTerm: '',
 		status: 'Proposed',
-		rationale: ''
+		rationale: '',
+		language: defaultLanguage
 	};
 }
 

@@ -83,9 +83,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			};
 		}
 
+		const lang = locals.user?.targetLanguage || 'Malayalam';
 		return {
 			story: storyModel,
-			glossaryTerms: listGlossaryTerms(),
+			glossaryTerms: listGlossaryTerms().filter(t => t.language === lang),
 			lockedInfo,
 			sqliteDraft
 		};

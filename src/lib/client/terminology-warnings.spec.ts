@@ -11,14 +11,16 @@ const GLOSSARY: TerminologyGlossaryTerm[] = [
 		sourceTerm: 'God',
 		targetTerm: 'Ishwar',
 		status: 'Approved',
-		rationale: 'Preferred rendering in this project'
+		rationale: 'Preferred rendering in this project',
+		language: 'Hindi'
 	},
 	{
 		id: 'term-2',
 		sourceTerm: 'Covenant',
 		targetTerm: 'Ahd',
 		status: 'Proposed',
-		rationale: 'Still under review'
+		rationale: 'Still under review',
+		language: 'Hindi'
 	}
 ];
 

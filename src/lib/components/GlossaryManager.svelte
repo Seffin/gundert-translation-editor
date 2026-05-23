@@ -7,20 +7,22 @@
 		type GlossaryTerm,
 		type GlossaryTermDraft
 	} from '$lib/glossary';
+	import { SUPPORTED_LANGUAGES } from '$lib/client/target-language';
 
-	let { initialTerms } = $props<{ initialTerms: GlossaryTerm[] }>();
+	let { initialTerms, defaultLanguage = 'Malayalam' } = $props<{ initialTerms: GlossaryTerm[]; defaultLanguage?: string }>();
 
 	let terms = $state<GlossaryTerm[]>([]);
-	let draft = $state<GlossaryTermDraft>(createGlossaryTermDraft());
+	let draft = $state<GlossaryTermDraft>(createGlossaryTermDraft('Malayalam'));
 	let editingId = $state<string | null>(null);
 	let message = $state('');
 
 	onMount(() => {
 		terms = initialTerms.map((term) => ({ ...term }));
+		draft.language = defaultLanguage;
 	});
 
 	function resetForm(): void {
-		draft = createGlossaryTermDraft();
+		draft = createGlossaryTermDraft(defaultLanguage);
 		editingId = null;
 	}
 
@@ -43,7 +45,8 @@
 			sourceTerm: term.sourceTerm,
 			targetTerm: term.targetTerm,
 			status: term.status,
-			rationale: term.rationale
+			rationale: term.rationale,
+			language: term.language
 		};
 		message = `Editing ${term.sourceTerm}.`;
 	}
@@ -73,15 +76,23 @@
 				<input bind:value={draft.targetTerm} required />
 			</label>
 			<label>
+				Language
+				<select bind:value={draft.language} required>
+					{#each SUPPORTED_LANGUAGES as lang}
+						<option value={lang}>{lang}</option>
+					{/each}
+				</select>
+			</label>
+			<label>
 				Status
 				<select bind:value={draft.status}>
 					<option value="Proposed">Proposed</option>
 					<option value="Approved">Approved</option>
 				</select>
 			</label>
-			<label>
+			<label style="grid-column: span 2;">
 				Rationale
-				<input bind:value={draft.rationale} />
+				<input bind:value={draft.rationale} style="width: 100%;" />
 			</label>
 		</div>
 
@@ -94,6 +105,7 @@
 				<tr>
 					<th>Term (EN)</th>
 					<th>Translation</th>
+					<th>Language</th>
 					<th>Status</th>
 					<th>Rationale</th>
 					<th>Action</th>
@@ -104,6 +116,7 @@
 					<tr>
 						<td>{term.sourceTerm}</td>
 						<td>{term.targetTerm}</td>
+						<td>{term.language}</td>
 						<td>{term.status}</td>
 						<td>{term.rationale}</td>
 						<td>

@@ -97,7 +97,8 @@ async function migrate() {
 				username TEXT UNIQUE NOT NULL,
 				password_hash TEXT NOT NULL,
 				salt TEXT NOT NULL,
-				role TEXT NOT NULL
+				role TEXT NOT NULL,
+				target_language TEXT DEFAULT NULL
 			);
 		`);
 
@@ -168,8 +169,8 @@ async function migrate() {
 			});
 			if (check.rows.length === 0) {
 				await cloudDb.execute({
-					sql: 'INSERT INTO users (id, username, password_hash, salt, role) VALUES (?, ?, ?, ?, ?)',
-					args: [u.id, u.username, u.password_hash, u.salt, u.role]
+					sql: 'INSERT INTO users (id, username, password_hash, salt, role, target_language) VALUES (?, ?, ?, ?, ?, ?)',
+					args: [u.id, u.username, u.password_hash, u.salt, u.role, u.target_language || null]
 				});
 				userImported++;
 			} else {

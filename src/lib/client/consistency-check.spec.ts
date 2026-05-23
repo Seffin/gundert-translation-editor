@@ -27,7 +27,8 @@ describe('consistency check', () => {
 		sourceTerm,
 		targetTerm,
 		status,
-		rationale: `Translation of ${sourceTerm}`
+		rationale: `Translation of ${sourceTerm}`,
+		language: 'Hindi'
 	});
 
 	it('returns empty list when no approved terms', () => {

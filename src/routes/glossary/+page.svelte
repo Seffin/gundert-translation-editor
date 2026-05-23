@@ -4,4 +4,4 @@
 	let { data } = $props();
 </script>
 
-<GlossaryManager initialTerms={data.terms} />
+<GlossaryManager initialTerms={data.terms} defaultLanguage={data.userTargetLanguage} />

@@ -10,14 +10,16 @@ const TERMS: GlossaryTerm[] = [
 		sourceTerm: 'Grace',
 		targetTerm: 'Anugrah',
 		status: 'Approved',
-		rationale: 'Unmerited divine favor'
+		rationale: 'Unmerited divine favor',
+		language: 'Malayalam'
 	},
 	{
 		id: 'term-2',
 		sourceTerm: 'Covenant',
 		targetTerm: 'Ahd',
 		status: 'Proposed',
-		rationale: 'Formal agreement'
+		rationale: 'Formal agreement',
+		language: 'Malayalam'
 	}
 ];
 
