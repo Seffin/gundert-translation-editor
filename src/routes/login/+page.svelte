@@ -120,24 +120,6 @@
 					</div>
 				{/if}
 
-				<!-- Google Authentication Option -->
-				<div class="google-auth-wrapper">
-					<a href="/api/auth/google" class="google-login-btn">
-						<svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
-							<path fill="#EA4335" d="M12 5.04c1.67 0 3.19.57 4.38 1.69l3.27-3.27C17.68 1.54 15.01 0 12 0 7.35 0 3.37 2.67 1.48 6.57l3.96 3.07C6.39 6.84 8.97 5.04 12 5.04z"/>
-							<path fill="#4285F4" d="M23.49 12.27c0-.81-.07-1.59-.2-2.35H12v4.51h6.46c-.29 1.48-1.14 2.73-2.42 3.58l3.76 2.91c2.2-2.03 3.49-5.02 3.49-8.65z"/>
-							<path fill="#FBBC05" d="M5.44 14.5c-.24-.71-.38-1.47-.38-2.5s.14-1.79.38-2.5L1.48 6.43C.54 8.26 0 10.07 0 12s.54 3.74 1.48 5.57l3.96-3.07z"/>
-							<path fill="#34A853" d="M12 24c3.24 0 5.97-1.07 7.96-2.92l-3.76-2.91c-1.04.7-2.38 1.12-4.2 1.12-3.03 0-5.61-1.8-6.56-4.61l-3.96 3.07C3.37 21.33 7.35 24 12 24z"/>
-						</svg>
-						Sign in with Google
-					</a>
-					
-					<div class="separator">
-						<span class="separator-line"></span>
-						<span class="separator-text">or fallback with credentials</span>
-						<span class="separator-line"></span>
-					</div>
-				</div>
 
 				<form onsubmit={handleSubmit} class="login-form">
 					<div class="input-group">
@@ -564,7 +546,9 @@
 	.quick-card:hover {
 		background: rgba(30, 41, 59, 0.65);
 		border-color: var(--role-color);
-		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px -3px var(--role-color);
+		box-shadow:
+			0 10px 25px -5px rgba(0, 0, 0, 0.4),
+			0 0 15px -3px var(--role-color);
 		transform: translateY(-2px);
 	}
 
@@ -608,63 +592,6 @@
 		color: #a855f7;
 	}
 
-	/* Google Sign-in styles */
-	.google-auth-wrapper {
-		display: flex;
-		flex-direction: column;
-		gap: 1.25rem;
-		margin-bottom: 1.25rem;
-	}
-
-	.google-login-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.75rem;
-		width: 100%;
-		padding: 0.95rem;
-		background: rgba(255, 255, 255, 0.04);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		border-radius: 0.85rem;
-		color: #ffffff;
-		font-size: 0.95rem;
-		font-weight: 700;
-		text-decoration: none;
-		transition: all 0.25s ease;
-		cursor: pointer;
-	}
-
-	.google-login-btn:hover {
-		background: rgba(255, 255, 255, 0.08);
-		border-color: rgba(56, 189, 248, 0.4);
-		box-shadow: 0 4px 15px -3px rgba(56, 189, 248, 0.15);
-		transform: translateY(-1px);
-	}
-
-	.google-icon {
-		flex-shrink: 0;
-	}
-
-	.separator {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		color: #475569;
-		font-size: 0.78rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		font-weight: 600;
-	}
-
-	.separator-line {
-		flex: 1;
-		height: 1px;
-		background: rgba(255, 255, 255, 0.06);
-	}
-
-	.separator-text {
-		white-space: nowrap;
-	}
 
 	.pre-register-invite {
 		margin-top: 1.75rem;

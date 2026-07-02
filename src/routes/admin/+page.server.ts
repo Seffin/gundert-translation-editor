@@ -10,14 +10,18 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	// Fetch all users in alphabetical order
-	const users = (await db.prepare('SELECT id, username, role FROM users ORDER BY username ASC').all()) as Array<{
+	const users = (await db
+		.prepare('SELECT id, username, role FROM users ORDER BY username ASC')
+		.all()) as Array<{
 		id: number;
 		username: string;
 		role: string;
 	}>;
 
 	// Fetch all pre-registrations ordered by creation time (newest first)
-	const preRegistrations = (await db.prepare('SELECT * FROM pre_registrations ORDER BY created_at DESC').all()) as Array<{
+	const preRegistrations = (await db
+		.prepare('SELECT * FROM pre_registrations ORDER BY created_at DESC')
+		.all()) as Array<{
 		id: number;
 		email: string;
 		name: string;
@@ -97,9 +101,9 @@ export const actions: Actions = {
 
 		try {
 			// Safety lock: prevent demoting the last SuperAdmin
-			const currentRoleQuery = (await db.prepare('SELECT role FROM users WHERE id = ?').get(userId)) as
-				| { role: string }
-				| undefined;
+			const currentRoleQuery = (await db
+				.prepare('SELECT role FROM users WHERE id = ?')
+				.get(userId)) as { role: string } | undefined;
 			if (currentRoleQuery?.role === 'SuperAdmin' && newRole !== 'SuperAdmin') {
 				const superAdminCountQuery = (await db
 					.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'SuperAdmin'")
@@ -193,14 +197,17 @@ export const actions: Actions = {
 			}
 
 			// Update the status of pre-registration request to Approved
-			await db.prepare('UPDATE pre_registrations SET status = ? WHERE id = ?').run('Approved', requestId);
+			await db
+				.prepare('UPDATE pre_registrations SET status = ? WHERE id = ?')
+				.run('Approved', requestId);
 
 			// Check if user already exists
 			const existing = await db.prepare('SELECT id FROM users WHERE username = ?').get(email);
+			let defaultPassword = '';
 			if (!existing) {
 				const salt = generateSalt();
 				// Generate a secure fallback password
-				const defaultPassword = Math.random().toString(36).substring(2, 12);
+				defaultPassword = Math.random().toString(36).substring(2, 12);
 				const passwordHash = hashPassword(defaultPassword, salt);
 
 				const insertUser = db.prepare(`
@@ -213,7 +220,12 @@ export const actions: Actions = {
 				await db.prepare('UPDATE users SET role = ? WHERE id = ?').run(requestedRole, existing.id);
 			}
 
-			return { success: true, message: `Successfully approved request and whitelisted ${email} as ${requestedRole}` };
+			const passwordMessage = defaultPassword ? `. Temporary password is "${defaultPassword}"` : '';
+
+			return {
+				success: true,
+				message: `Successfully approved request and whitelisted ${email} as ${requestedRole}${passwordMessage}`
+			};
 		} catch (err) {
 			console.error('Error approving request:', err);
 			return fail(500, { error: 'Failed to approve access request' });
@@ -243,7 +255,9 @@ export const actions: Actions = {
 			}
 
 			// Update the status of pre-registration request to Rejected
-			await db.prepare('UPDATE pre_registrations SET status = ? WHERE id = ?').run('Rejected', requestId);
+			await db
+				.prepare('UPDATE pre_registrations SET status = ? WHERE id = ?')
+				.run('Rejected', requestId);
 
 			return { success: true, message: `Successfully rejected access request for ${req.email}` };
 		} catch (err) {

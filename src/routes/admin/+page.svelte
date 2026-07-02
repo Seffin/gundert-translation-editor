@@ -10,7 +10,9 @@
 	let showPassword = $state(false);
 
 	let activeTab = $state('members'); // 'members' | 'requests'
-	let pendingCount = $derived(data.preRegistrations?.filter((r: any) => r.status === 'Pending').length || 0);
+	let pendingCount = $derived(
+		data.preRegistrations?.filter((r: any) => r.status === 'Pending').length || 0
+	);
 
 	let loading = $state(false);
 	let message = $derived(form?.message || form?.error || '');
@@ -46,7 +48,9 @@
 			<!-- Whitelist Panel -->
 			<section class="glass-card whitelist-panel">
 				<h2>Whitelist / Pre-Register User</h2>
-				<p class="panel-desc">Add a Google email address or username to authorize access and assign a starting role.</p>
+				<p class="panel-desc">
+					Add a username or email address to authorize access and assign a starting role.
+				</p>
 
 				<form
 					method="POST"
@@ -82,7 +86,13 @@
 						<label for="role">Assigned System Role</label>
 						<div class="input-wrapper">
 							<span class="input-icon">🔑</span>
-							<select id="role" name="role" bind:value={roleInput} disabled={loading} class="role-select">
+							<select
+								id="role"
+								name="role"
+								bind:value={roleInput}
+								disabled={loading}
+								class="role-select"
+							>
 								{#each roles as r}
 									<option value={r.id}>{r.name} - {r.desc}</option>
 								{/each}
@@ -91,7 +101,7 @@
 					</div>
 
 					<div class="input-group">
-						<label for="password">Password (Optional / Fallback Credentials)</label>
+						<label for="password">Password (Defaults to 'default123' if blank)</label>
 						<div class="input-wrapper">
 							<span class="input-icon">🔒</span>
 							<input
@@ -111,7 +121,9 @@
 								{showPassword ? '👁️' : '🙈'}
 							</button>
 						</div>
-						<p class="input-hint">Google users will sign in securely via OAuth. Password is a fallback for testing.</p>
+						<p class="input-hint">
+							Password is required for credentials-based sign in.
+						</p>
 					</div>
 
 					<button type="submit" class="submit-btn" disabled={loading}>
@@ -127,20 +139,20 @@
 			<!-- Directory / Requests Control Desk -->
 			<section class="glass-card directory-panel control-desk-panel">
 				<div class="panel-header-tabs">
-					<button 
-						type="button" 
-						class="tab-btn" 
-						class:active={activeTab === 'members'} 
-						onclick={() => activeTab = 'members'}
+					<button
+						type="button"
+						class="tab-btn"
+						class:active={activeTab === 'members'}
+						onclick={() => (activeTab = 'members')}
 					>
 						Active Members
 						<span class="tab-badge-members">{data.users.length}</span>
 					</button>
-					<button 
-						type="button" 
-						class="tab-btn" 
-						class:active={activeTab === 'requests'} 
-						onclick={() => activeTab = 'requests'}
+					<button
+						type="button"
+						class="tab-btn"
+						class:active={activeTab === 'requests'}
+						onclick={() => (activeTab = 'requests')}
 					>
 						Access Requests
 						{#if pendingCount > 0}
@@ -150,7 +162,9 @@
 				</div>
 
 				{#if activeTab === 'members'}
-					<p class="panel-desc">Active system access maps. Changing a role updates permissions instantly.</p>
+					<p class="panel-desc">
+						Active system access maps. Changing a role updates permissions instantly.
+					</p>
 
 					<div class="table-responsive">
 						<table class="user-table">
@@ -214,13 +228,22 @@
 													};
 												}}
 												onsubmit={(e) => {
-													if (!confirm(`Are you sure you want to revoke access and delete ${user.username}?`)) {
+													if (
+														!confirm(
+															`Are you sure you want to revoke access and delete ${user.username}?`
+														)
+													) {
 														e.preventDefault();
 													}
 												}}
 											>
 												<input type="hidden" name="userId" value={user.id} />
-												<button type="submit" class="revoke-btn" disabled={loading} title="Revoke system access">
+												<button
+													type="submit"
+													class="revoke-btn"
+													disabled={loading}
+													title="Revoke system access"
+												>
 													Revoke Access
 												</button>
 											</form>
@@ -231,7 +254,9 @@
 						</table>
 					</div>
 				{:else}
-					<p class="panel-desc">Review self-service registrations. Approving whitelist credentials grants immediate Google login clearance.</p>
+					<p class="panel-desc">
+						Review self-service registrations. Approving requests grants immediate login clearance.
+					</p>
 
 					{#if !data.preRegistrations || data.preRegistrations.length === 0}
 						<div class="empty-state">
@@ -241,10 +266,10 @@
 					{:else}
 						<div class="requests-list">
 							{#each data.preRegistrations as req (req.id)}
-								<div 
-									class="request-card" 
-									class:pending-card={req.status === 'Pending'} 
-									class:approved-card={req.status === 'Approved'} 
+								<div
+									class="request-card"
+									class:pending-card={req.status === 'Pending'}
+									class:approved-card={req.status === 'Approved'}
 									class:rejected-card={req.status === 'Rejected'}
 								>
 									<div class="request-card-header">
@@ -255,7 +280,12 @@
 												<p class="request-email">{req.email}</p>
 											</div>
 										</div>
-										<span class="status-badge" class:pending={req.status === 'Pending'} class:approved={req.status === 'Approved'} class:rejected={req.status === 'Rejected'}>
+										<span
+											class="status-badge"
+											class:pending={req.status === 'Pending'}
+											class:approved={req.status === 'Approved'}
+											class:rejected={req.status === 'Rejected'}
+										>
 											{req.status}
 										</span>
 									</div>
@@ -263,10 +293,18 @@
 									<div class="request-card-body">
 										<div class="request-detail">
 											<span class="detail-label">Requested Role:</span>
-											<span 
-												class="role-badge-small" 
-												style:--role-bg-color={req.requested_role === 'Lead' ? 'rgba(245, 158, 11, 0.15)' : req.requested_role === 'Reviewer' ? 'rgba(168, 85, 247, 0.15)' : 'rgba(59, 130, 246, 0.15)'} 
-												style:--role-text-color={req.requested_role === 'Lead' ? '#f59e0b' : req.requested_role === 'Reviewer' ? '#c084fc' : '#60a5fa'}
+											<span
+												class="role-badge-small"
+												style:--role-bg-color={req.requested_role === 'Lead'
+													? 'rgba(245, 158, 11, 0.15)'
+													: req.requested_role === 'Reviewer'
+														? 'rgba(168, 85, 247, 0.15)'
+														: 'rgba(59, 130, 246, 0.15)'}
+												style:--role-text-color={req.requested_role === 'Lead'
+													? '#f59e0b'
+													: req.requested_role === 'Reviewer'
+														? '#c084fc'
+														: '#60a5fa'}
 											>
 												{req.requested_role}
 											</span>

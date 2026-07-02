@@ -11,9 +11,21 @@
 	let loading = $state(false);
 
 	const roles = [
-		{ id: 'Translator', name: 'Translator', desc: 'Draft translation segments and manage local term consistency.' },
-		{ id: 'Reviewer', name: 'Reviewer', desc: 'Provide quality review, resolve terminology warnings, and comment.' },
-		{ id: 'Lead', name: 'Project Lead', desc: 'Supervise translation stages, approve final stories, and manage team members.' }
+		{
+			id: 'Translator',
+			name: 'Translator',
+			desc: 'Draft translation segments and manage local term consistency.'
+		},
+		{
+			id: 'Reviewer',
+			name: 'Reviewer',
+			desc: 'Provide quality review, resolve terminology warnings, and comment.'
+		},
+		{
+			id: 'Lead',
+			name: 'Project Lead',
+			desc: 'Supervise translation stages, approve final stories, and manage team members.'
+		}
 	];
 </script>
 
@@ -35,7 +47,10 @@
 					<span class="status-icon">⏳</span>
 					<div class="status-content">
 						<h3>Application Under Review</h3>
-						<p>Your request for <strong>{email}</strong> is currently pending Super Admin approval. Once approved, you will be able to log in with Google instantly.</p>
+						<p>
+							Your request for <strong>{email}</strong> is currently pending Super Admin approval. Once
+							approved, you will be able to log in using your credentials.
+						</p>
 					</div>
 				</div>
 			{:else}
@@ -44,7 +59,10 @@
 						<span class="status-icon">❌</span>
 						<div class="status-content">
 							<h3>Access Application Rejected</h3>
-							<p>The access request for <strong>{email}</strong> was rejected by the administration. Please contact the project administrator directly if you believe this is an error.</p>
+							<p>
+								The access request for <strong>{email}</strong> was rejected by the administration. Please
+								contact the project administrator directly if you believe this is an error.
+							</p>
 						</div>
 					</div>
 				{/if}
@@ -65,15 +83,15 @@
 						</div>
 					{/if}
 
-					<form 
-						method="POST" 
+					<form
+						method="POST"
 						use:enhance={() => {
 							loading = true;
 							return async ({ update }) => {
 								loading = false;
 								await update();
 							};
-						}} 
+						}}
 						class="reg-form"
 					>
 						<!-- User profile pre-fills -->
@@ -82,12 +100,12 @@
 								<label for="reg-name">Full Name</label>
 								<div class="input-wrapper">
 									<span class="field-icon">👤</span>
-									<input 
-										type="text" 
-										id="reg-name" 
-										name="name" 
-										bind:value={name} 
-										placeholder="e.g. Balan Nair" 
+									<input
+										type="text"
+										id="reg-name"
+										name="name"
+										bind:value={name}
+										placeholder="e.g. Balan Nair"
 										disabled={loading}
 										required
 									/>
@@ -95,47 +113,50 @@
 							</div>
 
 							<div class="input-group">
-								<label for="reg-email">Google Email Address</label>
+								<label for="reg-email">Email Address</label>
 								<div class="input-wrapper">
 									<span class="field-icon">📧</span>
-									<!-- Email is readonly if they come prefilled from Google flow for safety -->
-									<input 
-										type="email" 
-										id="reg-email" 
-										name="email" 
-										bind:value={email} 
-										placeholder="e.g. balan.nair@gmail.com" 
+									<!-- Email is readonly if they come prefilled from registration flow for safety -->
+									<input
+										type="email"
+										id="reg-email"
+										name="email"
+										bind:value={email}
+										placeholder="e.g. balan.nair@gmail.com"
 										readonly={!!data.email}
 										disabled={loading}
 										required
 									/>
 								</div>
 								{#if data.email}
-									<span class="input-help">Verified Google email address. Locked for security.</span>
+									<span class="input-help">Email address. Locked for security.</span>
 								{/if}
 							</div>
 						</div>
 
 						<!-- Role Selection -->
 						<div class="role-selection">
-							<label class="block-label">Select Workspace Role</label>
-							<p class="role-desc">Select the workspace access clearance you require. This is subject to lead verification.</p>
-							
+							<span class="block-label">Select Workspace Role</span>
+							<p class="role-desc">
+								Select the workspace access clearance you require. This is subject to lead
+								verification.
+							</p>
+
 							<div class="role-cards-grid">
 								{#each roles as role}
-									<button 
-										type="button" 
-										class="role-card" 
+									<button
+										type="button"
+										class="role-card"
 										class:selected={selectedRole === role.id}
-										onclick={() => selectedRole = role.id}
+										onclick={() => (selectedRole = role.id)}
 										disabled={loading}
 									>
-										<input 
-											type="radio" 
-											name="role" 
-											value={role.id} 
+										<input
+											type="radio"
+											name="role"
+											value={role.id}
 											checked={selectedRole === role.id}
-											style="display:none;" 
+											style="display:none;"
 										/>
 										<div class="role-radio-indicator"></div>
 										<div class="role-info">
@@ -150,12 +171,15 @@
 						<!-- Justification -->
 						<div class="input-group">
 							<label for="reg-justification">Workspace Justification / Experience</label>
-							<p class="input-help-above">Briefly explain your role in this translation project or details for the Lead to confirm your access.</p>
-							<textarea 
-								id="reg-justification" 
-								name="justification" 
+							<p class="input-help-above">
+								Briefly explain your role in this translation project or details for the Lead to
+								confirm your access.
+							</p>
+							<textarea
+								id="reg-justification"
+								name="justification"
 								bind:value={justification}
-								placeholder="Describe your qualifications, organization, or translating context..." 
+								placeholder="Describe your qualifications, organization, or translating context..."
 								rows="4"
 								disabled={loading}
 							></textarea>
@@ -428,7 +452,8 @@
 		transition: all 0.2s ease;
 	}
 
-	.input-wrapper input:focus, .input-group textarea:focus {
+	.input-wrapper input:focus,
+	.input-group textarea:focus {
 		outline: none;
 		border-color: #a855f7;
 		background: rgba(15, 23, 42, 0.8);
@@ -518,7 +543,7 @@
 	}
 
 	.role-radio-indicator::after {
-		content: "";
+		content: '';
 		position: absolute;
 		top: 50%;
 		left: 50%;
@@ -603,7 +628,9 @@
 	}
 
 	@keyframes spin {
-		to { transform: rotate(360deg); }
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.actions-footer {
