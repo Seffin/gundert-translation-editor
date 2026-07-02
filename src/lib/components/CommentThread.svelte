@@ -320,7 +320,9 @@
 		font-size: 0.75rem;
 		cursor: pointer;
 		font-weight: 700;
-		transition: background 0.2s, transform 0.2s;
+		transition:
+			background 0.2s,
+			transform 0.2s;
 	}
 
 	.resolve-btn:hover {
@@ -336,7 +338,9 @@
 		font-size: 0.875rem;
 		cursor: pointer;
 		font-weight: 700;
-		transition: background 0.2s, transform 0.2s;
+		transition:
+			background 0.2s,
+			transform 0.2s;
 		width: 100%;
 	}
 
@@ -416,7 +420,9 @@
 		font-size: 0.875rem;
 		cursor: pointer;
 		font-weight: 700;
-		transition: background 0.2s, transform 0.2s;
+		transition:
+			background 0.2s,
+			transform 0.2s;
 	}
 
 	.add-comment button:hover:not(:disabled) {

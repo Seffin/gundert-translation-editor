@@ -40,15 +40,18 @@ export const actions: Actions = {
 			const checkUser = db.prepare('SELECT id FROM users WHERE LOWER(username) = ?');
 			const existingUser = await checkUser.get(email);
 			if (existingUser) {
-				return fail(400, { error: 'Your email is already registered and whitelisted! Please go to the login screen and sign in.' });
+				return fail(400, {
+					error:
+						'Your email is already registered and whitelisted! Please go to the login screen and sign in.'
+				});
 			}
 
 			// Verify if user already has a pending pre-registration request
 			const checkReq = db.prepare('SELECT status FROM pre_registrations WHERE email = ?');
-			const existingReq = await checkReq.get(email) as { status: string } | undefined;
+			const existingReq = (await checkReq.get(email)) as { status: string } | undefined;
 			if (existingReq) {
-				return fail(400, { 
-					error: `An access request for this email already exists with status: "${existingReq.status}".` 
+				return fail(400, {
+					error: `An access request for this email already exists with status: "${existingReq.status}".`
 				});
 			}
 
@@ -59,7 +62,11 @@ export const actions: Actions = {
 			`);
 			await insertReq.run(email, name, requestedRole, justification, 'Pending', Date.now());
 
-			return { success: true, message: 'Your application has been successfully submitted! A Super Admin will review your request shortly.' };
+			return {
+				success: true,
+				message:
+					'Your application has been successfully submitted! A Super Admin will review your request shortly.'
+			};
 		} catch (err) {
 			console.error('Pre-registration submission failure:', err);
 			return fail(500, { error: 'An unexpected database error occurred. Please try again later.' });

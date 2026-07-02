@@ -3,6 +3,7 @@
 Use this as your implementation checklist.
 
 ## Phase 0: Foundations and Guardrails
+
 Status: Completed
 
 - [x] Confirm integration mode
@@ -18,13 +19,16 @@ Status: Completed
   - enableBibleTextFetch
 
 Definition of done:
+
 - [x] App runs with feature flag off (no regressions)
 - [x] Feature flag on shows placeholder viewer shell
 
 Validation note:
+
 - Enable shell quickly with URL parameter: `pages/browser.html?ff_enableBibleViewer=1`
 
 ## Phase 1: UI Skeleton (No live API yet)
+
 Status: Completed
 
 - [x] Add Bible Settings entry point in pages/browser.html
@@ -34,11 +38,13 @@ Status: Completed
 - [x] Render mock stacked version cards (hardcoded test data)
 
 Definition of done:
+
 - [x] Clicking a reference opens viewer
 - [x] Viewer displays stacked cards (one version per card)
 - [x] Close/open flow works on desktop and mobile
 
 Validation notes:
+
 - Enable with: `pages/browser.html?ff_enableBibleViewer=1`
 - ⚙ Bible Versions button appears in sidebar
 - Clicking any reference chip opens right-side viewer panel with 3 mock version cards (ESV, KJV, French)
@@ -46,6 +52,7 @@ Validation notes:
 - Reference label in viewer header shows the clicked reference string
 
 ## Phase 2: Settings + Catalog Curation
+
 Status: Completed
 
 - [x] Add settings state model in pages/browser.html
@@ -56,11 +63,13 @@ Status: Completed
 - [x] Restore selected versions on reload
 
 Definition of done:
+
 - [x] User can select multiple versions grouped by language
 - [x] Selection persists after refresh
 - [x] Catalog UX remains responsive
 
 Validation notes:
+
 - Enable with: `pages/browser.html?ff_enableBibleViewer=1`
 - 25 Bible versions across 15 language groups (English, French, Spanish, Portuguese, German, Swahili, Indonesian, Tagalog, Hindi, Amharic, Hausa, Yoruba, Zulu, Tok Pisin, Malagasy)
 - Default selection: ENGESV restored on first load
@@ -69,12 +78,15 @@ Validation notes:
 - `BIBLE_CATALOG` is the single source of truth — Phase 3 API adapter will read from the same selected IDs
 
 ## Phase 3: Live Bible Text Fetch
+
 Status: Blocked until API key
 
 Dependency:
+
 - [ ] Bible.is/BibleBrains API key provided
 
 Tasks:
+
 - [ ] Add API client adapter (single integration layer)
 - [ ] Map parsed references to API request format
 - [ ] Fetch text per selected Bible identifier
@@ -83,11 +95,13 @@ Tasks:
 - [ ] Add Open on Bible.is deep link for each version
 
 Definition of done:
+
 - [ ] Clicking a reference loads real text for selected versions
 - [ ] Failed version fetch does not break other versions
 - [ ] At least one successful end-to-end reference load
 
 ## Phase 4: Larger Context (Show More)
+
 Status: Not started
 
 - [ ] Default view
@@ -102,11 +116,13 @@ Status: Not started
   - Full chapter (optional if API supports efficiently)
 
 Definition of done:
+
 - [ ] Show more expands context without reloading full UI
 - [ ] User can independently expand/collapse per version
 - [ ] Expanded content is readable and performant
 
 ## Phase 5: Performance + Resilience
+
 Status: Not started
 
 - [ ] Add response caching by reference+version
@@ -116,11 +132,13 @@ Status: Not started
 - [ ] Add graceful fallback link when content unavailable
 
 Definition of done:
+
 - [ ] Repeat reference opens feel fast
 - [ ] No UI freeze when multiple versions are selected
 - [ ] Errors are actionable and non-blocking
 
 ## Phase 6: UX Polish + QA
+
 Status: Not started
 
 - [ ] Keyboard navigation for viewer and settings
@@ -132,11 +150,13 @@ Status: Not started
   - Image rendering
 
 Definition of done:
+
 - [ ] No regressions in existing browser behavior
 - [ ] Viewer is usable on desktop and mobile
 - [ ] Ready for production flag enablement
 
 ## API Key Handoff Checklist
+
 Status: Waiting
 
 - [ ] API base URL

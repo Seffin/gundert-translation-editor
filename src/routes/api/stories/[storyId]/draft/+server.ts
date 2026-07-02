@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ params }) => {
 			JOIN users u ON d.saved_by_user_id = u.id 
 			WHERE d.story_id = ?
 		`);
-		const rows = await stmt.all(storyId) as any[];
+		const rows = (await stmt.all(storyId)) as any[];
 
 		if (rows.length === 0) {
 			return json({ draft: null });
@@ -70,7 +70,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		}
 
 		// Fallback user id if unauthenticated (e.g. in tests)
-		const userId = locals.user?.id ?? 1; 
+		const userId = locals.user?.id ?? 1;
 
 		const queries = Object.entries(draft.segments).map(([segmentId, seg]) => ({
 			sql: `INSERT OR REPLACE INTO story_drafts (story_id, segment_id, target_text, saved_by_user_id, saved_at)

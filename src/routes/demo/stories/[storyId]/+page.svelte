@@ -13,7 +13,7 @@
 <article class="showcase-reader">
 	<header class="reader-header">
 		<a href={`/demo?lang=${data.targetLanguage}`} class="back-link">← Back to Showcase Dashboard</a>
-		
+
 		<div class="title-meta">
 			<span class="story-badge">Story {story.storyId}</span>
 			<h1>{story.title}</h1>
@@ -24,7 +24,11 @@
 				<span class="status-icon">✓</span>
 				<div class="status-content">
 					<h3>{data.targetLanguage} Publication Live</h3>
-					<p>This story was approved by the Project Lead and is successfully written to <code>{data.langCode}_obs/content/{story.storyId}.md</code>.</p>
+					<p>
+						This story was approved by the Project Lead and is successfully written to <code
+							>{data.langCode}_obs/content/{story.storyId}.md</code
+						>.
+					</p>
 				</div>
 			</div>
 		{:else}
@@ -32,7 +36,11 @@
 				<span class="status-icon">⚠</span>
 				<div class="status-content">
 					<h3>Preview Mode (English Fallback)</h3>
-					<p>The {data.targetLanguage} translation for this story has not yet been approved. Showing original English text. You can approve this story in the <a href="/lead">Project Lead Approval Gate</a>.</p>
+					<p>
+						The {data.targetLanguage} translation for this story has not yet been approved. Showing original
+						English text. You can approve this story in the
+						<a href="/lead">Project Lead Approval Gate</a>.
+					</p>
 				</div>
 			</div>
 		{/if}
@@ -43,7 +51,11 @@
 			<div class="story-row">
 				{#if segment.imageUrl}
 					<div class="story-illustration-container">
-						<img src={segment.imageUrl} alt={`Segment ${index + 1} illustration`} class="story-illustration" />
+						<img
+							src={segment.imageUrl}
+							alt={`Segment ${index + 1} illustration`}
+							class="story-illustration"
+						/>
 					</div>
 				{/if}
 				<div class="story-text-container">
@@ -181,12 +193,16 @@
 		border-radius: 1.5rem;
 		overflow: hidden;
 		box-shadow: var(--shadow-subtle);
-		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+		transition:
+			transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+			box-shadow 0.3s ease;
 	}
 
 	.story-row:hover {
 		transform: translateY(-4px);
-		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+		box-shadow:
+			0 20px 25px -5px rgba(0, 0, 0, 0.1),
+			0 10px 10px -5px rgba(0, 0, 0, 0.04);
 	}
 
 	.story-illustration-container {

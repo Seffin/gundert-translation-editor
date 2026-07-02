@@ -9,7 +9,10 @@
 	} from '$lib/glossary';
 	import { SUPPORTED_LANGUAGES } from '$lib/client/target-language';
 
-	let { initialTerms, defaultLanguage = 'Malayalam' } = $props<{ initialTerms: GlossaryTerm[]; defaultLanguage?: string }>();
+	let { initialTerms, defaultLanguage = 'Malayalam' } = $props<{
+		initialTerms: GlossaryTerm[];
+		defaultLanguage?: string;
+	}>();
 
 	let terms = $state<GlossaryTerm[]>([]);
 	let draft = $state<GlossaryTermDraft>(createGlossaryTermDraft('Malayalam'));
@@ -17,7 +20,7 @@
 	let message = $state('');
 
 	onMount(() => {
-		terms = initialTerms.map((term) => ({ ...term }));
+		terms = initialTerms.map((term: GlossaryTerm) => ({ ...term }));
 		draft.language = defaultLanguage;
 	});
 

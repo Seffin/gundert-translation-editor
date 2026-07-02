@@ -14,6 +14,8 @@ describe('page metadata', () => {
 		expect(getPageMetadata('/lead').title).toBe('Lead Approval');
 		expect(getPageMetadata('/glossary').title).toBe('Glossary');
 		expect(getPageMetadata('/activity').title).toBe('Activity Log');
+		expect(getPageMetadata('/login').title).toBe('Login');
+		expect(getPageMetadata('/pre-register').title).toBe('Apply for Access');
 	});
 
 	it('falls back to home metadata for unknown routes', () => {

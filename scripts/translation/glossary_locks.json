@@ -1,26 +1,5 @@
 {
-  "fr": [
-    "Yahweh",
-    "Leviathan",
-    "Azazel",
-    "cherub",
-    "seraph",
-    "behemah",
-    "chayah",
-    "z\u014don"
-  ],
-  "es": [
-    "Yahweh",
-    "Leviathan",
-    "Azazel",
-    "cherub",
-    "seraph"
-  ],
-  "pt": [
-    "Yahweh",
-    "Leviathan",
-    "Azazel",
-    "cherub",
-    "seraph"
-  ]
+	"fr": ["Yahweh", "Leviathan", "Azazel", "cherub", "seraph", "behemah", "chayah", "z\u014don"],
+	"es": ["Yahweh", "Leviathan", "Azazel", "cherub", "seraph"],
+	"pt": ["Yahweh", "Leviathan", "Azazel", "cherub", "seraph"]
 }

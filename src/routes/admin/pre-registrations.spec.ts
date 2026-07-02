@@ -9,9 +9,9 @@ describe('Admin pre-registrations approval actions', () => {
 		} as unknown as Request;
 
 		// Try without user
-		await expect(
-			actions.approveRequest({ request, locals: {} } as any)
-		).rejects.toMatchObject({ status: 403 });
+		await expect(actions.approveRequest({ request, locals: {} } as any)).rejects.toMatchObject({
+			status: 403
+		});
 
 		// Try with Translator role
 		await expect(
@@ -24,14 +24,25 @@ describe('Admin pre-registrations approval actions', () => {
 
 	it('should allow SuperAdmin to approve a pre-registration request and whitelist user', async () => {
 		const uniqueEmail = `scholar-${Math.random().toString(36).substring(7)}@gmail.com`;
-		
+
 		// Seed a pending pre-registration request
-		await db.prepare('INSERT INTO pre_registrations (email, name, requested_role, justification, status, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-			.run(uniqueEmail, 'Scholar Heidelberg', 'Reviewer', 'I am an OBS scholar.', 'Pending', Date.now());
+		await db
+			.prepare(
+				'INSERT INTO pre_registrations (email, name, requested_role, justification, status, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+			)
+			.run(
+				uniqueEmail,
+				'Scholar Heidelberg',
+				'Reviewer',
+				'I am an OBS scholar.',
+				'Pending',
+				Date.now()
+			);
 
 		// Query request to get its ID
-		const preRegs = await db.prepare('SELECT * FROM pre_registrations').all();
-		const savedReq = preRegs.find((r: any) => r.email === uniqueEmail);
+		const savedReq = (await db
+			.prepare('SELECT * FROM pre_registrations WHERE email = ?')
+			.get(uniqueEmail)) as any;
 		expect(savedReq).toBeDefined();
 
 		const formData = new FormData();
@@ -53,8 +64,9 @@ describe('Admin pre-registrations approval actions', () => {
 		expect(result.message).toContain('Successfully approved');
 
 		// Verify registration status updated to Approved
-		const updatedPreRegs = await db.prepare('SELECT * FROM pre_registrations').all();
-		const updatedReq = updatedPreRegs.find((r: any) => r.email === uniqueEmail);
+		const updatedReq = (await db
+			.prepare('SELECT * FROM pre_registrations WHERE email = ?')
+			.get(uniqueEmail)) as any;
 		expect(updatedReq.status).toBe('Approved');
 
 		// Verify user was successfully whitelisted in users table
@@ -67,11 +79,22 @@ describe('Admin pre-registrations approval actions', () => {
 		const uniqueEmail = `rejected-${Math.random().toString(36).substring(7)}@gmail.com`;
 
 		// Seed a pending pre-registration request
-		await db.prepare('INSERT INTO pre_registrations (email, name, requested_role, justification, status, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-			.run(uniqueEmail, 'Rejected Applicant', 'Translator', 'Not enough info.', 'Pending', Date.now());
+		await db
+			.prepare(
+				'INSERT INTO pre_registrations (email, name, requested_role, justification, status, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+			)
+			.run(
+				uniqueEmail,
+				'Rejected Applicant',
+				'Translator',
+				'Not enough info.',
+				'Pending',
+				Date.now()
+			);
 
-		const preRegs = await db.prepare('SELECT * FROM pre_registrations').all();
-		const savedReq = preRegs.find((r: any) => r.email === uniqueEmail);
+		const savedReq = (await db
+			.prepare('SELECT * FROM pre_registrations WHERE email = ?')
+			.get(uniqueEmail)) as any;
 
 		const formData = new FormData();
 		formData.append('requestId', savedReq!.id.toString());
@@ -90,8 +113,9 @@ describe('Admin pre-registrations approval actions', () => {
 		expect(result.message).toContain('Successfully rejected');
 
 		// Verify registration status updated to Rejected
-		const updatedPreRegs = await db.prepare('SELECT * FROM pre_registrations').all();
-		const updatedReq = updatedPreRegs.find((r: any) => r.email === uniqueEmail);
+		const updatedReq = (await db
+			.prepare('SELECT * FROM pre_registrations WHERE email = ?')
+			.get(uniqueEmail)) as any;
 		expect(updatedReq.status).toBe('Rejected');
 	});
 });

@@ -9,6 +9,7 @@ Phase 1 north-star metric:
 Median time to validated export (from resource import to approved, round-trippable export for one resource version).
 
 **Key Features:**
+
 - Multi-source resource support (UBS dictionaries, lexicons, theology resources, translations, commentaries, etc.)
 - Multi-format import (XML, JSON, Markdown, SFM, and more)
 - AI-assisted drafting and AI-assisted validation
@@ -42,17 +43,20 @@ Median time to validated export (from resource import to approved, round-trippab
 The original static HTML PoC is preserved under `legacy-poc/`.
 
 The active product surface is in Next.js 16 with React components:
+
 - `/` - Home page (authentication gateway)
 - `/browser` - Resource browser (mobile-first, modern UI)
 - `/translator` - Translation workbench (AI-assisted drafting and validation)
 
 **Legacy files (preserved for reference):**
+
 - `legacy-poc/pages/browser.html`, `legacy-poc/pages/translator.html` - Original PoC UI
 - `legacy-poc/assets/js/browser.js`, `legacy-poc/assets/js/translator.js` - Legacy JavaScript logic
 
 ## Data Format Support
 
 The editor accepts translation resources in multiple formats:
+
 - **XML** - UBS dictionaries (ThematicLexicon format), OSIS Bibles
 - **JSON** - Structured lexicons, metadata bundles
 - **Markdown** - Commentary entries, theology resources

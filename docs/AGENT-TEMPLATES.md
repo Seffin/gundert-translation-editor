@@ -7,22 +7,27 @@ Use these templates for repeated workflows. Keep comments in plain language.
 Purpose: match the structure already used in this repository.
 
 Observed pattern:
+
 - Title prefix includes both tracker ID and story/feature ID.
 - User-story issues are concise (single-sentence body).
 - Most issues currently have no labels.
 
 Title format:
+
 - User story: `GH-XXX US-XXX <short feature title>`
 - Feature requirement: `GH-XXX FR-XX <short feature title>`
 
 Lean issue body template (default):
+
 - `<Role> needs <capability> so <outcome>.`
 
 Examples:
+
 - `Translators need fast, unified search to jump directly to entries without mode toggles.`
 - `Admin needs to import UBS FAUNA, FLORA, and REALIA XML files so entries are available for browsing.`
 
 Expanded technical issue template (use only when needed):
+
 - Objective: <what must be implemented>
 - Failing tests: <test groups and key failures>
 - Deliverables: <files/artifacts expected>
@@ -30,6 +35,7 @@ Expanded technical issue template (use only when needed):
 - Notes: <constraints and non-goals>
 
 `gh` examples:
+
 ```bash
 gh issue create --title "GH-014 US-011 <title>" --body "<Role> needs <capability> so <outcome>."
 gh issue create --title "GH-015 FR-04 <title>" --body-file <path-to-detailed-body.txt>
@@ -40,6 +46,7 @@ gh issue create --title "GH-015 FR-04 <title>" --body-file <path-to-detailed-bod
 Purpose: define Red -> Green -> Refactor scope.
 
 Template:
+
 - Goal: <what behavior is being added/fixed>
 - Red (failing tests first):
   - Add/adjust test: <test name/path>
@@ -57,6 +64,7 @@ Template:
 Purpose: record what was tested/covered for issue-linked work.
 
 Template:
+
 - Summary: <one-line status>
 - Covered/Tested:
   - <behavior/test area 1>
@@ -70,6 +78,7 @@ Template:
   - <known limitation or risk>
 
 `gh` example:
+
 ```bash
 gh issue comment <issue-number> --body-file <path-to-comment.txt>
 ```
@@ -79,6 +88,7 @@ gh issue comment <issue-number> --body-file <path-to-comment.txt>
 Purpose: keep commits clear and consistent.
 
 Template:
+
 - Title: <type>(<scope>): <short summary>
 - Body:
   - Why: <problem>
@@ -92,6 +102,7 @@ Example types: feat, fix, refactor, test, docs, chore.
 Purpose: explain intent, scope, and verification.
 
 Template:
+
 - What changed:
   - <change 1>
   - <change 2>
@@ -106,6 +117,7 @@ Template:
   - <future task 1>
 
 `gh` example:
+
 ```bash
 gh pr create --title "<title>" --body-file <path-to-pr-body.txt>
 ```
@@ -115,6 +127,7 @@ gh pr create --title "<title>" --body-file <path-to-pr-body.txt>
 Purpose: capture root cause before fixing.
 
 Template:
+
 - Symptom: <what user sees>
 - Repro steps:
   1. <step 1>
@@ -129,6 +142,7 @@ Template:
 Purpose: concise report after validation.
 
 Template:
+
 - Scope tested: <feature/module>
 - Commands run:
   - <command 1>
@@ -146,6 +160,7 @@ Template:
 Purpose: avoid missing release steps.
 
 Template:
+
 - [ ] Tests pass locally
 - [ ] Build succeeds
 - [ ] Lint/type checks pass
@@ -160,6 +175,7 @@ Template:
 Purpose: consistent closeout in long tasks.
 
 Template:
+
 - Status: <done/in progress/blocked>
 - Files changed: <paths>
 - Validation: <commands/tests>

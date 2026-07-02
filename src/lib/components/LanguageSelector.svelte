@@ -51,7 +51,9 @@
 		background: var(--color-surface);
 		color: var(--color-on-surface);
 		cursor: pointer;
-		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
 	}
 
 	select:focus {

@@ -9,6 +9,7 @@ The resource browser is the **primary entry point** for users to discover, filte
 **Primary Goal:** Enable users to browse translation resources (dictionaries, lexicons, Bibles, commentaries, etc.) by filtering, searching, and viewing individual entries with source text and any existing translations.
 
 **Core Features (Phase 1):**
+
 1. **Resource Library View** - List of available translation resources (UBS, unfoldingWord, SIL, Tyndale, Strong's, etc.)
 2. **Entry Search & Filter** - Search by entry key, title, Bible reference (for relevant resources)
 3. **Entry Viewer** - Side-by-side source and target language display
@@ -70,30 +71,35 @@ Desktop (> 1024px):
 ## Key Components
 
 ### Header
+
 - Logo / App name
 - Search bar (entry/reference search)
 - Settings button (language, format preferences)
 - Breadcrumb (resource name)
 
 ### Resource Library (Sidebar - Desktop only)
+
 - Filterable list of translation resources
 - Resource type badge (Dictionary, Lexicon, Bible, Commentary, etc.)
 - Source label (UBS, unfoldingWord, SIL, Tyndale, Strong's)
 - Entry count per resource
 
 ### Entry List
+
 - Searchable, scrollable list
 - Entry key + title + Bible reference (if applicable)
 - Active entry highlight
 - Virtual scrolling for large datasets (1000+ entries)
 
 ### Entry Viewer
+
 - **Source Column**: Original entry text (language tag, read-only)
 - **Target Column**: Existing translations (by language, editable for authorized users)
 - **Metadata Panel**: Entry key, source, references, creation date, last translator
 - **Actions**: Link to translator workbench, export, compare languages
 
 ### Filters (Mobile Drawer / Desktop Sidebar)
+
 - Resource type (Dictionary, Lexicon, Bible, Commentary, etc.)
 - Source (UBS, unfoldingWord, SIL, Tyndale, Strong's)
 - Language (source + target)
@@ -103,10 +109,10 @@ Desktop (> 1024px):
 
 - Provide a dedicated filter for translation status in the browser list.
 - Minimum statuses in Phase 1:
-   - `Untranslated`
-   - `Draft`
-   - `Ready for Review`
-   - `Approved`
+  - `Untranslated`
+  - `Draft`
+  - `Ready for Review`
+  - `Approved`
 - Filter applies within current search scope and selected target language.
 - Status filter state is represented in URL query params for shareable views.
 
@@ -120,9 +126,9 @@ Desktop (> 1024px):
 ### Default Target Language (Accepted)
 
 - Target language resolution order:
-   1. user preference
-   2. organization default
-   3. project fallback (`ml` for current UBS Phase 1)
+  1.  user preference
+  2.  organization default
+  3.  project fallback (`ml` for current UBS Phase 1)
 - Selected language controls translation-status evaluation and cache keys.
 - User changes are persisted as preference for future sessions.
 
@@ -131,11 +137,13 @@ Desktop (> 1024px):
 Use a two-layer scope selector for unified search.
 
 ### Layer 1: Scope Chips (always visible)
+
 - `All`
 - `Selected Resources`
 - `Current Resource`
 
 ### Layer 2: Resource Picker Drawer (on demand)
+
 - Opened when users choose or edit `Selected Resources`
 - Multi-select resource versions (example: `UBS FAUNA v1.0`, `UBS FLORA v1.0`)
 - Search runs only against selected resources when `Selected Resources` is active
@@ -145,6 +153,7 @@ This keeps default UX simple while enabling precise cross-resource control as ca
 ## Data Display Format
 
 Each entry viewer should display:
+
 ```
 Entry Key: A123
 Title: Lion
@@ -172,15 +181,15 @@ Related References:
 
 - Use a unified search box (no mode toggle in Phase 1).
 - One query searches across:
-   - entry key
-   - title
-   - indexed source content snippets
-   - Bible references
+  - entry key
+  - title
+  - indexed source content snippets
+  - Bible references
 - Query results can be narrowed further by translation status filter.
 - Bible references are matched using all three formats:
-   - human-readable forms (example: John 3:16)
-   - USFM notation (example: JHN 3:16)
-   - mnemonic numeric forms stored in source data (example: 04400301600005)
+  - human-readable forms (example: John 3:16)
+  - USFM notation (example: JHN 3:16)
+  - mnemonic numeric forms stored in source data (example: 04400301600005)
 - Result cards show match context and field type (key/title/content/reference) to reduce ambiguity.
 
 This replaces separate Entries vs Bible Refs modes for a simpler and faster user workflow.
@@ -188,6 +197,7 @@ This replaces separate Entries vs Bible Refs modes for a simpler and faster user
 ### Unified Search Ranking (Accepted)
 
 Default result ordering:
+
 1. Exact entry key match
 2. Exact title match
 3. Prefix title match
@@ -253,6 +263,7 @@ Hybrid loading is the default strategy for browser UX.
 - Cache invalidates when resource version, language, or major filter scope changes.
 
 Rationale:
+
 - Better translator UX than pure server reloads.
 - Better scalability than loading all entries in-browser.
 - Works for current UBS scope and future multi-source expansion.

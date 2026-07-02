@@ -3,6 +3,7 @@
 Use this tracker to execute and monitor the POC's translation feature delivery.
 
 Single point of truth:
+
 - This document is the authoritative status log for translation work.
 - Implementation decisions and phase readiness should be reflected here first.
 
@@ -32,6 +33,7 @@ Single point of truth:
   - Lock adaptation editing rules before Phase 7 pilot hardening.
 
 ## Phase 0: Scope and Baseline
+
 Status: Not started
 
 - [ ] Confirm target languages for first release
@@ -42,9 +44,11 @@ Status: Not started
 - [ ] Confirm adaptation policy for target-only blocks and paragraph restructuring
 
 Definition of done:
+
 - [ ] Scope decisions documented and approved
 
 ## Phase 1: Data Contract and Core Pipeline
+
 Status: Completed
 
 - [x] Align generated data contract with browser (`ALL_DICTIONARY_ENTRIES`)
@@ -55,10 +59,12 @@ Status: Completed
 - [x] Finalize and implement v1 JSON draft contract with source anchors and operation log
 
 Definition of done:
+
 - [x] Can generate target XML without changing source XML
 - [x] XML -> JSON -> XML round-trip succeeds for pilot entries with zero protected drift
 
 ## Phase 2: Deterministic Validation
+
 Status: In progress
 
 - [x] XML well-formedness validator
@@ -68,9 +74,11 @@ Status: In progress
 - [x] Entry ordering/key consistency validator
 
 Definition of done:
+
 - [x] Validator blocks any protected-content drift
 
 ## Phase 3: MT Draft Translation
+
 Status: In progress
 
 - [x] Add MT adapter interface
@@ -80,9 +88,11 @@ Status: In progress
 - [x] Add dry-run mode for no-write testing
 
 Definition of done:
+
 - [x] Draft translation can run entry-by-entry with protected placeholders intact
 
 ## Phase 4: LLM QA Validation
+
 Status: Completed
 
 - [x] Add LLM QA prompt and structured output parser
@@ -92,9 +102,11 @@ Status: Completed
 - [x] Add policy-aware checks for target-only blocks, paragraph splits, and merges
 
 Definition of done:
+
 - [x] LLM validation report produced per entry and batch
 
 ## Phase 5: XSD Validation
+
 Status: In progress
 
 - [x] Create initial schema (`schemas/thematic_lexicon.xsd`)
@@ -103,9 +115,11 @@ Status: In progress
 - [x] Add CI or batch validation command
 
 Definition of done:
+
 - [x] Target XML fails fast on schema violations
 
 ## Phase 6: Translator UI Workbench
+
 Status: In progress
 
 - [x] Create `pages/translator.html`
@@ -119,10 +133,12 @@ Status: In progress
 - [x] Add adaptation-aware reader preview mode
 
 Definition of done:
+
 - [ ] Translator can complete full flow from UI without editing raw XML files
 - [ ] Translator can add approved target-only content without breaking canonical validation
 
 ## Phase 7: Pilot and Hardening
+
 Status: Not started
 
 - [ ] Pilot on FAUNA only
@@ -133,9 +149,11 @@ Status: Not started
 - [ ] Measure adaptation usage patterns: additions, splits, merges, and validation friction
 
 Definition of done:
+
 - [ ] Three dictionaries pass validation and render correctly
 
 ## Phase 8: Documentation and Handoff
+
 Status: Not started
 
 - [ ] Update README with translation commands
@@ -144,6 +162,7 @@ Status: Not started
 - [ ] Add release notes for translation feature
 
 Definition of done:
+
 - [ ] Team can run and maintain translation workflow independently
 
 ---
@@ -151,19 +170,28 @@ Definition of done:
 ## New Suggestions (Prioritized)
 
 1. Implement Phase 4 next with a strict JSON report contract:
-  - `errors[]`, `warnings[]`, `suggested_fixes[]`, `entryKey`.
-  - Fail pipeline on `errors.length > 0`.
+
+- `errors[]`, `warnings[]`, `suggested_fixes[]`, `entryKey`.
+- Fail pipeline on `errors.length > 0`.
+
 2. Add a minimal-but-enforceable XSD in Phase 5 first, then tighten iteratively:
-  - Start with entry/key/section/reference constraints.
-  - Expand to optional metadata strictness after pilot.
+
+- Start with entry/key/section/reference constraints.
+- Expand to optional metadata strictness after pilot.
+
 3. Add glossary lock support in Phase 4/Phase 7:
-  - Do-not-translate term list by target language.
-  - Warn on terminology drift.
+
+- Do-not-translate term list by target language.
+- Warn on terminology drift.
+
 4. Add batch orchestration command after Phase 5:
-  - Draft -> deterministic validate -> LLM validate -> XSD validate.
+
+- Draft -> deterministic validate -> LLM validate -> XSD validate.
+
 5. Pilot quality metrics in Phase 7:
-  - Post-edit distance per entry.
-  - Validation failure categories by frequency.
+
+- Post-edit distance per entry.
+- Validation failure categories by frequency.
 
 ## Verification Commands (Current)
 
@@ -181,7 +209,7 @@ Definition of done:
 
 ## Weekly Status Snapshot
 
-Week of: __________
+Week of: ****\_\_****
 
 - Overall status: [ ] Green [ ] Amber [ ] Red
 - Completed this week:

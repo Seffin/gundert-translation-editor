@@ -25,7 +25,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 				JOIN users u ON s.user_id = u.id
 				WHERE s.id = ?
 			`);
-			const session = await stmt.get(sessionCookie) as { id: string; expires_at: number; user_id: number; username: string; role: string; target_language?: string | null } | undefined;
+			const session = (await stmt.get(sessionCookie)) as
+				| {
+						id: string;
+						expires_at: number;
+						user_id: number;
+						username: string;
+						role: string;
+						target_language?: string | null;
+				  }
+				| undefined;
 
 			if (session) {
 				if (session.expires_at > Date.now()) {
@@ -54,10 +63,17 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const isAuthApi = path.startsWith('/api/auth');
 	const isDemo = path.startsWith('/demo');
 	const isLogin = path === '/login';
+	const isPreRegister = path === '/pre-register' || path === '/preregistration';
 	// Let SvelteKit's dev assets, standard static assets, and favicon run public
-	const isStaticAsset = path.includes('.') || path.startsWith('/favicon') || path.startsWith('/src') || path.startsWith('/@') || path.startsWith('/node_modules') || path.startsWith('/static');
+	const isStaticAsset =
+		path.includes('.') ||
+		path.startsWith('/favicon') ||
+		path.startsWith('/src') ||
+		path.startsWith('/@') ||
+		path.startsWith('/node_modules') ||
+		path.startsWith('/static');
 
-	const isPublic = isLogin || isDemo || isAuthApi || isStaticAsset;
+	const isPublic = isLogin || isPreRegister || isDemo || isAuthApi || isStaticAsset;
 
 	if (!event.locals.user) {
 		// Unauthenticated
@@ -98,7 +114,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 
 		// Translators can access '/', '/stories', '/glossary', '/settings'
-		if ((path === '/' || path.startsWith('/stories') || path.startsWith('/glossary')) && role !== 'Translator' && role !== 'SuperAdmin') {
+		if (
+			(path === '/' || path.startsWith('/stories') || path.startsWith('/glossary')) &&
+			role !== 'Translator' &&
+			role !== 'SuperAdmin'
+		) {
 			if (role === 'Lead') {
 				throw redirect(303, '/lead');
 			} else if (role === 'Reviewer') {

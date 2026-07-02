@@ -37,7 +37,7 @@ jobs:
         if: ${{ secrets.POSTGRES_URL_NON_POOLING != '' }}
         env:
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
-          RUN_DB_INTEGRATION_TESTS: "true"
+          RUN_DB_INTEGRATION_TESTS: 'true'
         run: |
           npm run db:push
           npm run test:db

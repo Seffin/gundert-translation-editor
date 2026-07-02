@@ -4,7 +4,7 @@
 	let { items } = $props<{ items: ReviewerQueueItem[] }>();
 
 	function createInitialItems() {
-		return items.map((item) => ({ ...item }));
+		return items.map((item: ReviewerQueueItem) => ({ ...item }));
 	}
 
 	let queueItems = $state(createInitialItems());
@@ -12,7 +12,7 @@
 	let errorMessage = $state('');
 
 	async function resolveItem(storyId: string): Promise<void> {
-		const item = queueItems.find((entry) => entry.storyId === storyId);
+		const item = queueItems.find((entry: ReviewerQueueItem) => entry.storyId === storyId);
 		if (!item) return;
 
 		try {
@@ -23,7 +23,7 @@
 			});
 
 			resolveReviewerQueueItem(item);
-			queueItems = queueItems.filter((entry) => entry.storyId !== storyId);
+			queueItems = queueItems.filter((entry: ReviewerQueueItem) => entry.storyId !== storyId);
 			errorMessage = '';
 			message = `Resolved review for story ${storyId}`;
 		} catch (error) {
@@ -219,7 +219,10 @@
 		color: var(--color-on-primary);
 		font-weight: 700;
 		cursor: pointer;
-		transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+		transition:
+			background-color 0.2s ease,
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
 	}
 
 	button:hover {

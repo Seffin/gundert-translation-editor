@@ -4,11 +4,11 @@
 
 **Two apps live here. Never mix them.**
 
-| | **MVP** (`nextjs-app/`) | **Legacy PoC** (`legacy-poc/`) | **Root** |
-|-|------------------------|-------------------------------|---------|
-| Stack | Next.js 16 + React 19 | Vanilla HTML+JS | Static HTML |
-| Status | Active · Vercel | Read-only reference | Selector page |
-| npm | `cd nextjs-app && npm …` | ❌ | ❌ |
+|        | **MVP** (`nextjs-app/`)  | **Legacy PoC** (`legacy-poc/`) | **Root**      |
+| ------ | ------------------------ | ------------------------------ | ------------- |
+| Stack  | Next.js 16 + React 19    | Vanilla HTML+JS                | Static HTML   |
+| Status | Active · Vercel          | Read-only reference            | Selector page |
+| npm    | `cd nextjs-app && npm …` | ❌                             | ❌            |
 
 ## Instruction Precedence
 
@@ -17,17 +17,20 @@
 3. Order: system instructions → root `AGENTS.md` → local `AGENTS.md`.
 
 Local overrides:
+
 - `nextjs-app/AGENTS.md` — must read before editing `nextjs-app/`
 - `legacy-poc/AGENTS.md` — read if added in future
 
 ## Rules
 
 **DO:**
+
 - `cd nextjs-app` before any `npm` command
 - MVP data → `nextjs-app/data/` · Legacy data → `legacy-poc/data/`
 - Scripts from root: `node scripts/analyze_*.js`
 
 **DON'T:**
+
 - Run `npm` from root (no real package.json)
 - Modify `legacy-poc/` without approval
 - Mix frameworks (no React/TS in legacy, no vanilla in MVP)
@@ -65,4 +68,5 @@ npm run import:ubs     # Import UBS XML
 `DATABASE_URL` · `NEXTAUTH_SECRET` · `GEMINI_API_KEY` · `GEMINI_MODEL`
 
 ---
-*Last updated: April 2026 · v2.1*
+
+_Last updated: April 2026 · v2.1_

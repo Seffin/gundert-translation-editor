@@ -8,7 +8,7 @@
 	let { items } = $props<{ items: LeadApprovalItem[] }>();
 
 	function createInitialItems() {
-		return items.map((item) => ({ ...item }));
+		return items.map((item: LeadApprovalItem) => ({ ...item }));
 	}
 
 	let approvalItems = $state(createInitialItems());
@@ -21,11 +21,11 @@
 		const approved = approveLeadApprovalItem(approvalItems[index]);
 		approvalItems[index] = approved;
 		approvalItems = [...approvalItems];
-		
+
 		// Load client-side target language and draft
 		const targetLanguage = loadTargetLanguage(storyId);
 		const draft = loadPersistedStoryDraft(storyId);
-		
+
 		message = `Story ${storyId} approved for publication.`;
 
 		// Emit audit event to server
@@ -71,47 +71,47 @@
 	{:else}
 		<div class="table-responsive">
 			<table>
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Title</th>
-					<th>Assignee</th>
-					<th>Gate</th>
-					<th>Blockers</th>
-					<th>Action</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each approvalItems as item (item.storyId)}
+				<thead>
 					<tr>
-						<td>{item.storyId}</td>
-						<td><a href={`/stories/${item.storyId}`}>{item.title}</a></td>
-						<td>{item.assignee}</td>
-						<td>{statusLabel(item)}</td>
-						<td>{blockersText(item)}</td>
-						<td>
-							{#if item.canApprove}
-								<button
-									type="button"
-									onclick={() => approveStory(item.storyId)}
-									aria-label={`Approve story ${item.storyId}`}
-								>
-									Approve Ready Story
-								</button>
-							{:else if item.status === 'Approved'}
-								<button type="button" disabled aria-label={`Approved story ${item.storyId}`}>
-									Approved
-								</button>
-							{:else}
-								<button type="button" disabled aria-label={`Blocked story ${item.storyId}`}>
-									Approval Blocked
-								</button>
-							{/if}
-						</td>
+						<th>#</th>
+						<th>Title</th>
+						<th>Assignee</th>
+						<th>Gate</th>
+						<th>Blockers</th>
+						<th>Action</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each approvalItems as item (item.storyId)}
+						<tr>
+							<td>{item.storyId}</td>
+							<td><a href={`/stories/${item.storyId}`}>{item.title}</a></td>
+							<td>{item.assignee}</td>
+							<td>{statusLabel(item)}</td>
+							<td>{blockersText(item)}</td>
+							<td>
+								{#if item.canApprove}
+									<button
+										type="button"
+										onclick={() => approveStory(item.storyId)}
+										aria-label={`Approve story ${item.storyId}`}
+									>
+										Approve Ready Story
+									</button>
+								{:else if item.status === 'Approved'}
+									<button type="button" disabled aria-label={`Approved story ${item.storyId}`}>
+										Approved
+									</button>
+								{:else}
+									<button type="button" disabled aria-label={`Blocked story ${item.storyId}`}>
+										Approval Blocked
+									</button>
+								{/if}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
 		</div>
 	{/if}
 </section>

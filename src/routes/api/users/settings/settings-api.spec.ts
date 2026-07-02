@@ -30,7 +30,10 @@ describe('Settings save API endpoint', () => {
 			json: async () => ({ targetLanguage: 'InvalidLanguage' })
 		} as unknown as Request;
 
-		const response2 = await POST({ locals: { user: { id: 1 } }, request: requestUnsupported } as any);
+		const response2 = await POST({
+			locals: { user: { id: 1 } },
+			request: requestUnsupported
+		} as any);
 		const data2 = await response2.json();
 		expect(response2.status).toBe(400);
 		expect(data2.error).toContain('Unsupported target language');
@@ -38,7 +41,7 @@ describe('Settings save API endpoint', () => {
 
 	it('should successfully update user target language preference in database', async () => {
 		const getUser = db.prepare('SELECT id FROM users WHERE username = ?');
-		const user = await getUser.get('translator.demo') as DBUser;
+		const user = (await getUser.get('translator.demo')) as DBUser;
 		expect(user).toBeDefined();
 
 		const request = {
@@ -54,7 +57,7 @@ describe('Settings save API endpoint', () => {
 
 		// Verify change in the database
 		const verifyUser = db.prepare('SELECT target_language FROM users WHERE id = ?');
-		const updated = await verifyUser.get(user.id) as any;
+		const updated = (await verifyUser.get(user.id)) as any;
 		expect(updated.target_language).toBe('Malayalam');
 
 		// Reset settings back to null

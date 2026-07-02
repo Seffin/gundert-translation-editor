@@ -26,10 +26,13 @@
 </svelte:head>
 
 <div class="app-container">
-	{#if $page.url.pathname !== '/login'}
+	{#if $page.url.pathname !== '/login' && $page.url.pathname !== '/pre-register'}
 		<Navigation />
 	{/if}
-	<main class="app-main" class:login-main={$page.url.pathname === '/login'}>
+	<main
+		class="app-main"
+		class:login-main={$page.url.pathname === '/login' || $page.url.pathname === '/pre-register'}
+	>
 		{@render children()}
 	</main>
 </div>

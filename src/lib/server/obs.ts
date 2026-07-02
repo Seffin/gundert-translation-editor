@@ -92,7 +92,9 @@ export function parseObsStoryMarkdown(markdown: string, storyNumber: number): Ob
 }
 
 export function getSourceFileUrl(storyId: string): string {
-	const template = process.env.SOURCE_FILE_URL_TEMPLATE || 'https://git.door43.org/unfoldingWord/en_obs/raw/branch/master/content/{storyId}.md';
+	const template =
+		process.env.SOURCE_FILE_URL_TEMPLATE ||
+		'https://git.door43.org/unfoldingWord/en_obs/raw/branch/master/content/{storyId}.md';
 	return template.replace('{storyId}', storyId);
 }
 
@@ -112,7 +114,9 @@ export async function parseObsStoryFile(filePath: string): Promise<ObsStory> {
 	} catch (err: any) {
 		if (err.code === 'ENOENT') {
 			const url = getSourceFileUrl(storyId);
-			console.log(`Local story file ${filePath} not found. Fetching dynamically from remote URL: ${url}`);
+			console.log(
+				`Local story file ${filePath} not found. Fetching dynamically from remote URL: ${url}`
+			);
 			const res = await fetch(url);
 			if (!res.ok) {
 				throw new Error(`Failed to fetch original story ${storyId} from remote: ${res.statusText}`);
@@ -140,7 +144,9 @@ export async function parseObsContentDirectory(contentDirPath: string): Promise<
 			.map((entry) => entry.name);
 	} catch (err: any) {
 		if (err.code === 'ENOENT') {
-			console.log(`Local content directory ${contentDirPath} not found. Generating story file list 01-50 dynamically.`);
+			console.log(
+				`Local content directory ${contentDirPath} not found. Generating story file list 01-50 dynamically.`
+			);
 			storyFiles = Array.from({ length: 50 }, (_, i) => `${String(i + 1).padStart(2, '0')}.md`);
 		} else {
 			throw err;
@@ -168,24 +174,24 @@ export async function parseObsStoryById(
 }
 
 export const LANGUAGE_CODE_MAP: Record<string, string> = {
-	'Amharic': 'am',
-	'Assamese': 'as',
-	'Bengali': 'bn',
-	'Gujarati': 'gu',
-	'Hindi': 'hi',
-	'Indonesian': 'id',
-	'Kannada': 'kn',
-	'Malay': 'ms',
-	'Malayalam': 'ml',
-	'Marathi': 'mr',
-	'Nepali': 'ne',
-	'Odia': 'or',
-	'Punjabi': 'pa',
-	'Sinhala': 'si',
-	'Swahili': 'sw',
-	'Tamil': 'ta',
-	'Telugu': 'te',
-	'Urdu': 'ur'
+	Amharic: 'am',
+	Assamese: 'as',
+	Bengali: 'bn',
+	Gujarati: 'gu',
+	Hindi: 'hi',
+	Indonesian: 'id',
+	Kannada: 'kn',
+	Malay: 'ms',
+	Malayalam: 'ml',
+	Marathi: 'mr',
+	Nepali: 'ne',
+	Odia: 'or',
+	Punjabi: 'pa',
+	Sinhala: 'si',
+	Swahili: 'sw',
+	Tamil: 'ta',
+	Telugu: 'te',
+	Urdu: 'ur'
 };
 
 export async function publishStory(
@@ -246,9 +252,10 @@ export async function publishStory(
 	lines.push(footerLine);
 
 	// Resolve language folder prefix
-	const langKey = Object.keys(LANGUAGE_CODE_MAP).find(
-		(key) => key.toLowerCase() === targetLanguage.toLowerCase()
-	) || 'Malayalam';
+	const langKey =
+		Object.keys(LANGUAGE_CODE_MAP).find(
+			(key) => key.toLowerCase() === targetLanguage.toLowerCase()
+		) || 'Malayalam';
 	const langPrefix = LANGUAGE_CODE_MAP[langKey] || 'ml';
 
 	const content = lines.join('\n');
@@ -280,9 +287,11 @@ export async function publishStory(
 
 		const relativePath = `${langPrefix}_obs/content/${normalizedId}.md`;
 		const githubUrl = `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${relativePath}`;
-		
-		console.log(`Publishing Story ${normalizedId} to GitHub repository: ${githubOwner}/${githubRepo}/${relativePath}`);
-		
+
+		console.log(
+			`Publishing Story ${normalizedId} to GitHub repository: ${githubOwner}/${githubRepo}/${relativePath}`
+		);
+
 		let sha: string | undefined = undefined;
 
 		// 1. Check if file already exists on GitHub to obtain its SHA
@@ -329,7 +338,9 @@ export async function publishStory(
 			console.log(`Successfully committed Story ${normalizedId} to GitHub!`);
 		} catch (e) {
 			console.error('Failed to commit to GitHub via Contents API:', e);
-			throw new Error(`Failed to commit approved story to GitHub: ${e instanceof Error ? e.message : String(e)}`);
+			throw new Error(
+				`Failed to commit approved story to GitHub: ${e instanceof Error ? e.message : String(e)}`
+			);
 		}
 	}
 }

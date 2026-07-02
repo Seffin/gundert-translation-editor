@@ -3,27 +3,27 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 function parseArgs(argv) {
-    const args = {};
-    for (let i = 2; i < argv.length; i++) {
-        const token = argv[i];
-        if (token.startsWith('--')) {
-            const key = token.slice(2);
-            const value = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[++i] : true;
-            args[key] = value;
-        }
-    }
-    return args;
+	const args = {};
+	for (let i = 2; i < argv.length; i++) {
+		const token = argv[i];
+		if (token.startsWith('--')) {
+			const key = token.slice(2);
+			const value = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[++i] : true;
+			args[key] = value;
+		}
+	}
+	return args;
 }
 
 function escapePsSingleQuoted(value) {
-    return String(value).replace(/'/g, "''");
+	return String(value).replace(/'/g, "''");
 }
 
 function runXsdValidation(xmlPath, xsdPath) {
-    const psXml = escapePsSingleQuoted(xmlPath);
-    const psXsd = escapePsSingleQuoted(xsdPath);
+	const psXml = escapePsSingleQuoted(xmlPath);
+	const psXsd = escapePsSingleQuoted(xsdPath);
 
-    const psScript = `
+	const psScript = `
 $ErrorActionPreference = 'Stop'
 $xmlPath = '${psXml}'
 $xsdPath = '${psXsd}'
@@ -59,84 +59,86 @@ $result | ConvertTo-Json -Depth 5
 if ($errors.Count -gt 0) { exit 1 }
 `;
 
-    const run = spawnSync('powershell', ['-NoProfile', '-Command', psScript], {
-        encoding: 'utf8',
-        cwd: process.cwd(),
-        maxBuffer: 10 * 1024 * 1024
-    });
+	const run = spawnSync('powershell', ['-NoProfile', '-Command', psScript], {
+		encoding: 'utf8',
+		cwd: process.cwd(),
+		maxBuffer: 10 * 1024 * 1024
+	});
 
-    const stdout = (run.stdout || '').trim();
-    const stderr = (run.stderr || '').trim();
+	const stdout = (run.stdout || '').trim();
+	const stderr = (run.stderr || '').trim();
 
-    if (stdout) {
-        try {
-            return {
-                exitCode: run.status ?? 0,
-                report: JSON.parse(stdout),
-                stderr
-            };
-        } catch (err) {
-            return {
-                exitCode: run.status ?? 1,
-                report: {
-                    valid: false,
-                    errors: ['Failed to parse PowerShell JSON output.'],
-                    raw: stdout
-                },
-                stderr
-            };
-        }
-    }
+	if (stdout) {
+		try {
+			return {
+				exitCode: run.status ?? 0,
+				report: JSON.parse(stdout),
+				stderr
+			};
+		} catch (err) {
+			return {
+				exitCode: run.status ?? 1,
+				report: {
+					valid: false,
+					errors: ['Failed to parse PowerShell JSON output.'],
+					raw: stdout
+				},
+				stderr
+			};
+		}
+	}
 
-    return {
-        exitCode: run.status ?? 1,
-        report: {
-            valid: false,
-            errors: [stderr || 'XSD validation failed with no output.']
-        },
-        stderr
-    };
+	return {
+		exitCode: run.status ?? 1,
+		report: {
+			valid: false,
+			errors: [stderr || 'XSD validation failed with no output.']
+		},
+		stderr
+	};
 }
 
 function main() {
-    const args = parseArgs(process.argv);
-    const xmlArg = args.file || args.xml;
-    const xsdArg = args.schema;
+	const args = parseArgs(process.argv);
+	const xmlArg = args.file || args.xml;
+	const xsdArg = args.schema;
 
-    if (!xmlArg || !xsdArg) {
-        console.error('Usage: node scripts/translation/validate_xsd.js --file <target.xml> --schema <schema.xsd>');
-        process.exit(2);
-    }
+	if (!xmlArg || !xsdArg) {
+		console.error(
+			'Usage: node scripts/translation/validate_xsd.js --file <target.xml> --schema <schema.xsd>'
+		);
+		process.exit(2);
+	}
 
-    const xmlPath = path.resolve(process.cwd(), xmlArg);
-    const xsdPath = path.resolve(process.cwd(), xsdArg);
+	const xmlPath = path.resolve(process.cwd(), xmlArg);
+	const xsdPath = path.resolve(process.cwd(), xsdArg);
 
-    if (!fs.existsSync(xmlPath) || !fs.existsSync(xsdPath)) {
-        console.error('XML or schema file does not exist.');
-        process.exit(2);
-    }
+	if (!fs.existsSync(xmlPath) || !fs.existsSync(xsdPath)) {
+		console.error('XML or schema file does not exist.');
+		process.exit(2);
+	}
 
-    const result = runXsdValidation(xmlPath, xsdPath);
+	const result = runXsdValidation(xmlPath, xsdPath);
 
-    const output = {
-        valid: Boolean(result.report && result.report.valid),
-        xml: xmlPath,
-        schema: xsdPath,
-        errors: (result.report && result.report.errors) || [],
-        stderr: result.stderr || ''
-    };
+	const output = {
+		valid: Boolean(result.report && result.report.valid),
+		xml: xmlPath,
+		schema: xsdPath,
+		errors: (result.report && result.report.errors) || [],
+		stderr: result.stderr || ''
+	};
 
-    console.log(JSON.stringify(output, null, 2));
+	console.log(JSON.stringify(output, null, 2));
 
-    if (!output.valid) {
-        process.exit(1);
-    }
+	if (!output.valid) {
+		process.exit(1);
+	}
 }
 
 if (require.main === module) {
-    main();
+	main();
 }
 
 module.exports = {
-    runXsdValidation
+	runXsdValidation
 };

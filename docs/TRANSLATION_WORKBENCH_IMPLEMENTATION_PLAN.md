@@ -119,6 +119,7 @@ No release proceeds without E2E tests passing.
 ### 3.1 Multi-Source, Multi-Format Data Flow
 
 **Supported Sources & Formats:**
+
 - UBS Resources (XML/JSON/Markdown)
 - unfoldingWord Resources (JSON/Markdown)
 - SIL Resources (SFM/XML)
@@ -127,6 +128,7 @@ No release proceeds without E2E tests passing.
 - Custom resources (user-uploaded)
 
 **Data Flow:**
+
 1. **Source resources** (read-only, immutable):
    - Stored in versioned resource library
    - Multiple formats: XML, JSON, Markdown, SFM, CSV
@@ -148,17 +150,20 @@ No release proceeds without E2E tests passing.
 ### 3.2 Resource Versioning & Export
 
 **Version Management:**
+
 - Multiple versions of the same resource can coexist (e.g., UBS Lexicon v1.0 and v2.0)
 - Each resource version is immutable once imported
 - Translations are tied to a specific resource version
 - New versions can be imported as updates without affecting existing translations
 
 **Export Format Preservation:**
+
 - Export maintains original format: XML→XML, JSON→JSON, Markdown→Markdown, SFM→SFM
 - Directory structure and file organization mirror source
 - Encoding and special characters preserved
 
 **Export Modes:**
+
 1. **Source-only mode**: Translated content only, no custom fields
    - Output matches source structure exactly
    - Suitable for direct publication/distribution
@@ -167,6 +172,7 @@ No release proceeds without E2E tests passing.
    - Includes translator metadata (attribution, timestamp, notes)
 
 **Custom Fields:**
+
 - Users can add metadata not in source (translator notes, context, internal links, etc.)
 - Stored separately in database (`entry_custom_fields` table)
 - Does not modify source content
@@ -175,16 +181,19 @@ No release proceeds without E2E tests passing.
 ### 3.3 Bible Reference Handling (Storage vs. Display)
 
 **Storage Layer:**
+
 - Store Bible references in **original format from source** (e.g., UBS mnemonics)
 - Preserve exactly as provided (do not normalize or convert)
 - Example: Store `G2424-I-21` (mnemonic) as-is
 
 **Display Layer:**
+
 - Convert mnemonic → USFM-compatible, human-readable format
 - Example: Display `G2424-I-21` as `John 3:16` in UI
 - Conversion happens at read-time for display only
 
 **Conversion Module:**
+
 - Build reference converter (`lib/bible-reference-converter.ts`)
 - Mappings for UBS mnemonics, other reference systems
 - Extensible for future reference formats
@@ -192,6 +201,7 @@ No release proceeds without E2E tests passing.
 ### 3.4 Database Schema (Multi-Org, Multi-Resource, Versioning)
 
 **Core Tables:**
+
 - `organizations` - Multi-org support (translation teams, institutions)
 - `users` - Team members with roles
 - `org_members` - User-org relationships with role assignments (Admin, Translator, Reviewer)
@@ -218,20 +228,24 @@ No release proceeds without E2E tests passing.
 - **Resource Browser UI**: Mobile-first resource discovery and entry viewing
 
 **Browser retrieval pattern (Phase 1 decision):**
+
 - Hybrid: server-rendered initial load + client-side paginated fetch + short-lived cache.
 - URL query params are the source of truth for search/filter/pagination state.
 - Cache scope includes resource list, current result pages, and selected entry details.
 - Cache invalidates on resource version change, target language change, or filter scope reset.
 
 **Browser mobile UX decision:**
+
 - Master-detail pattern on mobile (list first, full-screen detail on select, explicit Back action).
 - Split-view on tablet/desktop when viewport width permits.
 
 **Browser list-state persistence decision (accepted):**
+
 - Preserve list query, scope, filters, language, sort, selected item, and scroll position when moving between list and detail.
 - Persist state for the active session and clear only on explicit user reset.
 
 **Browser search decision:**
+
 - Unified search (single input, no search-mode toggle).
 - Query pipeline searches entry key, title, indexed content snippets, and Bible references.
 - Reference matching supports both human-readable input and source mnemonic forms.
@@ -239,26 +253,30 @@ No release proceeds without E2E tests passing.
 - Query pipeline supports translation-status filtering for the selected target language.
 
 **Browser ranking policy (accepted):**
-- 1) exact entry key
-- 2) exact title
-- 3) title prefix
-- 4) exact Bible reference
-- 5) content snippet
+
+- 1. exact entry key
+- 2. exact title
+- 3. title prefix
+- 4. exact Bible reference
+- 5. content snippet
 - deterministic tie-breakers: resource priority, then alphabetical title
 
 **Browser scope-selector decision (accepted):**
+
 - Two-layer model:
   - Layer 1: visible scope chips (`All`, `Selected Resources`, `Current Resource`)
   - Layer 2: on-demand resource picker drawer for multi-selecting resource versions
 - Default search scope is `Selected Resources` when selections exist; otherwise `Current Resource`.
 
 **Browser empty-state decision (accepted):**
+
 - On zero results, show explicit reason based on active query/scope/filters.
 - Primary action: `clear_filters`.
 - Secondary action: `switch_scope`.
 - Provide direct `open_resource_picker` action for fast scope widening.
 
 **Browser translation-status filter decision (accepted):**
+
 - Add status filter in browser UI and API query model.
 - Phase 1 statuses: `untranslated`, `draft`, `ready_for_review`, `approved`.
 - Status is evaluated per selected target language.
@@ -267,11 +285,13 @@ No release proceeds without E2E tests passing.
 - Add quick preset `needs_work` = (`untranslated` OR `draft`).
 
 **Browser target-language default decision (accepted):**
+
 - Resolution order: user preference -> organization default -> project fallback (`ml` in current UBS phase).
 - Selected target language drives status calculations, query filters, and cache key derivation.
 - Persist user language changes to profile preferences.
 
 **Cache freshness defaults (accepted):**
+
 - Entry list pages TTL: 60 seconds
 - Entry detail payload TTL: 5 minutes
 - Immediate invalidation on resource version change
@@ -283,17 +303,21 @@ No release proceeds without E2E tests passing.
 Round-trip validation is mandatory for every import/export implementation and every new resource version.
 
 **Validation Goal:**
+
 - For `source-only` export mode, output must be structurally equivalent to the original source format.
 - For `extended` export mode, output must preserve source structure while adding custom fields only in allowed extension points.
 
 **Phase 1 strictness decision:**
+
 - Canonical structural equivalence (not byte-for-byte equality).
 - After canonicalization, structure/protected fields/references/entry keys-order must match exactly.
 - Whitespace-only and attribute-order-only differences are allowed.
 
 **Phase 1 Scope (UBS XML resources):**
+
 - Inputs: `FAUNA_en.xml`, `FLORA_en.xml`, `REALIA_en.xml`
 - Process:
+
 1. Import original XML into `resources`/`resource_versions`/`resource_entries`
 2. Export immediately with no translation changes (`source-only`)
 3. Compare original vs exported using canonical XML normalization
@@ -301,12 +325,14 @@ Round-trip validation is mandatory for every import/export implementation and ev
 5. Validate mnemonic Bible references are stored raw and display-converted only
 
 **Pass/Fail Gates:**
+
 - Blocking fail if any protected node changes
 - Blocking fail if entry keys/order or reference fingerprints differ
 - Blocking fail if serializer cannot reconstruct required nodes
 - Warning (non-blocking) for whitespace-only diffs after canonicalization
 
 **Artifacts per run:**
+
 - `roundtrip-report.json` with checks, counts, and failures
 - `roundtrip-diff.txt` with normalized structural diff summary
 - Per-entry failure list for targeted debugging
@@ -326,21 +352,21 @@ Source and final deliverables remain XML. The translator UI uses a structured JS
 
 ```json
 {
-  "schemaVersion": "1.0",
-  "entryKey": "A123",
-  "source": {
-    "dictionary": "FAUNA",
-    "sourceLang": "en",
-    "targetLang": "fr",
-    "sourceHash": "sha256:..."
-  },
-  "metadata": {
-    "updatedAt": "2026-04-17T12:00:00.000Z",
-    "updatedBy": "translator-id",
-    "status": "draft"
-  },
-  "blocks": [],
-  "operations": []
+	"schemaVersion": "1.0",
+	"entryKey": "A123",
+	"source": {
+		"dictionary": "FAUNA",
+		"sourceLang": "en",
+		"targetLang": "fr",
+		"sourceHash": "sha256:..."
+	},
+	"metadata": {
+		"updatedAt": "2026-04-17T12:00:00.000Z",
+		"updatedBy": "translator-id",
+		"status": "draft"
+	},
+	"blocks": [],
+	"operations": []
 }
 ```
 
@@ -348,21 +374,21 @@ Source and final deliverables remain XML. The translator UI uses a structured JS
 
 ```json
 {
-  "id": "blk-0001",
-  "class": "source-mapped",
-  "type": "paragraph",
-  "sourceAnchor": {
-    "sectionId": "discussion",
-    "sourcePath": "ThemLex_Entry[Key='A123']/Section[Content='discussion']/Para[2]"
-  },
-  "content": {
-    "text": "..."
-  },
-  "flags": {
-    "locked": false,
-    "protected": false
-  },
-  "order": 12
+	"id": "blk-0001",
+	"class": "source-mapped",
+	"type": "paragraph",
+	"sourceAnchor": {
+		"sectionId": "discussion",
+		"sourcePath": "ThemLex_Entry[Key='A123']/Section[Content='discussion']/Para[2]"
+	},
+	"content": {
+		"text": "..."
+	},
+	"flags": {
+		"locked": false,
+		"protected": false
+	},
+	"order": 12
 }
 ```
 
@@ -377,14 +403,14 @@ For target-only blocks:
 
 ```json
 {
-  "opId": "op-0008",
-  "kind": "split-paragraph",
-  "timestamp": "2026-04-17T12:01:00.000Z",
-  "blockId": "blk-0001",
-  "details": {
-    "from": 1,
-    "to": 2
-  }
+	"opId": "op-0008",
+	"kind": "split-paragraph",
+	"timestamp": "2026-04-17T12:01:00.000Z",
+	"blockId": "blk-0001",
+	"details": {
+		"from": 1,
+		"to": 2
+	}
 }
 ```
 

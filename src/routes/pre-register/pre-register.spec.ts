@@ -22,8 +22,9 @@ describe('Pre-registration server actions', () => {
 		expect(result.message).toContain('successfully submitted');
 
 		// Verify in the database
-		const preRegs = await db.prepare('SELECT * FROM pre_registrations').all();
-		const saved = preRegs.find((r: any) => r.email === uniqueEmail);
+		const saved = (await db
+			.prepare('SELECT * FROM pre_registrations WHERE email = ?')
+			.get(uniqueEmail)) as any;
 		expect(saved).toBeDefined();
 		expect(saved.name).toBe('Test Applicant');
 		expect(saved.requested_role).toBe('Translator');
@@ -32,13 +33,13 @@ describe('Pre-registration server actions', () => {
 
 	it('should fail if email already has a pending pre-registration', async () => {
 		const uniqueEmail = `test-duplicate-${Math.random().toString(36).substring(7)}@gmail.com`;
-		
+
 		// Seed first request
 		const f1 = new FormData();
 		f1.append('email', uniqueEmail);
 		f1.append('name', 'Test Applicant');
 		f1.append('role', 'Translator');
-		
+
 		const r1 = {
 			formData: async () => f1
 		} as unknown as Request;

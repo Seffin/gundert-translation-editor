@@ -15,5 +15,15 @@ export { classifyEventActorType, filterActivityEvents, type ActivityEvent, type 
  */
 export function getActivityEvents(): ActivityEvent[] {
 	const stored = listAuditEventsFromStore();
-	return stored.length > 0 ? stored : buildDemoActivityEvents();
+	return stored.length > 0
+		? stored.map((event) => ({
+				eventId: event.eventId,
+				action: event.action,
+				actorId: event.actorId,
+				storyId: event.storyId,
+				segmentId: event.segmentId,
+				createdAtIso: event.createdAtIso,
+				payload: event.context
+			}))
+		: buildDemoActivityEvents();
 }

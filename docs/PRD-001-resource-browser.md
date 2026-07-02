@@ -1,13 +1,13 @@
 # PRD-001 — Resource Browser MVP
 
-| Field | Value |
-|---|---|
-| **Status** | Draft |
-| **Author** | Team |
-| **Created** | 2026-04-18 |
-| **Phase** | 1 |
+| Field                   | Value                                                 |
+| ----------------------- | ----------------------------------------------------- |
+| **Status**              | Draft                                                 |
+| **Author**              | Team                                                  |
+| **Created**             | 2026-04-18                                            |
+| **Phase**               | 1                                                     |
 | **Build steps covered** | 1 (DB schema) · 2 (UBS XML importer) · 3 (Browser UI) |
-| **North-star metric** | Median time to validated export |
+| **North-star metric**   | Median time to validated export                       |
 
 ---
 
@@ -49,15 +49,19 @@ Without a purpose-built browser, translators waste time identifying scope and ca
 ## 4. User Personas
 
 ### Primary: Translator (authenticated)
+
 A missionary or language specialist who needs to find entries to work on. Likely on a mobile device, possibly with intermittent connectivity. Needs to quickly identify untranslated or draft entries and open them in the workbench.
 
 ### Secondary: Reviewer (authenticated)
+
 A senior translator or project lead who monitors translation progress. Uses status filters to find entries pending review across resources.
 
 ### Tertiary: Admin (authenticated)
+
 Sets up resources and manages org membership. Uses the browser to verify an import was successful.
 
 ### Quaternary: Reader (no authentication required)
+
 A community member who can browse and view entries but not edit. Sees the same browser UI as Translator but without workbench entry links.
 
 Reader can optionally submit entry ratings and feedback with an optional display name. Anonymous submissions are allowed only with CAPTCHA verification.
@@ -67,11 +71,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ## 5. User Stories
 
 ### US-001 — Browse entry list
+
 **As a** Translator,  
 **I want to** see a paginated list of all entries across imported resources,  
 **So that** I can understand the scope of work.
 
 **Acceptance criteria:**
+
 - Entry list loads on first visit within 2 seconds on a 4G connection
 - Each entry card shows: entry key, title, resource badge, match type badge, translation status, last updated date
 - List is paginated (50 entries per page) with infinite scroll or "load more"
@@ -80,11 +86,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-002 — Filter by translation status
+
 **As a** Translator,  
 **I want to** filter entries by translation status (untranslated / draft / ready for review / approved),  
 **So that** I can focus on the entries that need my attention.
 
 **Acceptance criteria:**
+
 - Status filter is visible on both mobile (drawer) and desktop (sidebar)
 - Default state: all statuses shown
 - `Needs Work` quick chip = untranslated + draft combined
@@ -94,11 +102,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-003 — Search for an entry
+
 **As a** Translator,  
 **I want to** type a query and see matching entries immediately,  
 **So that** I can jump directly to the entry I need.
 
 **Acceptance criteria:**
+
 - Single unified search box — no mode toggle
 - Search covers: entry key, title, indexed source content snippets, Bible references
 - Bible references matched in human-readable (`John 3:16`), USFM notation (`JHN 3:16`), and mnemonic numeric (`04400301600005`) forms
@@ -111,11 +121,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-004 — Scope search to specific resources
+
 **As a** Translator,  
 **I want to** limit my search to one or more specific resources,  
 **So that** results are not cluttered with entries from resources I'm not working on.
 
 **Acceptance criteria:**
+
 - Scope chips always visible: `All` · `Selected Resources` · `Current Resource`
 - Selecting `Selected Resources` opens a resource picker drawer
 - Drawer allows multi-select of resource versions (e.g., `UBS FAUNA v1.0`, `UBS FLORA v1.0`)
@@ -125,11 +137,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-005 — View entry detail
+
 **As a** Translator,  
 **I want to** tap an entry and see its full source content and existing translations,  
 **So that** I can assess what work has been done.
 
 **Acceptance criteria:**
+
 - On mobile: entry detail opens full-screen with a Back button to return to the list
 - On tablet/desktop: entry detail opens in a side panel (master-detail layout)
 - Detail view shows:
@@ -148,11 +162,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-006 — Select target language
+
 **As a** Translator,  
 **I want to** set my target language once and have it persist across sessions,  
 **So that** I always see translation status relative to the language I'm working in.
 
 **Acceptance criteria:**
+
 - Target language resolved in order: user preference → org default → project fallback (`ml`)
 - Language selector visible in browser header
 - Selection persisted to user preference in database
@@ -161,11 +177,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-007 — Preserve browser state
+
 **As a** Translator,  
 **I want to** return to the browser after opening an entry and find my filters and scroll position intact,  
 **So that** I don't lose my place when navigating between the list and detail view.
 
 **Acceptance criteria:**
+
 - Browser back navigation restores: search query, scope, status filter, selected language, sort order, scroll position, selected entry
 - State reflected in URL so it can be bookmarked and shared
 - No full page reload on back navigation (client-side routing)
@@ -173,11 +191,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-008 — Import UBS XML resources
+
 **As an** Admin,  
 **I want to** import the UBS FAUNA, FLORA, and REALIA XML source files,  
 **So that** entries are available for translators to browse.
 
 **Acceptance criteria:**
+
 - Import script processes all three XML files without errors
 - All entries inserted into `resource_entries` table with correct resource version FK
 - Protected content (Bible references, structural metadata) preserved as-is
@@ -189,11 +209,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-009 — Data integrity: round-trip validation
+
 **As an** Admin,  
 **I want to** verify that an export of the imported data matches the source XML,  
 **So that** we have proof the importer did not corrupt or lose any content.
 
 **Acceptance criteria:**
+
 - Round-trip validation script: parse source XML → serialize back to XML → diff against original
 - Diff is canonical structural (attribute order-independent, whitespace-normalized)
 - All three dictionaries (FAUNA, FLORA, REALIA) must pass with zero structural differences
@@ -203,11 +225,13 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ---
 
 ### US-010 — Public reader ratings and feedback
+
 **As a** Reader (not signed in),  
 **I want to** rate an entry and submit feedback with an optional name,  
 **So that** I can contribute quality signals without creating an account.
 
 **Acceptance criteria:**
+
 - Entry detail view includes reader feedback actions: upvote, downvote, comment, and flag
 - Reader may submit feedback without authentication
 - Reader name is optional; if omitted, submission is stored as `Anonymous`
@@ -222,6 +246,7 @@ Reader can optionally submit entry ratings and feedback with an optional display
 ## 6. Functional Requirements
 
 ### FR-01 — Database schema
+
 - Tables: `resources`, `resource_versions`, `resource_entries`, `entry_translations`, `entry_custom_fields`, `users`, `organizations`, `org_memberships`, `community_feedback`, `prompt_profiles`
 - `resource_entries.source_content` stored as JSONB
 - All primary keys: UUID v7
@@ -244,7 +269,7 @@ erDiagram
     RESOURCE_ENTRIES ||--o{ ENTRY_TRANSLATIONS : has
     RESOURCE_ENTRIES ||--o{ ENTRY_CUSTOM_FIELDS : has
     RESOURCE_ENTRIES ||--o{ COMMUNITY_FEEDBACK : receives
-    
+
     ORGANIZATIONS {
         uuid id PK
         string name
@@ -252,7 +277,7 @@ erDiagram
         timestamp created_at
         timestamp deleted_at
     }
-    
+
     USERS {
         uuid id PK
         string email UK
@@ -262,7 +287,7 @@ erDiagram
         timestamp created_at
         timestamp deleted_at
     }
-    
+
     ORG_MEMBERSHIPS {
         uuid id PK
         uuid user_id FK
@@ -271,7 +296,7 @@ erDiagram
         timestamp created_at
         timestamp deleted_at
     }
-    
+
     RESOURCES {
         uuid id PK
         uuid org_id FK
@@ -281,7 +306,7 @@ erDiagram
         timestamp created_at
         timestamp deleted_at
     }
-    
+
     RESOURCE_VERSIONS {
         uuid id PK
         uuid resource_id FK
@@ -291,7 +316,7 @@ erDiagram
         timestamp imported_at
         timestamp deleted_at
     }
-    
+
     RESOURCE_ENTRIES {
         uuid id PK
         uuid resource_version_id FK
@@ -303,7 +328,7 @@ erDiagram
         timestamp updated_at
         timestamp deleted_at
     }
-    
+
     ENTRY_TRANSLATIONS {
         uuid id PK
         uuid entry_id FK
@@ -315,7 +340,7 @@ erDiagram
         timestamp updated_at
         timestamp deleted_at
     }
-    
+
     ENTRY_CUSTOM_FIELDS {
         uuid id PK
         uuid entry_id FK
@@ -324,7 +349,7 @@ erDiagram
         timestamp created_at
         timestamp deleted_at
     }
-    
+
     COMMUNITY_FEEDBACK {
         uuid id PK
         uuid entry_id FK
@@ -337,7 +362,7 @@ erDiagram
         timestamp created_at
         timestamp deleted_at
     }
-    
+
     PROMPT_PROFILES {
         uuid id PK
         uuid user_id FK
@@ -354,6 +379,7 @@ erDiagram
 ```
 
 ### FR-02 — UBS XML importer
+
 - Script at `scripts/import-ubs-resources.ts`
 - Idempotent upsert (entry key + resource version = unique constraint)
 - Preserves: `<ref>` elements, attribute values, structural order
@@ -361,6 +387,7 @@ erDiagram
 - Included round-trip validation: post-import XML generation → canonical diff
 
 ### FR-03 — Resource browser page
+
 - Route: `/browser`
 - Publicly accessible for browsing and viewing entries
 - Server-side initial render of first page (SSR, 50 entries)
@@ -368,20 +395,24 @@ erDiagram
 - Cache: entry list 60s, entry detail 5min; invalidate on resource version, language, or filter change
 
 ### FR-04 — Search
+
 - API endpoint: `GET /api/resources/entries?q=&scope=&resources=&status=&lang=&page=&sort=`
 - Full-text search on key, title, content, refs (Postgres `tsvector` or indexed JSONB queries)
 - Returns: entries, total count, pagination cursor, per-result match type
 
 ### FR-05 — Entry detail
+
 - Route: `/browser/[entryId]` (detail page for direct link / SSR)
 - Also rendered inline (no navigation) when master-detail split is active
 - Fetches from `GET /api/resources/entries/[entryId]`
 
 ### FR-06 — Target language persistence
+
 - `PUT /api/users/preferences` — stores `target_language` preference
 - Returned in session/profile on next load
 
 ### FR-07 — Public feedback and anti-spam
+
 - Endpoint: `POST /api/resources/entries/[entryId]/feedback`
 - Supports unauthenticated submissions for feedback types: `upvote | downvote | comment | flag`
 - Request payload: `feedbackType`, `comment` (optional), `flagReason` (optional), `displayName` (optional), `captchaToken` (required when unauthenticated)
@@ -394,17 +425,17 @@ erDiagram
 
 ## 7. Non-Functional Requirements
 
-| Requirement | Target |
-|---|---|
-| Initial page load (entry list, 4G) | ≤ 2s LCP |
-| Search response time (client, debounced) | ≤ 500ms after input stops |
-| Entry detail open time (mobile) | ≤ 300ms perceived (optimistic render) |
-| Entry list capacity | 10,000+ entries without degradation |
-| WCAG accessibility | 2.1 AA |
-| Mobile breakpoint | 320px minimum supported width |
-| Browser support | Last 2 major versions of Chrome, Safari, Firefox, Samsung Internet |
-| Theme support | Dark (default) + Light themes; user preference persisted to session |
-| Security | Public read access for browser; privileged actions require auth; CAPTCHA + rate limiting required for unauth feedback |
+| Requirement                              | Target                                                                                                                |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Initial page load (entry list, 4G)       | ≤ 2s LCP                                                                                                              |
+| Search response time (client, debounced) | ≤ 500ms after input stops                                                                                             |
+| Entry detail open time (mobile)          | ≤ 300ms perceived (optimistic render)                                                                                 |
+| Entry list capacity                      | 10,000+ entries without degradation                                                                                   |
+| WCAG accessibility                       | 2.1 AA                                                                                                                |
+| Mobile breakpoint                        | 320px minimum supported width                                                                                         |
+| Browser support                          | Last 2 major versions of Chrome, Safari, Firefox, Samsung Internet                                                    |
+| Theme support                            | Dark (default) + Light themes; user preference persisted to session                                                   |
+| Security                                 | Public read access for browser; privileged actions require auth; CAPTCHA + rate limiting required for unauth feedback |
 
 ---
 
@@ -423,14 +454,14 @@ erDiagram
 
 ## 9. Dependencies
 
-| Dependency | Type | Status |
-|---|---|---|
-| Auth.js session working | Prerequisite | ✅ Done |
-| Neon Postgres provisioned | Prerequisite | ✅ Done |
-| UBS XML source files in `data/xml/` | Data | ✅ Present |
-| Drizzle schema for resources/entries | Internal | ⏳ PRD-001 Step 1 |
-| XML importer script | Internal | ⏳ PRD-001 Step 2 |
-| CAPTCHA provider configuration | Security | ⏳ Needed for US-010 |
+| Dependency                           | Type         | Status               |
+| ------------------------------------ | ------------ | -------------------- |
+| Auth.js session working              | Prerequisite | ✅ Done              |
+| Neon Postgres provisioned            | Prerequisite | ✅ Done              |
+| UBS XML source files in `data/xml/`  | Data         | ✅ Present           |
+| Drizzle schema for resources/entries | Internal     | ⏳ PRD-001 Step 1    |
+| XML importer script                  | Internal     | ⏳ PRD-001 Step 2    |
+| CAPTCHA provider configuration       | Security     | ⏳ Needed for US-010 |
 
 ---
 
@@ -455,11 +486,11 @@ This PRD is considered complete and ready for release when:
 
 ## 11. Open Questions
 
-| # | Question | Owner | Resolution |
-|---|---|---|---|
-| OQ-1 | Should Bible reference mnemonic → human-readable conversion happen in DB query or in render? | Arch | Accepted: render-time only (store mnemonic raw) |
-| OQ-2 | Should importer use streaming XML parse (for large files) or DOM parse? | Eng | TBD before Step 2 |
-| OQ-3 | Entry detail: source format parsing and target render format? | Design | Accepted: parse source in source format, render target as plain text in Phase 1 |
+| #    | Question                                                                                     | Owner  | Resolution                                                                      |
+| ---- | -------------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------- |
+| OQ-1 | Should Bible reference mnemonic → human-readable conversion happen in DB query or in render? | Arch   | Accepted: render-time only (store mnemonic raw)                                 |
+| OQ-2 | Should importer use streaming XML parse (for large files) or DOM parse?                      | Eng    | TBD before Step 2                                                               |
+| OQ-3 | Entry detail: source format parsing and target render format?                                | Design | Accepted: parse source in source format, render target as plain text in Phase 1 |
 
 ---
 

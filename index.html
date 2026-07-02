@@ -1,186 +1,194 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gundert Translation Editor - App Selector</title>
-  <style>
-    :root {
-      --bg-1: #0f172a;
-      --bg-2: #1e293b;
-      --ink: #f8fafc;
-      --muted: #cbd5e1;
-      --accent-a: #f59e0b;
-      --accent-b: #22c55e;
-      --card: rgba(15, 23, 42, 0.72);
-      --line: rgba(248, 250, 252, 0.22);
-    }
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Gundert Translation Editor - App Selector</title>
+		<style>
+			:root {
+				--bg-1: #0f172a;
+				--bg-2: #1e293b;
+				--ink: #f8fafc;
+				--muted: #cbd5e1;
+				--accent-a: #f59e0b;
+				--accent-b: #22c55e;
+				--card: rgba(15, 23, 42, 0.72);
+				--line: rgba(248, 250, 252, 0.22);
+			}
 
-    * {
-      box-sizing: border-box;
-    }
+			* {
+				box-sizing: border-box;
+			}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: "Space Grotesk", "Segoe UI", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(1200px 700px at 15% 12%, rgba(245, 158, 11, 0.22), transparent 58%),
-        radial-gradient(1000px 700px at 85% 8%, rgba(34, 197, 94, 0.18), transparent 56%),
-        linear-gradient(140deg, var(--bg-1), var(--bg-2));
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
+			body {
+				margin: 0;
+				min-height: 100vh;
+				font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+				color: var(--ink);
+				background:
+					radial-gradient(1200px 700px at 15% 12%, rgba(245, 158, 11, 0.22), transparent 58%),
+					radial-gradient(1000px 700px at 85% 8%, rgba(34, 197, 94, 0.18), transparent 56%),
+					linear-gradient(140deg, var(--bg-1), var(--bg-2));
+				display: grid;
+				place-items: center;
+				padding: 24px;
+			}
 
-    .shell {
-      width: min(1024px, 100%);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: var(--card);
-      backdrop-filter: blur(5px);
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(2, 6, 23, 0.55);
-    }
+			.shell {
+				width: min(1024px, 100%);
+				border: 1px solid var(--line);
+				border-radius: 24px;
+				background: var(--card);
+				backdrop-filter: blur(5px);
+				overflow: hidden;
+				box-shadow: 0 20px 60px rgba(2, 6, 23, 0.55);
+			}
 
-    .header {
-      padding: 34px 30px 18px;
-      border-bottom: 1px solid var(--line);
-    }
+			.header {
+				padding: 34px 30px 18px;
+				border-bottom: 1px solid var(--line);
+			}
 
-    .kicker {
-      letter-spacing: 0.14em;
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin: 0 0 10px;
-    }
+			.kicker {
+				letter-spacing: 0.14em;
+				font-size: 0.74rem;
+				text-transform: uppercase;
+				color: var(--muted);
+				margin: 0 0 10px;
+			}
 
-    h1 {
-      margin: 0;
-      font-size: clamp(1.5rem, 4.2vw, 2.5rem);
-      line-height: 1.08;
-    }
+			h1 {
+				margin: 0;
+				font-size: clamp(1.5rem, 4.2vw, 2.5rem);
+				line-height: 1.08;
+			}
 
-    .sub {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 1rem;
-    }
+			.sub {
+				margin: 12px 0 0;
+				color: var(--muted);
+				font-size: 1rem;
+			}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-      padding: 22px;
-    }
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 16px;
+				padding: 22px;
+			}
 
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 22px;
-      background: rgba(15, 23, 42, 0.56);
-      display: grid;
-      gap: 14px;
-    }
+			.card {
+				border: 1px solid var(--line);
+				border-radius: 18px;
+				padding: 22px;
+				background: rgba(15, 23, 42, 0.56);
+				display: grid;
+				gap: 14px;
+			}
 
-    .title {
-      margin: 0;
-      font-size: 1.2rem;
-    }
+			.title {
+				margin: 0;
+				font-size: 1.2rem;
+			}
 
-    .desc {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.45;
-      min-height: 64px;
-    }
+			.desc {
+				margin: 0;
+				color: var(--muted);
+				line-height: 1.45;
+				min-height: 64px;
+			}
 
-    .meta {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
+			.meta {
+				margin: 0;
+				color: var(--muted);
+				font-size: 0.92rem;
+			}
 
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 2px;
-    }
+			.actions {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				margin-top: 2px;
+			}
 
-    .btn {
-      border: 1px solid transparent;
-      border-radius: 999px;
-      padding: 10px 15px;
-      color: #0f172a;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.95rem;
-    }
+			.btn {
+				border: 1px solid transparent;
+				border-radius: 999px;
+				padding: 10px 15px;
+				color: #0f172a;
+				text-decoration: none;
+				font-weight: 700;
+				font-size: 0.95rem;
+			}
 
-    .btn.mvp {
-      background: linear-gradient(120deg, var(--accent-b), #4ade80);
-    }
+			.btn.mvp {
+				background: linear-gradient(120deg, var(--accent-b), #4ade80);
+			}
 
-    .btn.poc {
-      background: linear-gradient(120deg, var(--accent-a), #fbbf24);
-    }
+			.btn.poc {
+				background: linear-gradient(120deg, var(--accent-a), #fbbf24);
+			}
 
-    .btn.secondary {
-      color: var(--ink);
-      border-color: var(--line);
-      background: transparent;
-    }
+			.btn.secondary {
+				color: var(--ink);
+				border-color: var(--line);
+				background: transparent;
+			}
 
-    .foot {
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      padding: 16px 22px 20px;
-      font-size: 0.92rem;
-    }
+			.foot {
+				border-top: 1px solid var(--line);
+				color: var(--muted);
+				padding: 16px 22px 20px;
+				font-size: 0.92rem;
+			}
 
-    @media (max-width: 840px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <main class="shell">
-    <header class="header">
-      <p class="kicker">Gundert Translation Editor</p>
-      <h1>Select Your Experience</h1>
-      <p class="sub">Choose the archived proof-of-concept or the active MVP implementation.</p>
-    </header>
+			@media (max-width: 840px) {
+				.grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main class="shell">
+			<header class="header">
+				<p class="kicker">Gundert Translation Editor</p>
+				<h1>Select Your Experience</h1>
+				<p class="sub">Choose the archived proof-of-concept or the active MVP implementation.</p>
+			</header>
 
-    <section class="grid">
-      <article class="card">
-        <h2 class="title">MVP (Next.js App)</h2>
-        <p class="desc">Production-track application with active architecture, API routes, auth, and test coverage.</p>
-        <p class="meta">Primary path: <strong>/nextjs-app</strong></p>
-        <div class="actions">
-          <a class="btn mvp" href="/nextjs-app">Open MVP</a>
-          <a class="btn secondary" href="http://localhost:3000" target="_blank" rel="noreferrer">Open Dev Server</a>
-        </div>
-      </article>
+			<section class="grid">
+				<article class="card">
+					<h2 class="title">MVP (Next.js App)</h2>
+					<p class="desc">
+						Production-track application with active architecture, API routes, auth, and test
+						coverage.
+					</p>
+					<p class="meta">Primary path: <strong>/nextjs-app</strong></p>
+					<div class="actions">
+						<a class="btn mvp" href="/nextjs-app">Open MVP</a>
+						<a class="btn secondary" href="http://localhost:3000" target="_blank" rel="noreferrer"
+							>Open Dev Server</a
+						>
+					</div>
+				</article>
 
-      <article class="card">
-        <h2 class="title">Legacy PoC</h2>
-        <p class="desc">Original static prototype preserved exactly for historical comparison and reference.</p>
-        <p class="meta">Path: <strong>/legacy-poc/index.html</strong></p>
-        <div class="actions">
-          <a class="btn poc" href="/legacy-poc/index.html">Open PoC</a>
-          <a class="btn secondary" href="/legacy-poc/pages/browser.html">Open Legacy Browser</a>
-        </div>
-      </article>
-    </section>
+				<article class="card">
+					<h2 class="title">Legacy PoC</h2>
+					<p class="desc">
+						Original static prototype preserved exactly for historical comparison and reference.
+					</p>
+					<p class="meta">Path: <strong>/legacy-poc/index.html</strong></p>
+					<div class="actions">
+						<a class="btn poc" href="/legacy-poc/index.html">Open PoC</a>
+						<a class="btn secondary" href="/legacy-poc/pages/browser.html">Open Legacy Browser</a>
+					</div>
+				</article>
+			</section>
 
-    <footer class="foot">
-      If MVP links do not load, start the app with <strong>cd nextjs-app &amp;&amp; npm run dev</strong>.
-    </footer>
-  </main>
-</body>
+			<footer class="foot">
+				If MVP links do not load, start the app with
+				<strong>cd nextjs-app &amp;&amp; npm run dev</strong>.
+			</footer>
+		</main>
+	</body>
 </html>

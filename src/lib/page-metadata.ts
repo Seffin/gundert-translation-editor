@@ -37,6 +37,14 @@ export const PAGE_METADATA_BY_PATH: Record<string, PageMetadata> = {
 	'/activity': {
 		title: 'Activity Log',
 		description: 'Audit feed with actor, action, and date filters'
+	},
+	'/login': {
+		title: 'Login',
+		description: 'Access the Gundert OBS translation workspace'
+	},
+	'/pre-register': {
+		title: 'Apply for Access',
+		description: 'Apply for workspace access to the OBS translation editor'
 	}
 };
 

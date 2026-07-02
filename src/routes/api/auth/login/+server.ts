@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
 
 		// Find user
 		const getUser = db.prepare('SELECT * FROM users WHERE username = ?');
-		const user = await getUser.get(username) as DBUser | undefined;
+		const user = (await getUser.get(username)) as DBUser | undefined;
 
 		if (!user) {
 			return json({ error: 'Invalid username or password' }, { status: 400 });
@@ -38,7 +38,8 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
 		`);
 		await insertSession.run(sessionId, user.id, expiresAt);
 
-		const isHttps = url.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https';
+		const isHttps =
+			url.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https';
 
 		// Set httpOnly session cookie
 		cookies.set('gundert_session', sessionId, {

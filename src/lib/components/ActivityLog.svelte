@@ -10,7 +10,7 @@
 
 	let actorOptions = $derived([
 		'all',
-		...Array.from(new Set(events.map((event) => event.actorId)))
+		...Array.from(new Set(events.map((event: ActivityEvent) => event.actorId)))
 	]);
 
 	let filter = $state<ActivityLogFilter>({

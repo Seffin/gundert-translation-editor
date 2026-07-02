@@ -173,18 +173,21 @@ legacy-poc/
 ## Important Path Mappings
 
 ### MVP (TypeScript)
+
 - **Absolute imports:** Use `@/` prefix
   - `@/lib/db` → `nextjs-app/lib/db`
   - `@/app/api` → `nextjs-app/app/api`
   - Configure in `nextjs-app/tsconfig.json` under `compilerOptions.paths`
 
 ### Legacy (Vanilla JS)
+
 - **Relative paths:** From file location
   - `browser.html` → `../assets/js/browser.js`
   - `browser.html` → `../data/entries.js`
   - `browser.js` → `ALL_ENTRIES` (global array)
 
 ### Scripts (Node.js)
+
 - **Root directory:** `scripts/` folder
   - Run from repository root: `node scripts/analyze_dictionaries.js`
   - Output: `nextjs-app/data/`
@@ -194,13 +197,13 @@ legacy-poc/
 
 ## Data File Locations
 
-| File | MVP Path | Legacy Path | Purpose |
-|------|----------|-------------|---------|
-| Entries | `nextjs-app/data/entries.js` | `legacy-poc/data/entries.js` | Global ALL_ENTRIES array |
-| JSON Export | `nextjs-app/data/entries.json` | `legacy-poc/data/entries.json` | Structured entry data |
-| Statistics | `nextjs-app/data/stats.json` | `legacy-poc/data/stats.json` | Dictionary statistics |
-| UBS Dictionaries | `nextjs-app/data/xml/` | `legacy-poc/data/xml/` | Source XML files |
-| SFM Files | `nextjs-app/data/sfm/` | `legacy-poc/data/sfm/` | Source SFM files |
+| File             | MVP Path                       | Legacy Path                    | Purpose                  |
+| ---------------- | ------------------------------ | ------------------------------ | ------------------------ |
+| Entries          | `nextjs-app/data/entries.js`   | `legacy-poc/data/entries.js`   | Global ALL_ENTRIES array |
+| JSON Export      | `nextjs-app/data/entries.json` | `legacy-poc/data/entries.json` | Structured entry data    |
+| Statistics       | `nextjs-app/data/stats.json`   | `legacy-poc/data/stats.json`   | Dictionary statistics    |
+| UBS Dictionaries | `nextjs-app/data/xml/`         | `legacy-poc/data/xml/`         | Source XML files         |
+| SFM Files        | `nextjs-app/data/sfm/`         | `legacy-poc/data/sfm/`         | Source SFM files         |
 
 ---
 

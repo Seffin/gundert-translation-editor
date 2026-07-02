@@ -76,6 +76,7 @@ https://generativelanguage.googleapis.com/v1/models/{MODEL}:generateContent?key=
 ```
 
 **Parameters:**
+
 - `{MODEL}` – Model name (e.g., `gemini-2.5-pro`)
 - `{API_KEY}` – Your Gemini API key
 
@@ -144,15 +145,15 @@ POST
 
 ### Common Error Codes
 
-| Code | Meaning | Solution |
-|------|---------|----------|
-| 400 | Bad Request | Check request format, verify JSON is valid |
-| 401 | Unauthorized | Verify API key, check it's not expired |
-| 403 | Forbidden | API key doesn't have access, check Gemini console |
-| 404 | Not Found | Check endpoint URL and model name |
-| 405 | Method Not Allowed | Should be POST, not GET/PUT/DELETE |
-| 429 | Rate Limited | Wait and retry, check quota |
-| 500+ | Server Error | Google's servers are down, retry later |
+| Code | Meaning            | Solution                                          |
+| ---- | ------------------ | ------------------------------------------------- |
+| 400  | Bad Request        | Check request format, verify JSON is valid        |
+| 401  | Unauthorized       | Verify API key, check it's not expired            |
+| 403  | Forbidden          | API key doesn't have access, check Gemini console |
+| 404  | Not Found          | Check endpoint URL and model name                 |
+| 405  | Method Not Allowed | Should be POST, not GET/PUT/DELETE                |
+| 429  | Rate Limited       | Wait and retry, check quota                       |
+| 500+ | Server Error       | Google's servers are down, retry later            |
 
 ### Error Response Format
 
@@ -184,67 +185,60 @@ POST
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { prompt, provider = 'gemini' } = await req.json();
-  
-  try {
-    if (provider === 'gemini') {
-      const apiKey = process.env.GEMINI_API_KEY;
-      const model = process.env.GEMINI_MODEL || 'gemini-2.5-pro';
-      const baseUrl = process.env.GEMINI_BASE_URL || 
-        'https://generativelanguage.googleapis.com/v1';
-      
-      // Transform to Gemini native format
-      const geminiPayload = {
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt
-              }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048
-        }
-      };
-      
-      const endpoint = `${baseUrl}/models/${model}:generateContent?key=${apiKey}`;
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(geminiPayload)
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(
-          `Gemini API error ${response.status}: ${error.error?.message}`
-        );
-      }
-      
-      const data = await response.json();
-      const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      return NextResponse.json({ 
-        text: result,
-        usage: data.usageMetadata 
-      });
-    }
-    
-    // Handle other providers...
-    
-  } catch (error) {
-    console.error('Translation error:', error);
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
-  }
+	const { prompt, provider = 'gemini' } = await req.json();
+
+	try {
+		if (provider === 'gemini') {
+			const apiKey = process.env.GEMINI_API_KEY;
+			const model = process.env.GEMINI_MODEL || 'gemini-2.5-pro';
+			const baseUrl = process.env.GEMINI_BASE_URL || 'https://generativelanguage.googleapis.com/v1';
+
+			// Transform to Gemini native format
+			const geminiPayload = {
+				contents: [
+					{
+						parts: [
+							{
+								text: prompt
+							}
+						]
+					}
+				],
+				generationConfig: {
+					temperature: 0.7,
+					maxOutputTokens: 2048
+				}
+			};
+
+			const endpoint = `${baseUrl}/models/${model}:generateContent?key=${apiKey}`;
+
+			const response = await fetch(endpoint, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(geminiPayload)
+			});
+
+			if (!response.ok) {
+				const error = await response.json();
+				throw new Error(`Gemini API error ${response.status}: ${error.error?.message}`);
+			}
+
+			const data = await response.json();
+			const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+			return NextResponse.json({
+				text: result,
+				usage: data.usageMetadata
+			});
+		}
+
+		// Handle other providers...
+	} catch (error) {
+		console.error('Translation error:', error);
+		return NextResponse.json({ error: error.message }, { status: 500 });
+	}
 }
 ```
 
@@ -254,47 +248,46 @@ export async function POST(req: NextRequest) {
 // nextjs-app/api/translate.js
 
 module.exports = async (req, res) => {
-  const { prompt, provider = 'gemini' } = req.body;
-  
-  try {
-    if (provider === 'gemini') {
-      const apiKey = process.env.GEMINI_API_KEY;
-      const model = process.env.GEMINI_MODEL || 'gemini-2.5-pro';
-      const baseUrl = process.env.GEMINI_BASE_URL || 
-        'https://generativelanguage.googleapis.com/v1';
-      
-      const geminiPayload = {
-        contents: [
-          {
-            parts: [
-              {
-                text: prompt
-              }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2048
-        }
-      };
-      
-      const endpoint = `${baseUrl}/models/${model}:generateContent?key=${apiKey}`;
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(geminiPayload)
-      });
-      
-      const data = await response.json();
-      const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      res.json({ text: result, usage: data.usageMetadata });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+	const { prompt, provider = 'gemini' } = req.body;
+
+	try {
+		if (provider === 'gemini') {
+			const apiKey = process.env.GEMINI_API_KEY;
+			const model = process.env.GEMINI_MODEL || 'gemini-2.5-pro';
+			const baseUrl = process.env.GEMINI_BASE_URL || 'https://generativelanguage.googleapis.com/v1';
+
+			const geminiPayload = {
+				contents: [
+					{
+						parts: [
+							{
+								text: prompt
+							}
+						]
+					}
+				],
+				generationConfig: {
+					temperature: 0.7,
+					maxOutputTokens: 2048
+				}
+			};
+
+			const endpoint = `${baseUrl}/models/${model}:generateContent?key=${apiKey}`;
+
+			const response = await fetch(endpoint, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(geminiPayload)
+			});
+
+			const data = await response.json();
+			const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+			res.json({ text: result, usage: data.usageMetadata });
+		}
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
 };
 ```
 
@@ -328,20 +321,22 @@ const apiKey = 'your-key';
 const model = 'gemini-2.5-pro';
 
 const response = await fetch(
-  `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`,
-  {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{ text: 'Say hello' }]
-      }],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 100
-      }
-    })
-  }
+	`https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`,
+	{
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			contents: [
+				{
+					parts: [{ text: 'Say hello' }]
+				}
+			],
+			generationConfig: {
+				temperature: 0.7,
+				maxOutputTokens: 100
+			}
+		})
+	}
 );
 
 const data = await response.json();
@@ -388,13 +383,13 @@ console.log(data.candidates[0].content.parts[0].text);
 
 ### Key Differences
 
-| Aspect | OpenAI | Gemini |
-|--------|--------|--------|
-| Content structure | `messages: [{ role, content }]` | `contents: [{ parts: [{ text }] }]` |
-| Roles | `user`, `assistant`, `system` | (no explicit roles in contents) |
-| Generation config | Top-level fields | `generationConfig: {...}` |
-| API Key | `Authorization: Bearer ...` | Query parameter or header |
-| Response | `choices[0].message.content` | `candidates[0].content.parts[0].text` |
+| Aspect            | OpenAI                          | Gemini                                |
+| ----------------- | ------------------------------- | ------------------------------------- |
+| Content structure | `messages: [{ role, content }]` | `contents: [{ parts: [{ text }] }]`   |
+| Roles             | `user`, `assistant`, `system`   | (no explicit roles in contents)       |
+| Generation config | Top-level fields                | `generationConfig: {...}`             |
+| API Key           | `Authorization: Bearer ...`     | Query parameter or header             |
+| Response          | `choices[0].message.content`    | `candidates[0].content.parts[0].text` |
 
 ---
 
@@ -416,6 +411,7 @@ console.log(data.candidates[0].content.parts[0].text);
 ### Recommended Settings
 
 **For Translation (consistency):**
+
 ```javascript
 {
   "temperature": 0.3,
@@ -424,6 +420,7 @@ console.log(data.candidates[0].content.parts[0].text);
 ```
 
 **For Validation (deterministic):**
+
 ```javascript
 {
   "temperature": 0,
@@ -432,6 +429,7 @@ console.log(data.candidates[0].content.parts[0].text);
 ```
 
 **For Ideation (creativity):**
+
 ```javascript
 {
   "temperature": 0.8,

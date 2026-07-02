@@ -34,7 +34,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			JOIN users u ON l.user_id = u.id
 			WHERE l.story_id = ?
 		`);
-		const activeLock = await lockStmt.get(storyId) as { story_id: string; user_id: number; username: string } | undefined;
+		const activeLock = (await lockStmt.get(storyId)) as
+			| { story_id: string; user_id: number; username: string }
+			| undefined;
 
 		const lockedInfo = activeLock
 			? {
@@ -55,7 +57,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			JOIN users u ON d.saved_by_user_id = u.id
 			WHERE d.story_id = ?
 		`);
-		const draftRows = await draftStmt.all(storyId) as any[];
+		const draftRows = (await draftStmt.all(storyId)) as any[];
 
 		let sqliteDraft = null;
 		if (draftRows.length > 0) {
@@ -86,7 +88,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		const lang = locals.user?.targetLanguage || 'Malayalam';
 		return {
 			story: storyModel,
-			glossaryTerms: listGlossaryTerms().filter(t => t.language === lang),
+			glossaryTerms: listGlossaryTerms().filter((t) => t.language === lang),
 			lockedInfo,
 			sqliteDraft
 		};

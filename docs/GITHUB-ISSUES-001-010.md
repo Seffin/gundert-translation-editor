@@ -391,6 +391,7 @@ For each issue, tests must follow TDD:
 4. **Add E2E tests** (Playwright) for browser flows
 
 **Test directories:**
+
 - `tests/db/` — database and schema tests
 - `tests/importer/` — XML importer tests
 - `tests/browser/` — browser UI, URL, and route smoke tests

@@ -11,7 +11,10 @@
 <section class="demo-dashboard" aria-label="demo-dashboard">
 	<div class="dashboard-header">
 		<h1>Demonstration Showcase</h1>
-		<p>Explore the full end-to-end translation pipeline. Translate stories, approve them in the Project Lead gate, and view the final target-language publications with illustrations.</p>
+		<p>
+			Explore the full end-to-end translation pipeline. Translate stories, approve them in the
+			Project Lead gate, and view the final target-language publications with illustrations.
+		</p>
 	</div>
 
 	<div class="language-selector-container">
@@ -37,15 +40,24 @@
 			</div>
 		{:else}
 			{#each data.stories as item (item.storyId)}
-				<article class="story-showcase-card" class:story-showcase-card--published={item.isPublished}>
+				<article
+					class="story-showcase-card"
+					class:story-showcase-card--published={item.isPublished}
+				>
 					<header class="card-header">
 						<span class="story-number">Story {item.storyId}</span>
 						{#if item.isPublished}
-							<span class="status-badge status-badge--published" data-testid={`published-badge-${item.storyId}`}>
+							<span
+								class="status-badge status-badge--published"
+								data-testid={`published-badge-${item.storyId}`}
+							>
 								Published
 							</span>
 						{:else}
-							<span class="status-badge status-badge--draft" data-testid={`draft-badge-${item.storyId}`}>
+							<span
+								class="status-badge status-badge--draft"
+								data-testid={`draft-badge-${item.storyId}`}
+							>
 								In Draft
 							</span>
 						{/if}
@@ -57,16 +69,19 @@
 							{#if item.isPublished}
 								{data.targetLanguage} publication is live and formatted with illustrations.
 							{:else}
-								Awaiting project lead approval in the dashboard to generate {data.targetLanguage} `.md` file.
+								Awaiting project lead approval in the dashboard to generate {data.targetLanguage} `.md`
+								file.
 							{/if}
 						</p>
 					</div>
 
 					<footer class="card-footer">
-						<a href={`/stories/${item.storyId}`} class="btn btn--secondary">
-							Edit Translation
-						</a>
-						<a href={`/demo/stories/${item.storyId}?lang=${data.targetLanguage}`} class="btn btn--primary" class:btn--amber={!item.isPublished}>
+						<a href={`/stories/${item.storyId}`} class="btn btn--secondary"> Edit Translation </a>
+						<a
+							href={`/demo/stories/${item.storyId}?lang=${data.targetLanguage}`}
+							class="btn btn--primary"
+							class:btn--amber={!item.isPublished}
+						>
 							{#if item.isPublished}
 								Read {data.targetLanguage}
 							{:else}
@@ -208,12 +223,17 @@
 		flex-direction: column;
 		gap: 1.25rem;
 		box-shadow: var(--shadow-subtle);
-		transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+		transition:
+			transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+			box-shadow 0.3s ease,
+			border-color 0.3s ease;
 	}
 
 	.story-showcase-card:hover {
 		transform: translateY(-4px);
-		box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+		box-shadow:
+			0 15px 30px rgba(0, 0, 0, 0.1),
+			0 5px 15px rgba(0, 0, 0, 0.05);
 	}
 
 	.story-showcase-card--published {

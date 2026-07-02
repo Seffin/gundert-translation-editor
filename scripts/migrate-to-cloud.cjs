@@ -1,10 +1,10 @@
 /**
  * Gundert Translation Editor - Cloud Database Migration Utility
- * 
+ *
  * This script imports all local records (users, pre-registrations, story drafts,
  * assignments, and locks) from the local fallback database (data/gundert_fallback.json)
  * into your configured Turso Cloud Database.
- * 
+ *
  * Usage:
  *   node scripts/migrate-to-cloud.cjs
  */
@@ -25,15 +25,21 @@ const colors = {
 	red: '\x1b[31m'
 };
 
-console.log(`${colors.bright}${colors.cyan}================================================================${colors.reset}`);
-console.log(`${colors.bright}${colors.cyan}   Gundert Translation Editor - Cloud Database Migrator         ${colors.reset}`);
-console.log(`${colors.bright}${colors.cyan}================================================================${colors.reset}\n`);
+console.log(
+	`${colors.bright}${colors.cyan}================================================================${colors.reset}`
+);
+console.log(
+	`${colors.bright}${colors.cyan}   Gundert Translation Editor - Cloud Database Migrator         ${colors.reset}`
+);
+console.log(
+	`${colors.bright}${colors.cyan}================================================================${colors.reset}\n`
+);
 
 // 1. Load env variables manually from .env file
 const envPath = path.join(__dirname, '..', '.env');
 if (fs.existsSync(envPath)) {
 	const content = fs.readFileSync(envPath, 'utf8');
-	content.split(/\r?\n/).forEach(line => {
+	content.split(/\r?\n/).forEach((line) => {
 		const match = line.match(/^\s*([\w.\-]+)\s*=\s*(.*)?\s*$/);
 		if (match) {
 			const key = match[1];
@@ -48,19 +54,25 @@ if (fs.existsSync(envPath)) {
 	});
 	console.log(`${colors.green}✔ Loaded environment variables from .env${colors.reset}`);
 } else {
-	console.warn(`${colors.yellow}⚠ .env file not found. Falling back to system environment variables.${colors.reset}`);
+	console.warn(
+		`${colors.yellow}⚠ .env file not found. Falling back to system environment variables.${colors.reset}`
+	);
 }
 
 const tursoUrl = process.env.TURSO_DB_URL;
 const tursoToken = process.env.TURSO_DB_TOKEN;
 
 if (!tursoUrl) {
-	console.error(`\n${colors.red}❌ ERROR: TURSO_DB_URL is not set in your environment or .env file.${colors.reset}`);
+	console.error(
+		`\n${colors.red}❌ ERROR: TURSO_DB_URL is not set in your environment or .env file.${colors.reset}`
+	);
 	console.error(`Please configure your Turso cloud credentials first to perform a migration.\n`);
 	process.exit(1);
 }
 
-console.log(`${colors.blue}ℹ Connecting to cloud database at: ${colors.bright}${tursoUrl}${colors.reset}`);
+console.log(
+	`${colors.blue}ℹ Connecting to cloud database at: ${colors.bright}${tursoUrl}${colors.reset}`
+);
 const cloudDb = createClient({
 	url: tursoUrl,
 	authToken: tursoToken
@@ -69,7 +81,9 @@ const cloudDb = createClient({
 // 2. Load local JSON fallback data
 const fallbackPath = path.join(__dirname, '..', 'data', 'gundert_fallback.json');
 if (!fs.existsSync(fallbackPath)) {
-	console.error(`\n${colors.red}❌ ERROR: Local database file not found at: ${fallbackPath}${colors.reset}`);
+	console.error(
+		`\n${colors.red}❌ ERROR: Local database file not found at: ${fallbackPath}${colors.reset}`
+	);
 	console.error(`No local data exists to migrate.\n`);
 	process.exit(1);
 }
@@ -79,18 +93,22 @@ try {
 	const raw = fs.readFileSync(fallbackPath, 'utf8');
 	localData = JSON.parse(raw);
 } catch (e) {
-	console.error(`\n${colors.red}❌ ERROR: Failed to parse local database JSON file: ${e.message}${colors.reset}`);
+	console.error(
+		`\n${colors.red}❌ ERROR: Failed to parse local database JSON file: ${e.message}${colors.reset}`
+	);
 	process.exit(1);
 }
 
 const tables = localData.tables || {};
-console.log(`${colors.green}✔ Loaded local fallback database records successfully.${colors.reset}\n`);
+console.log(
+	`${colors.green}✔ Loaded local fallback database records successfully.${colors.reset}\n`
+);
 
 async function migrate() {
 	try {
 		// 3. Initialize cloud database schemas
 		console.log(`${colors.bright}Step 1: Setting up cloud database schemas...${colors.reset}`);
-		
+
 		await cloudDb.execute(`
 			CREATE TABLE IF NOT EXISTS users (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -264,14 +282,21 @@ async function migrate() {
 		console.log(`   - Imported: ${assignImported}\n`);
 
 		// Summary
-		console.log(`${colors.bright}${colors.green}================================================================${colors.reset}`);
-		console.log(`${colors.bright}${colors.green}🎉 MIGRATION COMPLETED SUCCESSFULLY!                            ${colors.reset}`);
-		console.log(`${colors.bright}${colors.green}================================================================${colors.reset}`);
+		console.log(
+			`${colors.bright}${colors.green}================================================================${colors.reset}`
+		);
+		console.log(
+			`${colors.bright}${colors.green}🎉 MIGRATION COMPLETED SUCCESSFULLY!                            ${colors.reset}`
+		);
+		console.log(
+			`${colors.bright}${colors.green}================================================================${colors.reset}`
+		);
 		console.log(`All local records have been securely imported into your Turso Cloud DB.`);
 		console.log(`The application is ready to transition to your cloud production database.\n`);
-
 	} catch (err) {
-		console.error(`\n${colors.red}❌ ERROR: Migration failed mid-execution: ${err.message}${colors.reset}`);
+		console.error(
+			`\n${colors.red}❌ ERROR: Migration failed mid-execution: ${err.message}${colors.reset}`
+		);
 		console.error(err);
 		process.exit(1);
 	}

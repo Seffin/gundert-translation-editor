@@ -64,8 +64,12 @@ describe('OBS parser', () => {
 
 	it('extracts segment image URLs sequentially', () => {
 		const story = parseObsStoryMarkdown(SAMPLE_STORY, 29);
-		expect(story.segments[0].imageUrl).toBe('https://cdn.door43.org/obs/jpg/360px/obs-en-29-01.jpg');
-		expect(story.segments[1].imageUrl).toBe('https://cdn.door43.org/obs/jpg/360px/obs-en-29-02.jpg');
+		expect(story.segments[0].imageUrl).toBe(
+			'https://cdn.door43.org/obs/jpg/360px/obs-en-29-01.jpg'
+		);
+		expect(story.segments[1].imageUrl).toBe(
+			'https://cdn.door43.org/obs/jpg/360px/obs-en-29-02.jpg'
+		);
 	});
 
 	it('falls back to fetching from remote Door43 if local file does not exist', async () => {

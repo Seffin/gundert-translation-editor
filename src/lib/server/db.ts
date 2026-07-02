@@ -38,7 +38,9 @@ class LibSQLDatabase {
 		const tursoToken = process.env.TURSO_DB_TOKEN;
 
 		if (!tursoUrl) {
-			throw new Error('TURSO_DB_URL environment variable is required. SvelteKit local fallback database is disabled.');
+			throw new Error(
+				'TURSO_DB_URL environment variable is required. SvelteKit local fallback database is disabled.'
+			);
 		}
 
 		this._client = createClient({
@@ -51,7 +53,10 @@ class LibSQLDatabase {
 
 	async run(sql: string, ...params: any[]) {
 		const client = this.getClient();
-		const args = params.length === 1 && typeof params[0] === 'object' && params[0] !== null ? params[0] : params;
+		const args =
+			params.length === 1 && typeof params[0] === 'object' && params[0] !== null
+				? params[0]
+				: params;
 		const res = await client.execute({ sql, args });
 		return {
 			changes: res.rowsAffected,
@@ -59,7 +64,7 @@ class LibSQLDatabase {
 		};
 	}
 
-	async batch(queries: { sql: string; args: any[] }[], mode: "read" | "write" = "write") {
+	async batch(queries: { sql: string; args: any[] }[], mode: 'read' | 'write' = 'write') {
 		const client = this.getClient();
 		return await client.batch(queries, mode);
 	}
@@ -69,9 +74,12 @@ class LibSQLDatabase {
 		return {
 			async run(paramsOrObj?: any, ...args: any[]) {
 				const client = self.getClient();
-				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
-					? paramsOrObj
-					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
+				const mergedParams =
+					typeof paramsOrObj === 'object' && paramsOrObj !== null
+						? paramsOrObj
+						: paramsOrObj !== undefined
+							? [paramsOrObj, ...args]
+							: [];
 				const res = await client.execute({ sql, args: mergedParams });
 				return {
 					changes: res.rowsAffected,
@@ -81,9 +89,12 @@ class LibSQLDatabase {
 
 			async get(paramsOrObj?: any, ...args: any[]) {
 				const client = self.getClient();
-				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
-					? paramsOrObj
-					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
+				const mergedParams =
+					typeof paramsOrObj === 'object' && paramsOrObj !== null
+						? paramsOrObj
+						: paramsOrObj !== undefined
+							? [paramsOrObj, ...args]
+							: [];
 				const res = await client.execute({ sql, args: mergedParams });
 				if (res.rows.length === 0) return undefined;
 				return { ...res.rows[0] };
@@ -91,9 +102,12 @@ class LibSQLDatabase {
 
 			async all(paramsOrObj?: any, ...args: any[]) {
 				const client = self.getClient();
-				const mergedParams = typeof paramsOrObj === 'object' && paramsOrObj !== null
-					? paramsOrObj
-					: (paramsOrObj !== undefined ? [paramsOrObj, ...args] : []);
+				const mergedParams =
+					typeof paramsOrObj === 'object' && paramsOrObj !== null
+						? paramsOrObj
+						: paramsOrObj !== undefined
+							? [paramsOrObj, ...args]
+							: [];
 				const res = await client.execute({ sql, args: mergedParams });
 				return res.rows.map((row: any) => ({ ...row }));
 			}
@@ -194,7 +208,7 @@ export async function initializeDatabase() {
 
 	let seededAny = false;
 	for (const u of seedUsers) {
-		const existing = await checkUser.get(u.username) as { id: number } | undefined;
+		const existing = (await checkUser.get(u.username)) as { id: number } | undefined;
 		if (!existing) {
 			const salt = generateSalt();
 			const password_hash = hashPassword(u.password, salt);
@@ -220,7 +234,9 @@ export function generateSalt(): string {
 }
 
 export function hashPassword(password: string, salt: string): string {
-	return createHash('sha256').update(password + salt).digest('hex');
+	return createHash('sha256')
+		.update(password + salt)
+		.digest('hex');
 }
 
 // SQLite Database helper interfaces

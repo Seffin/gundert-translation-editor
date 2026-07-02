@@ -76,7 +76,7 @@
 	const isTranslator = $derived($page?.data?.user ? $page.data.user.role === 'Translator' : true);
 
 	function createInitialSegments() {
-		return story.segments.map((segment) => ({ ...segment }));
+		return story.segments.map((segment: EditorSegment) => ({ ...segment }));
 	}
 
 	function createCommentExpansionState(segments: EditorSegment[]): Record<string, boolean> {
@@ -298,7 +298,7 @@
 
 	onMount(() => {
 		selectedLanguage = loadTargetLanguage(story.storyId);
-		editorSegments = editorSegments.map((segment) => ({
+		editorSegments = editorSegments.map((segment: EditorSegment) => ({
 			...segment,
 			targetLanguage: selectedLanguage
 		}));
@@ -434,7 +434,7 @@
 	async function handleLanguageChange(lang: string): Promise<void> {
 		selectedLanguage = lang;
 		saveTargetLanguage(story.storyId, lang);
-		editorSegments = editorSegments.map((s) => ({ ...s, targetLanguage: lang }));
+		editorSegments = editorSegments.map((s: EditorSegment) => ({ ...s, targetLanguage: lang }));
 
 		if ($page?.data?.user) {
 			try {
@@ -454,7 +454,7 @@
 
 	function handleTargetInput(segmentId: string): void {
 		activeSegmentId = segmentId;
-		editorSegments = editorSegments.map((segment) => {
+		editorSegments = editorSegments.map((segment: EditorSegment) => {
 			if (segment.id !== segmentId) {
 				return segment;
 			}
@@ -491,8 +491,8 @@
 		clearSelectionAfterDraft: boolean
 	): Promise<void> {
 		const selectedIds = editorSegments
-			.filter((segment) => selectionModel.selected[segment.id])
-			.map((segment) => segment.id);
+			.filter((segment: EditorSegment) => selectionModel.selected[segment.id])
+			.map((segment: EditorSegment) => segment.id);
 
 		if (selectedIds.length === 0 || drafting) return;
 
@@ -629,7 +629,7 @@
 
 			if (!response.ok) throw new Error('Failed to save to database');
 
-			editorSegments = editorSegments.map((segment) => ({
+			editorSegments = editorSegments.map((segment: EditorSegment) => ({
 				...segment,
 				lastSavedByActorId: ACTOR_ID,
 				lastSavedAtIso: nowIso

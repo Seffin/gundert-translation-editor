@@ -109,6 +109,7 @@ npm test -- --ci
 ```
 
 ### Test Files Location
+
 - API tests: `tests/api/*.test.ts`
 - Component tests: `tests/[feature]/*.test.ts`
 - Database tests: `tests/db/*.test.ts`
@@ -189,11 +190,13 @@ npm run validate:roundtrip
 ### Branching Strategy
 
 1. **Feature branch** (from main)
+
    ```bash
    git checkout -b feat/your-feature
    ```
 
 2. **Development** (within nextjs-app)
+
    ```bash
    cd nextjs-app
    npm run dev
@@ -203,6 +206,7 @@ npm run validate:roundtrip
    ```
 
 3. **Commit** (from root)
+
    ```bash
    cd ..
    git add .
@@ -225,6 +229,7 @@ npm run validate:roundtrip
 ```
 
 **Scope Examples:**
+
 - `nextjs-app` – MVP changes
 - `legacy-poc` – PoC changes
 - `root` – Root configuration
@@ -232,6 +237,7 @@ npm run validate:roundtrip
 - `ci` – CI/CD configuration
 
 **Type Examples:**
+
 - `feat` – New feature
 - `fix` – Bug fix
 - `refactor` – Code restructuring
@@ -240,6 +246,7 @@ npm run validate:roundtrip
 - `chore` – Build/config changes
 
 **Example:**
+
 ```
 feat(nextjs-app): add translation caching layer
 
@@ -278,6 +285,7 @@ echo $GEMINI_API_KEY
 Automatic on `main` branch push (configured in `.github/workflows/`).
 
 **Steps:**
+
 1. Push to `main`
 2. GitHub Actions runs tests
 3. Vercel auto-deploys if tests pass
@@ -286,6 +294,7 @@ Automatic on `main` branch push (configured in `.github/workflows/`).
 ### Environment Variables
 
 All production environment variables configured in Vercel dashboard:
+
 - `DATABASE_URL` – Neon production database
 - `NEXTAUTH_SECRET` – Production session secret
 - `NEXTAUTH_URL` – Production domain

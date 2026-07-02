@@ -5,11 +5,13 @@
 ### "Cannot find module" errors
 
 **Symptom:**
+
 ```
 Error: Cannot find module '@/lib/db'
 ```
 
 **Solutions:**
+
 1. Verify import path uses `@/` prefix (absolute imports)
 2. Check `nextjs-app/tsconfig.json` for path mapping:
    ```json
@@ -23,11 +25,13 @@ Error: Cannot find module '@/lib/db'
 ### Type errors in TypeScript
 
 **Symptom:**
+
 ```
 TS2339: Property 'x' does not exist on type 'y'
 ```
 
 **Solutions:**
+
 1. Check type definitions are imported: `import type { Type } from '@/lib/...'`
 2. Verify schema types match database changes
 3. Run type check: `npm run build` (catches all TS errors)
@@ -40,6 +44,7 @@ TS2339: Property 'x' does not exist on type 'y'
 ### Gemini API returns 405 (Method Not Allowed)
 
 **Symptom:**
+
 ```
 Error: 405 from Gemini API
 LLM request failed (405)
@@ -48,15 +53,17 @@ LLM request failed (405)
 **Root Cause:** Endpoint mismatch. Code tried `/chat/completions` (OpenAI format) but Gemini doesn't support this.
 
 **Solutions:**
+
 1. Check endpoint in `nextjs-app/app/api/translate/route.ts` (line ~35):
    - ❌ Wrong: `https://api.openai.com/v1/chat/completions`
    - ✅ Right: `https://generativelanguage.googleapis.com/v1/models/{model}:generateContent`
 
 2. Verify request format is Gemini native:
+
    ```javascript
    // ❌ Wrong (OpenAI format)
    { "messages": [...], "model": "..." }
-   
+
    // ✅ Right (Gemini format)
    { "contents": [{ "parts": [{ "text": "..." }] }], "generationConfig": {...} }
    ```
@@ -74,12 +81,15 @@ LLM request failed (405)
 ### Gemini API returns 401 (Unauthorized)
 
 **Symptom:**
+
 ```
 Error: 401 Unauthorized from Gemini API
 ```
 
 **Solutions:**
+
 1. Verify API key is set:
+
    ```bash
    echo $GEMINI_API_KEY
    ```
@@ -99,11 +109,13 @@ Error: 401 Unauthorized from Gemini API
 ### 500 error from /api/translate
 
 **Symptom:**
+
 ```
 POST /api/translate returns 500 Internal Server Error
 ```
 
 **Debugging:**
+
 1. Check server logs in terminal (where `npm run dev` is running)
 2. Look for error message with stack trace
 3. Check these common causes:
@@ -119,13 +131,16 @@ POST /api/translate returns 500 Internal Server Error
 ### NextAuth session not persisting
 
 **Symptom:**
+
 ```
 User logged out after refresh
 Session is undefined
 ```
 
 **Solutions:**
+
 1. Verify `NEXTAUTH_SECRET` is set in `.env.local`:
+
    ```bash
    openssl rand -base64 32 > /tmp/secret.txt
    # Copy output to .env.local
@@ -149,6 +164,7 @@ Session is undefined
 ### "entries.js not found" in legacy app
 
 **Symptom:**
+
 ```
 ReferenceError: ALL_ENTRIES is not defined
 Error loading ../data/entries.js
@@ -157,20 +173,25 @@ Error loading ../data/entries.js
 **Root Cause:** `legacy-poc/data/entries.js` doesn't exist.
 
 **Solutions:**
+
 1. Verify file exists:
+
    ```bash
    ls legacy-poc/data/entries.js
    ```
 
 2. If missing, copy from MVP:
+
    ```bash
    cp nextjs-app/data/entries.js legacy-poc/data/entries.js
    ```
 
 3. Check path in `legacy-poc/pages/browser.html`:
+
    ```html
    <script src="../data/entries.js"></script>
    ```
+
    Should resolve to `legacy-poc/data/entries.js`
 
 4. Verify entries.js is not empty:
@@ -183,18 +204,22 @@ Error loading ../data/entries.js
 ### Database connection error
 
 **Symptom:**
+
 ```
 Error: could not connect to server: Connection refused
 Database connection failed
 ```
 
 **Solutions:**
+
 1. Verify `DATABASE_URL` is set:
+
    ```bash
    echo $DATABASE_URL
    ```
 
 2. Format should be:
+
    ```
    postgresql://user:password@host:5432/database
    ```
@@ -202,6 +227,7 @@ Database connection failed
 3. If using Neon, verify URL from Neon dashboard
 
 4. Test connection:
+
    ```bash
    cd nextjs-app
    npm run db:push
@@ -216,24 +242,29 @@ Database connection failed
 ### Schema mismatch errors
 
 **Symptom:**
+
 ```
 Error: column "x" of relation "y" does not exist
 PG error: UNIQUE constraint violated
 ```
 
 **Solutions:**
+
 1. Check schema is applied to database:
+
    ```bash
    cd nextjs-app
    npm run db:push
    ```
 
 2. Verify migration files are committed:
+
    ```bash
    ls drizzle/
    ```
 
 3. Check for uncommitted schema changes:
+
    ```bash
    npm run db:generate
    ```
@@ -252,13 +283,16 @@ PG error: UNIQUE constraint violated
 ### Build fails with TypeScript errors
 
 **Symptom:**
+
 ```
 npm run build fails
 Type 'x' is not assignable to type 'y'
 ```
 
 **Solutions:**
+
 1. Fix TypeScript errors locally:
+
    ```bash
    cd nextjs-app
    npm run build
@@ -275,12 +309,15 @@ Type 'x' is not assignable to type 'y'
 ### "node_modules not found"
 
 **Symptom:**
+
 ```
 Error: Cannot find module 'react'
 ```
 
 **Solutions:**
+
 1. Install dependencies:
+
    ```bash
    cd nextjs-app
    npm install
@@ -301,18 +338,22 @@ Error: Cannot find module 'react'
 ### ".env.local not found"
 
 **Symptom:**
+
 ```
 Error: NEXTAUTH_SECRET is undefined
 Database connection failed
 ```
 
 **Solutions:**
+
 1. Verify `.env.local` exists:
+
    ```bash
    ls nextjs-app/.env.local
    ```
 
 2. Create it with required variables:
+
    ```bash
    cat > nextjs-app/.env.local << 'EOF'
    DATABASE_URL=postgresql://...
@@ -332,18 +373,22 @@ Database connection failed
 ### Legacy app won't load HTML
 
 **Symptom:**
+
 ```
 browser.html doesn't load
 Blank page
 ```
 
 **Solutions:**
+
 1. Check file exists:
+
    ```bash
    ls legacy-poc/pages/browser.html
    ```
 
 2. Open in browser directly or via file server:
+
    ```bash
    # Use a local file server (not recommended)
    # Or access via MVP's resource browser
@@ -353,7 +398,7 @@ Blank page
 
 4. Verify CSS loads:
    ```html
-   <link rel="stylesheet" href="../assets/css/browser.css">
+   <link rel="stylesheet" href="../assets/css/browser.css" />
    ```
 
 ---
@@ -361,12 +406,14 @@ Blank page
 ### Legacy app loads but no data displays
 
 **Symptom:**
+
 ```
 Browser shows empty table
 No entries loaded
 ```
 
 **Solutions:**
+
 1. Check console for `ALL_ENTRIES is not defined`
 2. Verify `legacy-poc/data/entries.js` exists
 3. Check script tag loads it:
@@ -380,12 +427,15 @@ No entries loaded
 ### JavaScript errors in browser console
 
 **Symptom:**
+
 ```
 Uncaught ReferenceError: browser is not defined
 ```
 
 **Solutions:**
+
 1. Check all required scripts load in correct order:
+
    ```html
    <script src="../data/entries.js"></script>
    <script src="../assets/js/browser.js"></script>
@@ -404,12 +454,14 @@ Uncaught ReferenceError: browser is not defined
 ### GitHub Actions fails
 
 **Symptom:**
+
 ```
 Workflow failed: npm command not found
 Tests failed in CI
 ```
 
 **Solutions:**
+
 1. Check workflow runs from correct directory:
    - Should be: `nextjs-app/`
    - Not: root directory
@@ -425,11 +477,13 @@ Tests failed in CI
 ### Vercel deployment fails
 
 **Symptom:**
+
 ```
 Build failed on Vercel
 ```
 
 **Solutions:**
+
 1. Check Vercel logs for specific error
 2. Verify environment variables in Vercel dashboard
 3. Build locally first to catch errors early:

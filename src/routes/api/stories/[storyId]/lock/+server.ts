@@ -28,7 +28,15 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 			JOIN users u ON l.user_id = u.id
 			WHERE l.story_id = ?
 		`);
-		const lock = await stmt.get(storyId) as { story_id: string; user_id: number; locked_at: number; expires_at: number; username: string } | undefined;
+		const lock = (await stmt.get(storyId)) as
+			| {
+					story_id: string;
+					user_id: number;
+					locked_at: number;
+					expires_at: number;
+					username: string;
+			  }
+			| undefined;
 
 		if (lock) {
 			const isOwnLock = locals.user ? locals.user.id === lock.user_id : false;
@@ -75,14 +83,19 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 			JOIN users u ON l.user_id = u.id
 			WHERE l.story_id = ?
 		`);
-		const currentLock = await checkStmt.get(storyId) as { story_id: string; user_id: number; username: string } | undefined;
+		const currentLock = (await checkStmt.get(storyId)) as
+			| { story_id: string; user_id: number; username: string }
+			| undefined;
 
 		if (currentLock && currentLock.user_id !== user.id) {
-			return json({
-				success: false,
-				error: 'Story is currently locked by another user',
-				lockedBy: currentLock.username
-			}, { status: 409 });
+			return json(
+				{
+					success: false,
+					error: 'Story is currently locked by another user',
+					lockedBy: currentLock.username
+				},
+				{ status: 409 }
+			);
 		}
 
 		// Acquire/Refresh: 30 seconds expiration window
@@ -125,7 +138,7 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 
 		// Check who holds the lock
 		const checkStmt = db.prepare('SELECT user_id FROM editing_locks WHERE story_id = ?');
-		const currentLock = await checkStmt.get(storyId) as { user_id: number } | undefined;
+		const currentLock = (await checkStmt.get(storyId)) as { user_id: number } | undefined;
 
 		if (!currentLock) {
 			return json({ success: true, message: 'No active lock found' });
@@ -138,10 +151,13 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 			return json({ success: true, revoked: currentLock.user_id !== user.id });
 		}
 
-		return json({
-			success: false,
-			error: 'Cannot release lock: owned by another user'
-		}, { status: 403 });
+		return json(
+			{
+				success: false,
+				error: 'Cannot release lock: owned by another user'
+			},
+			{ status: 403 }
+		);
 	} catch (err) {
 		console.error('DELETE lock error:', err);
 		return json(

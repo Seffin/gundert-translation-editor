@@ -12,11 +12,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	const langParam = url.searchParams.get('lang') || 'Malayalam';
-	
+
 	// Resolve target language and code
 	let langCode = 'ml';
 	let targetLanguage = 'Malayalam';
-	
+
 	const paramLower = langParam.toLowerCase();
 	for (const [name, code] of Object.entries(LANGUAGE_CODE_MAP)) {
 		if (name.toLowerCase() === paramLower || code.toLowerCase() === paramLower) {
